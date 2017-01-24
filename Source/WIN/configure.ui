@@ -1,0 +1,675 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>configure</class>
+ <widget class="QDialog" name="configure">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>500</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>400</width>
+    <height>500</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>400</width>
+    <height>500</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Configure</string>
+  </property>
+  <widget class="QDialogButtonBox" name="buttonBox">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>460</y>
+     <width>361</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="outputFolder">
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>10</y>
+     <width>171</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string comment="0"/>
+   </property>
+   <property name="cursorPosition">
+    <number>0</number>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="bitrateBox">
+   <property name="geometry">
+    <rect>
+     <x>250</x>
+     <y>160</y>
+     <width>61</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="maximum">
+    <number>51</number>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="selectMode">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>160</y>
+     <width>171</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <item>
+    <property name="text">
+     <string>Constant Rate Factor</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Bitrate 1 Pass</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Bitrate 2 Pass</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QComboBox" name="selectCodec">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>100</y>
+     <width>101</width>
+     <height>26</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="selectContainer">
+   <property name="geometry">
+    <rect>
+     <x>90</x>
+     <y>50</y>
+     <width>71</width>
+     <height>26</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="selectColorSpace">
+   <property name="geometry">
+    <rect>
+     <x>108</x>
+     <y>130</y>
+     <width>114</width>
+     <height>26</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="browseOutput">
+   <property name="geometry">
+    <rect>
+     <x>310</x>
+     <y>10</y>
+     <width>81</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Browse</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="selectPreset">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>190</y>
+     <width>121</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <item>
+    <property name="text">
+     <string>Placebo</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Very Slow</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Slower</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Slow</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Medium</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Fast</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Faster</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Very Fast</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Super Fast</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Ultra Fast</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QComboBox" name="selectTune">
+   <property name="geometry">
+    <rect>
+     <x>260</x>
+     <y>190</y>
+     <width>121</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <item>
+    <property name="text">
+     <string>Film</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Animation</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Grain</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Still Image</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>PSNR</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>SSIM</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Fast Decode</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Zero Latency</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QLabel" name="labelContainer">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>50</y>
+     <width>71</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Container:</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelCodec">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>100</y>
+     <width>51</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Codec:</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelMode">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>160</y>
+     <width>41</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Mode:</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelPreset">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>190</y>
+     <width>51</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Preset:</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelTune">
+   <property name="geometry">
+    <rect>
+     <x>216</x>
+     <y>190</y>
+     <width>41</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Tune:</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelBitrate">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>160</y>
+     <width>31</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Kbps</string>
+   </property>
+  </widget>
+  <widget class="Line" name="linevideo">
+   <property name="geometry">
+    <rect>
+     <x>115</x>
+     <y>89</y>
+     <width>266</width>
+     <height>2</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelVCoptions">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>80</y>
+     <width>91</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Video Options</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelOutput">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>10</y>
+     <width>111</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Output Location:</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="selectAudioCodec">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>300</y>
+     <width>81</width>
+     <height>26</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelVideoStream">
+   <property name="geometry">
+    <rect>
+     <x>188</x>
+     <y>100</y>
+     <width>121</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Use Video Stream:</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelColorSpace">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>130</y>
+     <width>81</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Color Space:</string>
+   </property>
+  </widget>
+  <widget class="Line" name="lineaudio">
+   <property name="geometry">
+    <rect>
+     <x>115</x>
+     <y>290</y>
+     <width>266</width>
+     <height>2</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelACoptions">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>280</y>
+     <width>91</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Audio Options</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="selectMatrix">
+   <property name="geometry">
+    <rect>
+     <x>290</x>
+     <y>130</y>
+     <width>91</width>
+     <height>26</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelMatrix">
+   <property name="geometry">
+    <rect>
+     <x>240</x>
+     <y>130</y>
+     <width>51</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Matrix:</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="selectVideoStream">
+   <property name="geometry">
+    <rect>
+     <x>309</x>
+     <y>100</y>
+     <width>71</width>
+     <height>26</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="selectAudioStream">
+   <property name="geometry">
+    <rect>
+     <x>313</x>
+     <y>300</y>
+     <width>71</width>
+     <height>26</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelAudioCodec">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>300</y>
+     <width>51</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Codec:</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelAudioStream">
+   <property name="geometry">
+    <rect>
+     <x>188</x>
+     <y>300</y>
+     <width>121</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Use Audio Stream:</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="selectAudioMode">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>330</y>
+     <width>81</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <item>
+    <property name="text">
+     <string>Quality</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Bitrate</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QLabel" name="labelAudioMode">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>330</y>
+     <width>41</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Mode:</string>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="bitrateBoxAudio">
+   <property name="geometry">
+    <rect>
+     <x>160</x>
+     <y>330</y>
+     <width>61</width>
+     <height>24</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelAudioBitrate">
+   <property name="geometry">
+    <rect>
+     <x>230</x>
+     <y>330</y>
+     <width>151</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Kbps</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="copyAudio">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>360</y>
+     <width>171</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Copy Compatible Audio</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="externalAudioSource">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>420</y>
+     <width>271</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="browseAudio">
+   <property name="geometry">
+    <rect>
+     <x>300</x>
+     <y>420</y>
+     <width>81</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Browse</string>
+   </property>
+  </widget>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>390</y>
+     <width>334</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QRadioButton" name="internalAudio">
+      <property name="text">
+       <string>Use Original Audio</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QRadioButton" name="externalAudio">
+      <property name="text">
+       <string>Use Another Audio Source</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QCheckBox" name="encodeIncompatible">
+   <property name="geometry">
+    <rect>
+     <x>190</x>
+     <y>360</y>
+     <width>191</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Encode Incompatible Audio</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>configure</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>configure</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

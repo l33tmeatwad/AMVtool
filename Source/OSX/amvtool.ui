@@ -26,7 +26,7 @@
    <bool>false</bool>
   </property>
   <property name="windowTitle">
-   <string>AMVtool (Alpha 6)</string>
+   <string>AMVtool (Beta 2)</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QListWidget" name="fileList">

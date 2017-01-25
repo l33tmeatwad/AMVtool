@@ -194,7 +194,14 @@ void filesettings::setupRecontainer()
                 outputConfig[i][1] = container;
                 outputConfig[i][5] = "Copy";
                 outputConfig[i][15] = "1";
-
+                if (container == "MP4")
+                {
+                    outputConfig[12] = "AAC";
+                }
+                else
+                {
+                    outputConfig[12] = "PCM";
+                }
             }
         }
     }

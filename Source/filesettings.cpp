@@ -196,11 +196,11 @@ void filesettings::setupRecontainer()
                 outputConfig[i][15] = "1";
                 if (container == "MP4")
                 {
-                    outputConfig[12] = "AAC";
+                    outputConfig[i][12] = "AAC";
                 }
                 else
                 {
-                    outputConfig[12] = "PCM";
+                    outputConfig[i][12] = "PCM";
                 }
             }
         }

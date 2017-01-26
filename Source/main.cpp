@@ -1,7 +1,6 @@
 #include "amvtool.h"
 #include <QApplication>
 
-
 QList<QStringList> mainQueueInfo;
 QList<QStringList> outputConfig;
 

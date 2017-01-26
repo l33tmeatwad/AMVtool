@@ -36,12 +36,12 @@ macx: FORMS    += Source/OSX/amvtool.ui \
 win32: FORMS    += Source/Windows/amvtool.ui \
     Source/Windows/configure.ui
 
-INCLUDEPATH += $$PWD/ReSources
-DEPENDPATH += $$PWD/ReSources
+INCLUDEPATH += $$PWD/Resources
+DEPENDPATH += $$PWD/Resources
 
 linux: LIBS += -lmediainfo
 linux: CONFIG += c++11
-macx: LIBS +=  -lmediainfo.0
+macx: LIBS += -L$$PWD/Resources -lmediainfo.0
 win32:CONFIG(release, debug|release): LIBS +=  -lMediaInfo
 
 

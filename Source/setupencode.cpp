@@ -5,13 +5,6 @@ setupencode::setupencode(QObject *parent) : QObject(parent)
 
 }
 
-QString setupencode::Encoder()
-{
-    QString encoder = ffmpegexec;
-
-    return encoder;
-}
-
 QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStringList> inputDetails, QStringList configList)
 {
     QString mediafile = fileInfo[0];
@@ -221,14 +214,6 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
 
 
 // VapourSynth Stuff //
-
-
-QString setupencode::VSPipe()
-{
-    QString vspipe = vspipeexec;
-
-    return vspipe;
-}
 
 QStringList setupencode::SetupPipe(QString inputFile, QString colorspace)
 {

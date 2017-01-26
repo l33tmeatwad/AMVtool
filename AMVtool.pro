@@ -11,33 +11,40 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = AMVtool
 TEMPLATE = app
 
-SOURCES += source/main.cpp\
-        source/amvtool.cpp \
-    source/configure.cpp \
-    source/filesettings.cpp \
-    source/setupencode.cpp
+SOURCES += Source/main.cpp\
+        Source/amvtool.cpp \
+    Source/configure.cpp \
+    Source/filesettings.cpp \
+    Source/setupencode.cpp
 
-macx: SOURCES += source/OSX/checkmedia.cpp
-win32: SOURCES += source/WIN/checkmedia.cpp
+linux: SOURCES += Source/checkmedia.cpp
+macx: SOURCES += Source/checkmedia.cpp
+win32: SOURCES += Source/Windows/checkmedia.cpp
 
-HEADERS  += source/amvtool.h \
-    source/configure.h \
-    source/filesettings.h \
-    source/checkmedia.h \
-    source/setupencode.h
+HEADERS  += Source/amvtool.h \
+    Source/configure.h \
+    Source/filesettings.h \
+    Source/checkmedia.h \
+    Source/setupencode.h
 
-macx: FORMS    += source/OSX/amvtool.ui \
-    source/OSX/configure.ui
+linux: FORMS    += Source/Linux/amvtool.ui \
+    Source/Linux/configure.ui
 
-win32: FORMS    += source/WIN/amvtool.ui \
-    source/WIN/configure.ui
+macx: FORMS    += Source/OSX/amvtool.ui \
+    Source/OSX/configure.ui
 
-INCLUDEPATH += $$PWD/Resources
-DEPENDPATH += $$PWD/Resources
+win32: FORMS    += Source/Windows/amvtool.ui \
+    Source/Windows/configure.ui
 
-linux: LIBS += -L$$PWD/Resources/ -lMediaInfo
-macx: LIBS += -L$$PWD/Resources/ -lmediainfo.0
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/Resources/ -lMediaInfo
+INCLUDEPATH += $$PWD/ReSources
+DEPENDPATH += $$PWD/ReSources
+
+linux: LIBS += -lmediainfo
+linux: CONFIG += c++11
+macx: LIBS +=  -lmediainfo.0
+win32:CONFIG(release, debug|release): LIBS +=  -lMediaInfo
+
 
 macx: ICON = Resources/icon.icns
+win32: RC_ICONS = Resources/icon.ico
 

@@ -242,7 +242,7 @@ void AMVtool::CheckQueue()
         if (!ui->overwrite->isChecked() && errorfree == true)
         {
             bool skip = false;
-            QFileInfo file_exists(mainQueueInfo[queue][0].left(mainQueueInfo[queue][0].length()-4) + "-AMVtool." + outputConfig[queue][1].toLower());
+            QFileInfo file_exists(outputConfig[queue][0] + mainQueueInfo[queue][1].left(mainQueueInfo[queue][1].length()-4) + "-AMVtool." + outputConfig[queue][1].toLower());
             if (file_exists.exists())
             {
                 if (ui->ask->isChecked())
@@ -299,7 +299,6 @@ void AMVtool::Encode(int queue, QList<QStringList> inputDetails, QStringList con
     connect(encode, SIGNAL(readyReadStandardOutput()),this,SLOT(readyReadStandardOutput()));
     connect(encode, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(encodeFinished(int,QProcess::ExitStatus)));
     encode->setProcessChannelMode(QProcess::MergedChannels);
-    QString Encoder = se.Encoder();
     QStringList EncodeOptions = se.SetupEncode(queue, mainQueueInfo[queue], inputDetails, configList);
 
     QString debugbox;
@@ -307,16 +306,16 @@ void AMVtool::Encode(int queue, QList<QStringList> inputDetails, QStringList con
     {
         debugbox += EncodeOptions[i] + " ";
     }
-//    QMessageBox::information(this,"Debug",debugbox);
+    QMessageBox::information(this,"Debug",debugbox);
 
     pipe = new QProcess(this);
     if (inputDetails[0][2] == "VapourSynth")
     {
         pipe->setStandardOutputProcess(encode);
-        pipe->start(se.VSPipe(), se.SetupPipe(mainQueueInfo[queue][0], inputDetails[3][0]));
+        pipe->start(vspipeexec, se.SetupPipe(mainQueueInfo[queue][0], inputDetails[3][0]));
     }
     encode->setWorkingDirectory(outputConfig[queue][0]);
-    encode->start(Encoder, EncodeOptions);
+    encode->start(ffmpegexec, EncodeOptions);
 
 }
 

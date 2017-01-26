@@ -6,18 +6,18 @@
 
 #ifdef WIN32
 #define _UNICODE
+#define ffmpegexec qApp->applicationDirPath() + "/" + "ffmpeg.exe"
 #define vspipeexec qApp->applicationDirPath() + "/" + "vspipe.exe"
+#elif __linux__
+#define ffmpegexec "/usr/bin/ffmpeg"
+#define vspipeexec "/usr/local/bin/vspipe"
 #else
+#define ffmpegexec qApp->applicationDirPath() + "/" + "ffmpeg"
 #define vspipeexec "/usr/local/bin/vspipe"
 #endif
 
-
-//extern QList<int> inputVideoStreams;
-
 extern QList<QStringList> mainQueueInfo;
 extern QString encodepass;
-
-// extern QStringList inputFPS;
 
 namespace Ui {
 class AMVtool;

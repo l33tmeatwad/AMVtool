@@ -87,7 +87,7 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
 
                 }
             }
-            if (astream != "All" && astream != "None")
+            if (astream.toLower() != "all" && astream.toLower() != "none")
             {
                 int stream = astream.toInt()-1;
                 streamID = inputDetails[8][stream].toInt()-1;

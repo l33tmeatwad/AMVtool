@@ -294,6 +294,7 @@ void AMVtool::CheckQueue()
 void AMVtool::Encode(int queue, QList<QStringList> inputDetails, QStringList configList)
 {
     inputDuration = inputDetails[0][3].toInt();
+    outputcreated = false;
     setupencode se;
     encode = new QProcess(this);
     connect(encode, SIGNAL(readyReadStandardOutput()),this,SLOT(readyReadStandardOutput()));
@@ -344,56 +345,74 @@ void AMVtool::encodeFinished(int exitcode, QProcess::ExitStatus)
         QMessageBox::information(this, "Process Canceled", "The process queue was stopped by the user, no more files will be converted.");
         changeEnabled(true,"Convert");
     }
-    if (stopprocess != true)
+    if (outputcreated == true)
     {
-        encode->deleteLater();
-        pipe->deleteLater();
-        int listcount = ui->fileList->count()-1;
-        if (listcount == queue)
+        if (stopprocess != true)
         {
-            if (encodepass == "Single")
+            encode->deleteLater();
+            pipe->deleteLater();
+            int listcount = ui->fileList->count()-1;
+            if (listcount == queue)
             {
-                mainQueueInfo[queue][2] = "Complete";
-                ui->fileList->item(queue)->setBackgroundColor(Qt::green);
-                ui->fileList->item(queue)->setText("CONVERTED | " + ui->fileList->item(queue)->text());
-                QMessageBox::information(this, "Process Complete", "Process Complete!");
-                changeEnabled(true,"Convert");
-            }
-            if (encodepass == "1")
-            {
-                CheckQueue();
-            }
+                if (encodepass == "Single")
+                {
+                    mainQueueInfo[queue][2] = "Complete";
+                    ui->fileList->item(queue)->setBackgroundColor(Qt::green);
+                    ui->fileList->item(queue)->setText("CONVERTED | " + ui->fileList->item(queue)->text());
+                    QMessageBox::information(this, "Process Complete", "Process Complete!");
+                    changeEnabled(true,"Convert");
+                }
+                if (encodepass == "1")
+                {
+                    CheckQueue();
+                }
 
-        }
-        else
-        {
-            if (encodepass == "Single")
-            {
-                QString derp = encodepass;
-
-                mainQueueInfo[queue][2] = "Complete";
-                ui->fileList->item(0)->setBackgroundColor(Qt::green);
-                ui->fileList->item(queue)->setText("CONVERTED | " + ui->fileList->item(queue)->text());
-                CheckQueue();
             }
-            if (encodepass == "1")
+            else
             {
-//                encodepass = "2";
+                if (encodepass == "Single")
+                {
+                    QString derp = encodepass;
 
-                CheckQueue();
+                    mainQueueInfo[queue][2] = "Complete";
+                    ui->fileList->item(0)->setBackgroundColor(Qt::green);
+                    ui->fileList->item(queue)->setText("CONVERTED | " + ui->fileList->item(queue)->text());
+                    CheckQueue();
+                }
+                if (encodepass == "1")
+                {
+    //                encodepass = "2";
+
+                    CheckQueue();
+                }
+
             }
 
         }
 
     }
+    else
+    {
+        mainQueueInfo[queue][2] = "Error";
+        ui->fileList->item(queue)->setBackgroundColor(Qt::red);
+        ui->fileList->item(queue)->setText("ERROR | " + ui->fileList->item(queue)->text());
+        int listcount = ui->fileList->count()-1;
+        if (listcount == queue)
+        {
+            QMessageBox::information(this, "Process Complete", "Process Complete!");
+        }
+        else
+        {
+            CheckQueue();
+        }
 
+    }
 
 }
 
 void AMVtool::readyReadStandardOutput()
 {
     QString readline = encode->readAllStandardOutput();
-
     int currentpercent = currentProcess(readline);
 
     ui->progressBar->setValue(currentpercent);
@@ -401,6 +420,10 @@ void AMVtool::readyReadStandardOutput()
     if (!readline.contains("time="))
     {
 
+    }
+    if (readline.contains("muxing overhead:"))
+    {
+        outputcreated = true;
     }
     mOutputString.append(readline);
     ui->textEdit->setText(mOutputString);

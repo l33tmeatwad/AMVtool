@@ -80,6 +80,7 @@ private:
     int queue;
     float progress;
     bool stopprocess;
+    bool outputcreated;
     QStringList inputFiles;
 
     int inputDuration;

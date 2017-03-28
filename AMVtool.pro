@@ -27,14 +27,13 @@ HEADERS  += Source/amvtool.h \
     Source/checkmedia.h \
     Source/setupencode.h
 
-linux: FORMS    += Source/Linux/amvtool.ui \
-    Source/Linux/configure.ui
+FORMS    += Source/amvtool.ui
 
-macx: FORMS    += Source/OSX/amvtool.ui \
-    Source/OSX/configure.ui
+linux: FORMS += Source/Linux/configure.ui
 
-win32: FORMS    += Source/Windows/amvtool.ui \
-    Source/Windows/configure.ui
+macx: FORMS += Source/OSX/configure.ui
+
+win32: FORMS += Source/Windows/configure.ui
 
 INCLUDEPATH += $$PWD/Resources
 DEPENDPATH += $$PWD/Resources
@@ -47,4 +46,3 @@ win32:CONFIG(release, debug|release): LIBS +=  -lMediaInfo
 
 macx: ICON = Resources/icon.icns
 win32: RC_ICONS = Resources/icon.ico
-

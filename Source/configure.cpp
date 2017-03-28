@@ -20,6 +20,11 @@ void configure::setData(const int &selFile, QList<QStringList> inputMediaInfo, c
 {
     selectedFile = selFile;
 
+    if (selFile >= 0)
+    {
+        ui->recontainerALL->setVisible(false);
+    }
+
     inputVideoStreams = inputMediaInfo[0][0].toInt();
     inputAudioStreams = inputMediaInfo[0][1].toInt();
 
@@ -584,7 +589,12 @@ void configure::on_buttonBox_accepted()
     this->close();
 }
 
-
+void configure::on_recontainerALL_clicked()
+{
+    fs.setupRecontainer();
+    QMessageBox::information(this,"Settings Changed", "Settings changed to recontainer all files in the queue compatible with possible output containers.");
+    this->close();
+}
 
 // CHANGED VALUE EVENTS
 

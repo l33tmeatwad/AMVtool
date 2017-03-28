@@ -51,6 +51,8 @@ private slots:
 
     void on_encodeIncompatible_toggled(bool checked);
 
+    void on_recontainerALL_clicked();
+
 private:
     Ui::configure *ui;
     filesettings fs;

@@ -75,14 +75,14 @@ void AMVtool::on_removeFiles_clicked()
 
 void AMVtool::on_convertFiles_clicked()
 {
-    if (ui->convertFiles->text() == "Convert")
+    if (ui->convertFiles->text() == "GO")
     {
         changeEnabled(false,"Cancel");
         CheckQueue();
     }
     else
     {
-        changeEnabled(true,"Convert");
+        changeEnabled(true,"GO");
         encode->kill();
         stopprocess = true;
     }
@@ -239,13 +239,13 @@ void AMVtool::CheckQueue()
             CheckQueue();
         }
 
-        if (!ui->overwrite->isChecked() && errorfree == true)
+        if (ui->ifExists->currentIndex() != 1 && errorfree == true)
         {
             bool skip = false;
             QFileInfo file_exists(outputConfig[queue][0] + mainQueueInfo[queue][1].left(mainQueueInfo[queue][1].length()-4) + "-AMVtool." + outputConfig[queue][1].toLower());
             if (file_exists.exists())
             {
-                if (ui->ask->isChecked())
+                if (ui->ifExists->currentIndex() == 0)
                 {
                     if (QMessageBox::question(this,"Overwrite File", "Output file already exists, overwrite it?", QMessageBox::Yes|QMessageBox::No) == QMessageBox::No)
                     {
@@ -285,7 +285,7 @@ void AMVtool::CheckQueue()
     }
     else
     {
-        changeEnabled(true,"Convert");
+        changeEnabled(true,"GO");
     }
 
 }
@@ -343,7 +343,7 @@ void AMVtool::encodeFinished(int exitcode, QProcess::ExitStatus)
         encode->deleteLater();
         pipe->deleteLater();
         QMessageBox::information(this, "Process Canceled", "The process queue was stopped by the user, no more files will be converted.");
-        changeEnabled(true,"Convert");
+        changeEnabled(true,"GO");
     }
     if (outputcreated == true)
     {
@@ -360,7 +360,7 @@ void AMVtool::encodeFinished(int exitcode, QProcess::ExitStatus)
                     ui->fileList->item(queue)->setBackgroundColor(Qt::green);
                     ui->fileList->item(queue)->setText("CONVERTED | " + ui->fileList->item(queue)->text());
                     QMessageBox::information(this, "Process Complete", "Process Complete!");
-                    changeEnabled(true,"Convert");
+                    changeEnabled(true,"GO");
                 }
                 if (encodepass == "1")
                 {
@@ -403,7 +403,10 @@ void AMVtool::encodeFinished(int exitcode, QProcess::ExitStatus)
         }
         else
         {
-            CheckQueue();
+            if (stopprocess != true)
+            {
+                CheckQueue();
+            }
         }
 
     }

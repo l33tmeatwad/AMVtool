@@ -28,10 +28,10 @@
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
-     <x>30</x>
+     <x>230</x>
      <y>460</y>
-     <width>361</width>
-     <height>32</height>
+     <width>156</width>
+     <height>23</height>
     </rect>
    </property>
    <property name="orientation">
@@ -47,7 +47,7 @@
      <x>130</x>
      <y>10</y>
      <width>171</width>
-     <height>26</height>
+     <height>23</height>
     </rect>
    </property>
    <property name="text">
@@ -134,7 +134,7 @@
      <x>310</x>
      <y>10</y>
      <width>81</width>
-     <height>32</height>
+     <height>23</height>
     </rect>
    </property>
    <property name="text">
@@ -361,7 +361,7 @@
      <x>20</x>
      <y>10</y>
      <width>111</width>
-     <height>26</height>
+     <height>23</height>
     </rect>
    </property>
    <property name="text">
@@ -574,7 +574,7 @@
      <x>20</x>
      <y>420</y>
      <width>271</width>
-     <height>26</height>
+     <height>23</height>
     </rect>
    </property>
    <property name="readOnly">
@@ -587,7 +587,7 @@
      <x>300</x>
      <y>420</y>
      <width>81</width>
-     <height>32</height>
+     <height>23</height>
     </rect>
    </property>
    <property name="text">
@@ -599,7 +599,7 @@
     <rect>
      <x>20</x>
      <y>390</y>
-     <width>334</width>
+     <width>335</width>
      <height>20</height>
     </rect>
    </property>
@@ -634,6 +634,19 @@
    </property>
    <property name="text">
     <string>Encode Incompatible Audio</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="recontainerALL">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>460</y>
+     <width>101</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Recontainer</string>
    </property>
   </widget>
  </widget>

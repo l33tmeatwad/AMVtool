@@ -27,13 +27,9 @@ HEADERS  += Source/amvtool.h \
     Source/checkmedia.h \
     Source/setupencode.h
 
-FORMS    += Source/amvtool.ui
+FORMS    += Source/amvtool.ui \
+            Source/configure.ui
 
-linux: FORMS += Source/Linux/configure.ui
-
-macx: FORMS += Source/OSX/configure.ui
-
-win32: FORMS += Source/Windows/configure.ui
 
 INCLUDEPATH += $$PWD/Resources
 DEPENDPATH += $$PWD/Resources

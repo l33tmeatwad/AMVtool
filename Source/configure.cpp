@@ -20,13 +20,9 @@ void configure::setData(const int &selFile, QList<QStringList> inputMediaInfo, c
 {
     selectedFile = selFile;
 
-    if (selFile >= 0)
-    {
-        ui->recontainerALL->setVisible(false);
-    }
-
     inputVideoStreams = inputMediaInfo[0][0].toInt();
     inputAudioStreams = inputMediaInfo[0][1].toInt();
+    inputContainer = inputMediaInfo[0][2];
 
     inputVideoCodecs = inputMediaInfo[2];
     inputColorSpaces = inputMediaInfo[3];
@@ -93,19 +89,11 @@ void configure::setData(const int &selFile, QList<QStringList> inputMediaInfo, c
 void configure::setVideoVisibility()
 {
     bool bitrateoptions;
+    bool bitratetype;
     bool matrixoptions;
     bool presetoptions;
     bool tuneoptions;
     bool colorspace;
-
-    if (ui->selectMode->currentText().contains("Bitrate"))
-    {
-        bitrateoptions = true;
-    }
-    else
-    {
-        bitrateoptions = false;
-    }
 
     if (ui->selectCodec->currentText() == "UT Video" || ui->selectCodec->currentText() == "Copy")
     {
@@ -119,6 +107,16 @@ void configure::setVideoVisibility()
         presetoptions = true;
         tuneoptions = true;
     }
+
+    if (ui->selectMode->currentText().contains("Bitrate") && bitrateoptions == true)
+    {
+        bitratetype = true;
+    }
+    else
+    {
+        bitratetype = false;
+    }
+
     if (ui->selectCodec->currentText() == "Copy" || ui->selectColorSpace->currentText().contains("RGB"))
     {
         matrixoptions = false;
@@ -137,10 +135,13 @@ void configure::setVideoVisibility()
         colorspace = true;
     }
 
-
+    if (selectedFile < 0)
+    {
+        matrixoptions = false;
+    }
 
     ui->bitrateBox->setVisible(bitrateoptions);
-    ui->labelBitrate->setVisible(bitrateoptions);
+    ui->labelBitrate->setVisible(bitratetype);
     ui->selectMode->setVisible(bitrateoptions);
     ui->labelMode->setVisible(bitrateoptions);
 
@@ -589,11 +590,30 @@ void configure::on_buttonBox_accepted()
     this->close();
 }
 
-void configure::on_recontainerALL_clicked()
+void configure::on_recontainer_clicked()
 {
-    fs.setupRecontainer();
-    QMessageBox::information(this,"Settings Changed", "Settings changed to recontainer all files in the queue compatible with possible output containers.");
-    this->close();
+    if (selectedFile < 0)
+    {
+        fs.setupRecontainer();
+        QMessageBox::information(this,"Settings Changed", "Settings changed to recontainer all files in the queue compatible with possible output containers.");
+        this->close();
+    }
+    else
+    {
+        QString container = fs.pickContainer(inputContainer,inputVideoCodecs[vsIndex]);
+        if (container != "Error")
+        {
+            int containerindex = ui->selectContainer->findText(container);
+            ui->selectContainer->setCurrentIndex(containerindex);
+            int index = ui->selectCodec->findText("Copy");
+            if (index == -1)
+            {
+                index = 0;
+            }
+            ui->selectCodec->setCurrentIndex(index);
+            ui->copyAudio->setChecked(true);
+        }
+    }
 }
 
 // CHANGED VALUE EVENTS
@@ -647,11 +667,11 @@ void configure::on_browseOutput_clicked()
     dialog.setFileMode(QFileDialog::Directory);
     dialog.setOption(QFileDialog::ShowDirsOnly);
     QString outputFolder = dialog.getExistingDirectory(this,"Select Output Directory");
-    if (outputFolder.right(outputFolder.size()) != "/")
+    if (outputFolder.right(outputFolder.size()) != "/" && outputFolder != "")
     {
         outputFolder = outputFolder + "/";
+        ui->outputFolder->setText(outputFolder);
     }
-    ui->outputFolder->setText(outputFolder);
 }
 
 void configure::on_selectVideoStream_currentIndexChanged(int index)
@@ -766,3 +786,5 @@ void configure::on_encodeIncompatible_toggled(bool checked)
 {
     setAudioVisibility();
 }
+
+

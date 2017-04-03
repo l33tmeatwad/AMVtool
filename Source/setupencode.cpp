@@ -129,20 +129,7 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
 
             if (vmode.contains("2 Pass"))
             {
-                if (encodepass == "1")
-                {
-                    encodepass = "2";
-                }
-                if (encodepass == "Single")
-                {
-                    encodepass = "1";
-                }
-                ffmpegcommand.append({ "-pass",encodepass });
-                if (encodepass == "2")
-                {
-                    encodepass = "Single";
-                }
-
+                ffmpegcommand.append({ "-pass",mainQueueInfo[queue][3] });
             }
         }
     ffmpegcommand.append({ "-preset", preset.toLower().replace(" ",""), "-tune", tune.toLower() });
@@ -199,7 +186,7 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
 
     ffmpegcommand.append("-y");
 
-    if (encodepass == "1")
+    if (mainQueueInfo[queue][3] == "1")
     {
         ffmpegcommand.append( pass1null );
 

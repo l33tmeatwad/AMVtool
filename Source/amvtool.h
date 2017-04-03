@@ -3,6 +3,8 @@
 #include "setupencode.h"
 #include <QMainWindow>
 #include <QProcess>
+#include <QDragEnterEvent>
+#include <QFileDialog>
 
 #ifdef WIN32
 #define _UNICODE
@@ -17,7 +19,6 @@
 #endif
 
 extern QList<QStringList> mainQueueInfo;
-extern QString encodepass;
 
 namespace Ui {
 class AMVtool;
@@ -39,8 +40,6 @@ private slots:
 
     void on_addFiles_clicked();
 
-
-
     void encodeFinished(int exitcode, QProcess::ExitStatus);
 
     void on_removeFiles_clicked();
@@ -57,13 +56,15 @@ private slots:
 
     void on_configAll_clicked();
 
-    void on_lossless_clicked();
+    void on_showDetails_clicked();
 
-    void on_recontainerAll_clicked();
+protected:
+    void dragEnterEvent(QDragEnterEvent *e);
+    void dropEvent(QDropEvent *e);
 
 private:
     Ui::AMVtool *ui;
-
+    void addFilesToQueue(QStringList inputFiles);
     void openConfigBox(int selectedfile);
     float parseTimecode(QString timecode);
     int currentProcess(QString currentstatus);
@@ -71,9 +72,11 @@ private:
 
     void CheckQueue();
     void Encode(int queue, QList<QStringList> inputDetails, QStringList configList);
-
+    QString mediatypes;
     QString outputfile;
     QString mOutputString;
+
+    QFileDialog dialog;
 
     QProcess *encode;
     QProcess *pipe;
@@ -81,7 +84,7 @@ private:
     float progress;
     bool stopprocess;
     bool outputcreated;
-    QStringList inputFiles;
+
 
     int inputDuration;
 

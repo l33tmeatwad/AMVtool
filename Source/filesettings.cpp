@@ -31,7 +31,7 @@ QString filesettings::InputFiles(QString inputFile)
         QFileInfo fileInfo(f);
         QString filename(fileInfo.fileName());
         QString Location = inputFile;
-        mainQueueInfo.append({inputFile, filename, "Pending"});
+        mainQueueInfo.append({inputFile, filename, "Pending", "1"});
         addSettings(Location.replace(filename,""), isVPY);
         openedFileInfo = filename;
     }

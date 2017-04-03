@@ -51,7 +51,7 @@ private slots:
 
     void on_encodeIncompatible_toggled(bool checked);
 
-    void on_recontainerALL_clicked();
+    void on_recontainer_clicked();
 
 private:
     Ui::configure *ui;
@@ -61,6 +61,7 @@ private:
 
     int inputVideoStreams;
     int inputAudioStreams;
+    QString inputContainer;
     int altAudioStreams;
 
     QStringList inputVideoCodecs;

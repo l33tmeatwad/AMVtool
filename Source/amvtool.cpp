@@ -2,13 +2,14 @@
 #include "ui_amvtool.h"
 #include "configure.h"
 #include "filesettings.h"
-#include <QFileDialog>
 #include <QFileInfo>
 #include <QMessageBox>
 #include <QApplication>
 #include <QProgressBar>
 #include <QDebug>
 #include <QScrollBar>
+#include <QMimeData>
+
 
 AMVtool::AMVtool(QWidget *parent) :
     QMainWindow(parent),
@@ -16,16 +17,8 @@ AMVtool::AMVtool(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->textEdit->setReadOnly(true);
-}
+    setAcceptDrops(true);
 
-AMVtool::~AMVtool()
-{
-    delete ui;
-}
-
-void AMVtool::on_addFiles_clicked()
-{
-    QString mediatypes;
     QFileInfo file_exists(vspipeexec);
     if (file_exists.exists())
     {
@@ -35,12 +28,52 @@ void AMVtool::on_addFiles_clicked()
     {
         mediatypes = "Media Files (*.avi *m2ts *.m4v *.mov *.mkv *.mp4 *ts)";
     }
+}
 
 
 
 
-    inputFiles = QFileDialog::getOpenFileNames(this, tr("Open Media File"), "", tr(mediatypes.toUtf8().constData()));
+AMVtool::~AMVtool()
+{
+    delete ui;
+}
 
+
+void AMVtool::dragEnterEvent(QDragEnterEvent *e)
+{
+    if (e->mimeData()->hasUrls())
+    {
+        e->acceptProposedAction();
+    }
+}
+
+void AMVtool::dropEvent(QDropEvent *e)
+{
+    QStringList fileList;
+    foreach (const QUrl &url, e->mimeData()->urls())
+    {
+        if (mediatypes.contains(url.toLocalFile().right(3)))
+        {
+            fileList.append(url.toLocalFile());
+        }
+    }
+    if (fileList.length() > 0)
+    {
+        addFilesToQueue(fileList);
+    }
+
+}
+
+void AMVtool::on_addFiles_clicked()
+{
+    setAcceptDrops(false);
+    QStringList inputFiles = dialog.getOpenFileNames(this, tr("Open Media File"), "", tr(mediatypes.toUtf8().constData()));
+    addFilesToQueue(inputFiles);
+    setAcceptDrops(true);
+}
+
+void AMVtool::addFilesToQueue(QStringList inputFiles)
+{
     foreach (const QString &file, inputFiles)
     {
         filesettings fs;
@@ -78,11 +111,13 @@ void AMVtool::on_convertFiles_clicked()
     if (ui->convertFiles->text() == "GO")
     {
         changeEnabled(false,"Cancel");
+        setAcceptDrops(false);
         CheckQueue();
     }
     else
     {
         changeEnabled(true,"GO");
+        setAcceptDrops(true);
         encode->kill();
         stopprocess = true;
     }
@@ -124,6 +159,7 @@ void AMVtool::on_fileList_doubleClicked(const QModelIndex &index)
     ui->fileList->item(selectedfile)->setText(newtext);
     ui->fileList->item(selectedfile)->setBackgroundColor(Qt::white);
     mainQueueInfo[selectedfile][2] = "Pending";
+    mainQueueInfo[selectedfile][3] = "1";
 }
 
 void AMVtool::openConfigBox(int selectedfile)
@@ -144,31 +180,17 @@ void AMVtool::openConfigBox(int selectedfile)
     QList<QStringList> inputMediaInfo = fs.getInputDetails(mediafile);
     if (inputMediaInfo[0][0].toInt() > 0)
     {
+        setAcceptDrops(false);
         configure *configwindow = new configure(this);
         configwindow->setData(selectedfile, inputMediaInfo, configList);
         configwindow->setAttribute(Qt::WA_DeleteOnClose);
         configwindow->exec();
+        setAcceptDrops(true);
     }
     else
     {
         QMessageBox::information(this,"Error", "There was an error reading the file, please check it and try again.");
     }
-
-}
-
-
-void AMVtool::on_lossless_clicked()
-{
-    filesettings fs;
-    fs.setupLossless();
-    QMessageBox::information(this,"Settings Changed", "Settings for everything in the queue have been configured for lossless output.");
-}
-
-void AMVtool::on_recontainerAll_clicked()
-{
-    filesettings fs;
-    fs.setupRecontainer();
-    QMessageBox::information(this,"Settings Changed", "Settings changed to recontainer all files in the queue compatible with possible output containers.");
 
 }
 
@@ -307,7 +329,6 @@ void AMVtool::Encode(int queue, QList<QStringList> inputDetails, QStringList con
     {
         debugbox += EncodeOptions[i] + " ";
     }
-//    QMessageBox::information(this,"Debug",debugbox);
 
     pipe = new QProcess(this);
     if (inputDetails[0][2] == "VapourSynth")
@@ -344,62 +365,45 @@ void AMVtool::encodeFinished(int exitcode, QProcess::ExitStatus)
         pipe->deleteLater();
         QMessageBox::information(this, "Process Canceled", "The process queue was stopped by the user, no more files will be converted.");
         changeEnabled(true,"GO");
+        setAcceptDrops(true);
     }
-    if (outputcreated == true)
+    else
     {
-        if (stopprocess != true)
+        if (outputcreated == true)
         {
-            encode->deleteLater();
-            pipe->deleteLater();
-            int listcount = ui->fileList->count()-1;
-            if (listcount == queue)
+            if (stopprocess != true)
             {
-                if (encodepass == "Single")
+                encode->deleteLater();
+                pipe->deleteLater();
+                if (mainQueueInfo[queue][3] == "1" && outputConfig[queue][6].contains("2 Pass") )
+                {
+                    mainQueueInfo[queue][3] = "2";
+                    CheckQueue();
+                }
+                else
                 {
                     mainQueueInfo[queue][2] = "Complete";
                     ui->fileList->item(queue)->setBackgroundColor(Qt::green);
                     ui->fileList->item(queue)->setText("CONVERTED | " + ui->fileList->item(queue)->text());
-                    QMessageBox::information(this, "Process Complete", "Process Complete!");
-                    changeEnabled(true,"GO");
                 }
-                if (encodepass == "1")
-                {
-                    CheckQueue();
-                }
-
-            }
-            else
-            {
-                if (encodepass == "Single")
-                {
-                    QString derp = encodepass;
-
-                    mainQueueInfo[queue][2] = "Complete";
-                    ui->fileList->item(0)->setBackgroundColor(Qt::green);
-                    ui->fileList->item(queue)->setText("CONVERTED | " + ui->fileList->item(queue)->text());
-                    CheckQueue();
-                }
-                if (encodepass == "1")
-                {
-    //                encodepass = "2";
-
-                    CheckQueue();
-                }
-
             }
 
         }
+        else
+        {
+            mainQueueInfo[queue][2] = "Error";
+            ui->fileList->item(queue)->setBackgroundColor(Qt::red);
+            ui->fileList->item(queue)->setText("ERROR | " + ui->fileList->item(queue)->text());
 
-    }
-    else
-    {
-        mainQueueInfo[queue][2] = "Error";
-        ui->fileList->item(queue)->setBackgroundColor(Qt::red);
-        ui->fileList->item(queue)->setText("ERROR | " + ui->fileList->item(queue)->text());
+
+        }
+
         int listcount = ui->fileList->count()-1;
         if (listcount == queue)
         {
             QMessageBox::information(this, "Process Complete", "Process Complete!");
+            changeEnabled(true,"GO");
+            setAcceptDrops(true);
         }
         else
         {
@@ -408,8 +412,8 @@ void AMVtool::encodeFinished(int exitcode, QProcess::ExitStatus)
                 CheckQueue();
             }
         }
-
     }
+
 
 }
 
@@ -462,4 +466,23 @@ float AMVtool::parseTimecode(QString timecode)
     float milliseconds = (timecode.left(11).right(2).toInt()) * 10;
     float mstime = hours+minutes+seconds+milliseconds;
     return mstime;
+}
+
+
+
+void AMVtool::on_showDetails_clicked()
+{
+    if (ui->showDetails->text() == "Show Details")
+    {
+        ui->showDetails->setText("Hide Details");
+        QMainWindow::setMaximumHeight(520);
+        QMainWindow::setMinimumHeight(520);
+    }
+    else
+    {
+        ui->showDetails->setText("Show Details");
+        QMainWindow::setMaximumHeight(350);
+        QMainWindow::setMinimumHeight(350);
+        QMainWindow::adjustSize();
+    }
 }

@@ -11,8 +11,6 @@
 #define pass1null "/dev/null"
 #endif
 
-extern QString encodepass;
-
 class setupencode : public QObject
 {
     Q_OBJECT

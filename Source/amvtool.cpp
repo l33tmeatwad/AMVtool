@@ -265,7 +265,7 @@ void AMVtool::CheckQueue()
         {
             bool skip = false;
             QFileInfo file_exists(outputConfig[queue][0] + mainQueueInfo[queue][1].left(mainQueueInfo[queue][1].length()-4) + "-AMVtool." + outputConfig[queue][1].toLower());
-            if (file_exists.exists())
+            if (file_exists.exists() && mainQueueInfo[queue][3] != "2")
             {
                 if (ui->ifExists->currentIndex() == 0)
                 {
@@ -371,23 +371,18 @@ void AMVtool::encodeFinished(int exitcode, QProcess::ExitStatus)
     {
         if (outputcreated == true)
         {
-            if (stopprocess != true)
+            encode->deleteLater();
+            pipe->deleteLater();
+            if (mainQueueInfo[queue][3] == "1" && outputConfig[queue][6].contains("2 Pass") )
             {
-                encode->deleteLater();
-                pipe->deleteLater();
-                if (mainQueueInfo[queue][3] == "1" && outputConfig[queue][6].contains("2 Pass") )
-                {
-                    mainQueueInfo[queue][3] = "2";
-                    CheckQueue();
-                }
-                else
-                {
-                    mainQueueInfo[queue][2] = "Complete";
-                    ui->fileList->item(queue)->setBackgroundColor(Qt::green);
-                    ui->fileList->item(queue)->setText("CONVERTED | " + ui->fileList->item(queue)->text());
-                }
+                mainQueueInfo[queue][3] = "2";
             }
-
+            else
+            {
+                mainQueueInfo[queue][2] = "Complete";
+                ui->fileList->item(queue)->setBackgroundColor(Qt::green);
+                ui->fileList->item(queue)->setText("CONVERTED | " + ui->fileList->item(queue)->text());
+            }
         }
         else
         {
@@ -401,16 +396,20 @@ void AMVtool::encodeFinished(int exitcode, QProcess::ExitStatus)
         int listcount = ui->fileList->count()-1;
         if (listcount == queue)
         {
-            QMessageBox::information(this, "Process Complete", "Process Complete!");
-            changeEnabled(true,"GO");
-            setAcceptDrops(true);
-        }
-        else
-        {
-            if (stopprocess != true)
+            if (mainQueueInfo[queue][2] != "Pending")
+            {
+                QMessageBox::information(this, "Process Complete", "Process Complete!");
+                changeEnabled(true,"GO");
+                setAcceptDrops(true);
+            }
+            else
             {
                 CheckQueue();
             }
+        }
+        else
+        {
+            CheckQueue();
         }
     }
 

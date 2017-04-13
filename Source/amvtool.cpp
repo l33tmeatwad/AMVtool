@@ -1,12 +1,15 @@
 #include "amvtool.h"
 #include "ui_amvtool.h"
 #include "configure.h"
+#include "dependencies.h"
 #include "filesettings.h"
+#include "progress.h"
+#include "queue.h"
+#include "setupencode.h"
 #include <QFileInfo>
 #include <QMessageBox>
 #include <QApplication>
 #include <QProgressBar>
-#include <QDebug>
 #include <QScrollBar>
 #include <QMimeData>
 
@@ -18,24 +21,29 @@ AMVtool::AMVtool(QWidget *parent) :
     ui->setupUi(this);
     ui->textEdit->setReadOnly(true);
     setAcceptDrops(true);
-
-    QFileInfo file_exists(vspipeexec);
-    if (file_exists.exists())
-    {
-        mediatypes = "Media Files (*.avi *m2ts *.m4v *.mov *.mkv *.mp4 *ts *.vpy)";
-    }
-    else
-    {
-        mediatypes = "Media Files (*.avi *m2ts *.m4v *.mov *.mkv *.mp4 *ts)";
-    }
+    mediatypes = checkDependencies();
+    timeRemaining = new QLabel(this);
+    ui->statusBar->addPermanentWidget(timeRemaining, 0);
 }
-
-
-
 
 AMVtool::~AMVtool()
 {
     delete ui;
+}
+
+
+QString AMVtool::checkDependencies()
+{
+    dependencies dep;
+    QStringList depStatus = dep.checkDependencies();
+    if (depStatus[1].contains("Not Found"))
+    {
+        ui->statusBar->showMessage("FFMPEG executable is missing!");
+        depStatus[1].replace("Not Found: ", "");
+    }
+    ffmpegexec = depStatus[1];
+    return depStatus[0];
+
 }
 
 
@@ -44,7 +52,9 @@ void AMVtool::dragEnterEvent(QDragEnterEvent *e)
     if (e->mimeData()->hasUrls())
     {
         e->acceptProposedAction();
+
     }
+
 }
 
 void AMVtool::dropEvent(QDropEvent *e)
@@ -76,8 +86,8 @@ void AMVtool::addFilesToQueue(QStringList inputFiles)
 {
     foreach (const QString &file, inputFiles)
     {
-        filesettings fs;
-        QString fileInfo = fs.InputFiles(file);
+        queue q;
+        QString fileInfo = q.InputFiles(file);
         if (fileInfo != "Error")
         {
             ui->fileList->addItem(fileInfo);
@@ -108,18 +118,21 @@ void AMVtool::on_removeFiles_clicked()
 
 void AMVtool::on_convertFiles_clicked()
 {
-    if (ui->convertFiles->text() == "GO")
+    ui->convertFiles->setEnabled(false);
+    if (ui->convertFiles->text() == "START")
     {
+        stopprocess = false;
         changeEnabled(false,"Cancel");
         setAcceptDrops(false);
         CheckQueue();
     }
     else
     {
-        changeEnabled(true,"GO");
-        setAcceptDrops(true);
-        encode->kill();
         stopprocess = true;
+        encode->kill();
+        timeRemaining->setText("");
+        ui->statusBar->showMessage("Process Canceled");
+        QMessageBox::information(this, "Process Canceled", "The process queue was stopped by the user, no more files will be converted.");
     }
 }
 
@@ -133,8 +146,11 @@ void AMVtool::on_configEncSettings_clicked()
 {
     foreach (QListWidgetItem * item, ui->fileList->selectedItems())
     {
-        openConfigBox(ui->fileList->row(item));
+        int queue = ui->fileList->row(item);
+        openConfigBox(queue);
+        ui->fileList->item(queue)->setText(mainQueueInfo[queue][2] + " | " + mainQueueInfo[queue][1]);
     }
+
 }
 
 
@@ -154,17 +170,14 @@ void AMVtool::on_fileList_clicked()
 
 void AMVtool::on_fileList_doubleClicked(const QModelIndex &index)
 {
-    int selectedfile = index.row();
-    QString newtext = ui->fileList->item(selectedfile)->text().replace("CONVERTED | ", "").replace("ERROR | ", "").replace("SKIPPED | ", "");
-    ui->fileList->item(selectedfile)->setText(newtext);
-    ui->fileList->item(selectedfile)->setBackgroundColor(Qt::white);
-    mainQueueInfo[selectedfile][2] = "Pending";
-    mainQueueInfo[selectedfile][3] = "1";
+    int pos = index.row();
+    updateQueue(pos,"Pending");
 }
 
 void AMVtool::openConfigBox(int selectedfile)
 {
-    filesettings fs;
+    queue queue;
+
     QString mediafile;
     QStringList configList;
     if (selectedfile >= 0)
@@ -177,7 +190,7 @@ void AMVtool::openConfigBox(int selectedfile)
         mediafile = "Default";
         configList.append(defaultConfiguration);
     }
-    QList<QStringList> inputMediaInfo = fs.getInputDetails(mediafile);
+    QList<QStringList> inputMediaInfo = queue.getInputDetails(mediafile);
     if (inputMediaInfo[0][0].toInt() > 0)
     {
         setAcceptDrops(false);
@@ -194,8 +207,57 @@ void AMVtool::openConfigBox(int selectedfile)
 
 }
 
+void AMVtool::on_showDetails_clicked()
+{
+    if (ui->showDetails->text() == "Show Details")
+    {
+        ui->showDetails->setText("Hide Details");
+        QMainWindow::setMaximumHeight(540);
+        QMainWindow::setMinimumHeight(540);
+    }
+    else
+    {
+        ui->showDetails->setText("Show Details");
+        QMainWindow::setMaximumHeight(370);
+        QMainWindow::setMinimumHeight(370);
+        QMainWindow::adjustSize();
+    }
+}
 
-// SECTION FOR PROCESSING ENCODES
+
+
+// SECTION FOR PROCESSING THE QUEUE
+
+void AMVtool::updateQueue(int pos, QString status)
+{
+    if (status == "Complete")
+    {
+        ui->fileList->item(pos)->setText("COMPLETE | " + ui->fileList->item(pos)->text());
+        ui->fileList->item(pos)->setBackgroundColor(Qt::green);
+        mainQueueInfo[pos][3] = "Complete";
+    }
+    if (status == "Error")
+    {
+        ui->fileList->item(pos)->setText("ERROR | " + ui->fileList->item(pos)->text());
+        ui->fileList->item(pos)->setBackgroundColor(Qt::red);
+        mainQueueInfo[pos][3] = "Error";
+    }
+    if (status == "Pending")
+    {
+        ui->fileList->item(pos)->setText(mainQueueInfo[pos][2] + " | " + mainQueueInfo[pos][1]);
+        ui->fileList->item(pos)->setBackgroundColor(Qt::white);
+        mainQueueInfo[pos][3] = "Pending";
+        mainQueueInfo[pos][4] = "1";
+    }
+    if (status == "Skipped")
+    {
+        ui->fileList->item(pos)->setText("SKIPPED | " + ui->fileList->item(pos)->text());
+        ui->fileList->item(pos)->setBackgroundColor(Qt::yellow);
+        mainQueueInfo[pos][3] = "Skipped";
+    }
+
+
+}
 
 void AMVtool::CheckQueue()
 {
@@ -204,125 +266,136 @@ void AMVtool::CheckQueue()
         ui->fileList->currentItem()->setSelected(false);
         ui->configEncSettings->setEnabled(false);
     }
-    queue = -1;
-    int position = mainQueueInfo.count();
-    for (int i = 0; i < position; i++)
+    queue queue;
+    position = queue.findPosition();
+    ui->convertFiles->setEnabled(false);
+    if (position >= 0)
     {
-        if (mainQueueInfo[i][2] == "Pending")
-        {
-            queue = i;
-            position = i;
-        }
+        ProcessFile(position);
     }
-    stopprocess = false;
-    if (queue >= 0)
+    else
+    {
+        if (ui->fileList->count() > 0)
+        {
+            QMessageBox::information(this, "Process Complete", "Process Complete!");
+        }
+        changeEnabled(true,"START");
+        ui->convertFiles->setEnabled(true);
+        setAcceptDrops(true);
+    }
+
+}
+
+void AMVtool::ProcessFile(int pos)
+{
+    ui->progressBar->setValue(0);
+    ui->addFiles->setEnabled(false);
+    ui->removeFiles->setEnabled(false);
+    ui->configEncSettings->setEnabled(false);
+
+    queue queue;
+    QList<QStringList> inputDetails = queue.checkInput(pos);
+
+    if (mainQueueInfo[pos][3] != "Error")
     {
         filesettings fs;
-        progress = 0.0;
-        bool errorfree;
-
-        ui->addFiles->setEnabled(false);
-        ui->removeFiles->setEnabled(false);
-        ui->configEncSettings->setEnabled(false);
-
-        QList<QStringList> inputDetails = fs.getInputDetails(mainQueueInfo[queue][0]);
-        if (outputConfig[queue][10] != "Original Audio")
+        if (!fs.checkFolder(outputConfig[pos][0]))
         {
-            QList<QStringList> audioDetails = fs.getInputDetails(outputConfig[queue][10]);
-            inputDetails[0][1] = audioDetails[0][1];
-            inputDetails[8] = audioDetails[8];
-        }
-
-        int vstreamcount = inputDetails[0][0].toInt();
-        int astreamcount = inputDetails[0][1].toInt();
-        QString audiosel = outputConfig[queue][11];
-        audiosel = audiosel.replace("All", inputDetails[0][1]);
-
-        if (vstreamcount > outputConfig[queue][2].toInt())
-        {
-            if (audiosel != "None")
+            if (QMessageBox::question(this,"Output Error", "Cannot write to output folder, select another?", QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes)
             {
-                if (audiosel.toInt() <= astreamcount)
+                QString newFolder = selectNewFolder();
+                if (newFolder != "Skipped")
                 {
-                    errorfree = true;
+                    outputConfig[pos][0] = newFolder;
+                }
+                else
+                {
+                    updateQueue(pos,"Skipped");
                 }
             }
-            if (audiosel == "None")
+            else
             {
-                errorfree = true;
+                updateQueue(pos,"Skipped");
             }
-        }
-        else
-        {
-            errorfree = false;
-            ui->fileList->item(queue)->setText("ERROR | " + ui->fileList->item(queue)->text());
-            ui->fileList->item(queue)->setBackgroundColor(Qt::red);
-            mainQueueInfo[queue][2] = "Error";
-            CheckQueue();
-        }
 
-        if (ui->ifExists->currentIndex() != 1 && errorfree == true)
+        }
+        if (mainQueueInfo[pos][3] != "Skipped")
         {
-            bool skip = false;
-            QFileInfo file_exists(outputConfig[queue][0] + mainQueueInfo[queue][1].left(mainQueueInfo[queue][1].length()-4) + "-AMVtool." + outputConfig[queue][1].toLower());
-            if (file_exists.exists() && mainQueueInfo[queue][3] != "2")
+            QFileInfo file_exists(outputConfig[pos][0] + mainQueueInfo[pos][1].left(mainQueueInfo[pos][1].length()-4) + "-AMVtool." + outputConfig[pos][1].toLower());
+            if (file_exists.exists() && mainQueueInfo[pos][4] != "2")
             {
                 if (ui->ifExists->currentIndex() == 0)
                 {
                     if (QMessageBox::question(this,"Overwrite File", "Output file already exists, overwrite it?", QMessageBox::Yes|QMessageBox::No) == QMessageBox::No)
                     {
-                        skip = true;
+                        updateQueue(pos,"Skipped");
                     }
                 }
                 else
                 {
-                    skip = true;
+                    updateQueue(pos,"Skipped");
                 }
             }
-            if (skip == true)
-            {
-                errorfree = false;
-                ui->fileList->item(queue)->setText("SKIPPED | " + ui->fileList->item(queue)->text());
-                ui->fileList->item(queue)->setBackgroundColor(Qt::yellow);
-                mainQueueInfo[queue][2] = "File exists, skipping.";
-                CheckQueue();
-            }
-
-
-
         }
+    }
 
-
-        if (errorfree)
-        {
-
-            Encode(queue,inputDetails, outputConfig[queue]);
-        }
-        else
-        {
-
-        }
-
-
+    if (mainQueueInfo[pos][3] == "Pending")
+    {
+        Encode(pos,inputDetails, outputConfig[pos]);
     }
     else
     {
-        changeEnabled(true,"GO");
+        CheckQueue();
     }
-
 }
 
+QString AMVtool::selectNewFolder()
+{
+    QFileDialog dialog;
+    dialog.setFileMode(QFileDialog::Directory);
+    dialog.setOption(QFileDialog::ShowDirsOnly);
+    QString outputFolder = "Try Again";
+    while (outputFolder == "Try Again")
+    {
+        QString newFolder = dialog.getExistingDirectory(this,"Select Output Directory");
+        if (newFolder != "")
+        {
+            if (newFolder.right(1) != "/")
+                newFolder = newFolder + "/";
 
-void AMVtool::Encode(int queue, QList<QStringList> inputDetails, QStringList configList)
+            filesettings fs;
+            if (fs.checkFolder(newFolder))
+            {
+                outputFolder = newFolder;
+            }
+            else
+            {
+                QMessageBox::warning(this,"Error","Destination folder is not writable!");
+            }
+
+        }
+        else
+        {
+            outputFolder = "Skipped";
+        }
+    }
+
+    return outputFolder;
+}
+
+// SECTION FOR PROCESSING ENCODES
+
+void AMVtool::Encode(int pos, QList<QStringList> inputDetails, QStringList configList)
 {
     inputDuration = inputDetails[0][3].toInt();
     outputcreated = false;
     setupencode se;
     encode = new QProcess(this);
     connect(encode, SIGNAL(readyReadStandardOutput()),this,SLOT(readyReadStandardOutput()));
+    connect(encode, SIGNAL(error(QProcess::ProcessError)), this, SLOT(readErrors()));
     connect(encode, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(encodeFinished(int,QProcess::ExitStatus)));
     encode->setProcessChannelMode(QProcess::MergedChannels);
-    QStringList EncodeOptions = se.SetupEncode(queue, mainQueueInfo[queue], inputDetails, configList);
+    QStringList EncodeOptions = se.SetupEncode(pos, mainQueueInfo[pos], inputDetails, configList);
 
     QString debugbox;
     for (int i = 0; i < EncodeOptions.count(); i++)
@@ -333,12 +406,14 @@ void AMVtool::Encode(int queue, QList<QStringList> inputDetails, QStringList con
     pipe = new QProcess(this);
     if (inputDetails[0][2] == "VapourSynth")
     {
+        connect(pipe, SIGNAL(error(QProcess::ProcessError)), this, SLOT(readFromStdErr()));
         pipe->setStandardOutputProcess(encode);
-        pipe->start(vspipeexec, se.SetupPipe(mainQueueInfo[queue][0], inputDetails[3][0]));
+        pipe->start(vspipeexec, se.SetupPipe(mainQueueInfo[pos][0], inputDetails[4][0]));
     }
-    encode->setWorkingDirectory(outputConfig[queue][0]);
+    encode->setWorkingDirectory(outputConfig[pos][0]);
     encode->start(ffmpegexec, EncodeOptions);
 
+    ui->convertFiles->setEnabled(true);
 }
 
 void AMVtool::changeEnabled(bool status, QString button)
@@ -352,136 +427,86 @@ void AMVtool::changeEnabled(bool status, QString button)
 void AMVtool::encodeFinished(int exitcode, QProcess::ExitStatus)
 {
     inputDuration = 0;
-    ui->progressBar->setValue(100);
     if (pipe->state() > 0)
     {
         pipe->kill();
     }
+    encode->deleteLater();
+    pipe->deleteLater();
 
-
-    if (stopprocess == true)
+    if (exitcode == 0)
     {
-        encode->deleteLater();
-        pipe->deleteLater();
-        QMessageBox::information(this, "Process Canceled", "The process queue was stopped by the user, no more files will be converted.");
-        changeEnabled(true,"GO");
-        setAcceptDrops(true);
+        ui->progressBar->setValue(100);
+        if (outputcreated == true)
+        {
+            if (mainQueueInfo[position][4] == "1" && outputConfig[position][6].contains("2 Pass") )
+            {
+                mainQueueInfo[position][4] = "2";
+            }
+            else
+            {
+                updateQueue(position, "Complete");
+            }
+        }
+        else
+        {
+            updateQueue(position, "Error");
+        }
+
+        CheckQueue();
     }
     else
     {
-        if (outputcreated == true)
+        if (stopprocess == false)
         {
-            encode->deleteLater();
-            pipe->deleteLater();
-            if (mainQueueInfo[queue][3] == "1" && outputConfig[queue][6].contains("2 Pass") )
-            {
-                mainQueueInfo[queue][3] = "2";
-            }
-            else
-            {
-                mainQueueInfo[queue][2] = "Complete";
-                ui->fileList->item(queue)->setBackgroundColor(Qt::green);
-                ui->fileList->item(queue)->setText("CONVERTED | " + ui->fileList->item(queue)->text());
-            }
-        }
-        else
-        {
-            mainQueueInfo[queue][2] = "Error";
-            ui->fileList->item(queue)->setBackgroundColor(Qt::red);
-            ui->fileList->item(queue)->setText("ERROR | " + ui->fileList->item(queue)->text());
-
-
-        }
-
-        int listcount = ui->fileList->count()-1;
-        if (listcount == queue)
-        {
-            if (mainQueueInfo[queue][2] != "Pending")
-            {
-                QMessageBox::information(this, "Process Complete", "Process Complete!");
-                changeEnabled(true,"GO");
-                setAcceptDrops(true);
-            }
-            else
-            {
-                CheckQueue();
-            }
-        }
-        else
-        {
+            updateQueue(position, "Error");
             CheckQueue();
         }
     }
+}
 
-
+void AMVtool::readErrors()
+{
+    QString error = encode->errorString();
+    if (error.contains("No such file or directory"))
+    {
+        encode->kill();
+        ui->statusBar->showMessage("FFMPEG executable is missing!");
+    }
+    ui->progressBar->setValue(0);
+    setAcceptDrops(true);
+    changeEnabled(true,"START");
+    ui->convertFiles->setEnabled(true);
 }
 
 void AMVtool::readyReadStandardOutput()
 {
+    float duration = inputDuration;
     QString readline = encode->readAllStandardOutput();
-    int currentpercent = currentProcess(readline);
 
-    ui->progressBar->setValue(currentpercent);
-
-    if (!readline.contains("time="))
+    if (readline.contains("time="))
     {
-
+        progress cp;
+        QList<QString> currentprogress = cp.currentProcess(readline, duration);
+        ui->statusBar->showMessage("Encoding: " + mainQueueInfo[position][1]);
+        timeRemaining->setText(currentprogress[1] + "  ");
+        ui->progressBar->setValue(currentprogress[0].toInt());
+    }
+    else
+    {
+        mOutputString.append(readline);
+        ui->textEdit->setText(mOutputString);
+        ui->textEdit->verticalScrollBar()->setSliderPosition(ui->textEdit->verticalScrollBar()->maximum());
     }
     if (readline.contains("muxing overhead:"))
     {
         outputcreated = true;
+        timeRemaining->setText("");
+        ui->statusBar->showMessage("Finished");
     }
-    mOutputString.append(readline);
-    ui->textEdit->setText(mOutputString);
-    // put the slider at the bottom
-    ui->textEdit->verticalScrollBar()
-            ->setSliderPosition(ui->textEdit->verticalScrollBar()->maximum());
-
-
-}
-
-int AMVtool::currentProcess(QString currentstatus)
-{
-    int currentpercent = 0;
-
-    float duration = inputDuration;
-    QRegExp findtime(timecode);
-    int length = findtime.indexIn(currentstatus);
-    QStringList findstatus;
-    if (length != -1)
-    {
-        findstatus = findtime.capturedTexts();
-        progress = parseTimecode(findstatus[0].right(11));
-    }
-    currentpercent = (progress/duration) *100;
-    return currentpercent;
-}
-
-float AMVtool::parseTimecode(QString timecode)
-{
-    float hours = ((timecode.left(2).toInt() * 60) * 60) * 1000;
-    float minutes = (timecode.left(5).right(2).toInt() * 60) * 1000;
-    float seconds = (timecode.left(8).right(2).toInt()) * 1000;
-    float milliseconds = (timecode.left(11).right(2).toInt()) * 10;
-    float mstime = hours+minutes+seconds+milliseconds;
-    return mstime;
-}
 
 
 
-void AMVtool::on_showDetails_clicked()
-{
-    if (ui->showDetails->text() == "Show Details")
-    {
-        ui->showDetails->setText("Hide Details");
-        QMainWindow::setMaximumHeight(520);
-        QMainWindow::setMinimumHeight(520);
-    }
-    else
-    {
-        ui->showDetails->setText("Show Details");
-        QMainWindow::setMaximumHeight(350);
-        QMainWindow::setMinimumHeight(350);
-        QMainWindow::adjustSize();
-    }
+
+
 }

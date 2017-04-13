@@ -1,8 +1,9 @@
 #include "configure.h"
-#include "checkmedia.h"
+#include "queue.h"
 #include "ui_configure.h"
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QStandardPaths>
 
 configure::configure(QWidget *parent) :
     QDialog(parent),
@@ -24,14 +25,12 @@ void configure::setData(const int &selFile, QList<QStringList> inputMediaInfo, c
     inputAudioStreams = inputMediaInfo[0][1].toInt();
     inputContainer = inputMediaInfo[0][2];
 
-    inputVideoCodecs = inputMediaInfo[2];
-    inputColorSpaces = inputMediaInfo[3];
-    inputColorMatrix = inputMediaInfo[4];
-    inputVideoHeight = inputMediaInfo[6];
-
-    inputAudioCodecs = inputMediaInfo[9];
-
-    inputColorSpace = inputColorSpaces[0];
+    inputVideoBitDepths = inputMediaInfo[2];
+    inputVideoCodecs = inputMediaInfo[3];
+    inputColorSpaces = inputMediaInfo[4];
+    inputColorMatrix = inputMediaInfo[5];
+    inputVideoHeight = inputMediaInfo[7];
+    inputAudioCodecs = inputMediaInfo[10];
 
     outputLocation = configurationList[0];
     outputContainer = configurationList[1];
@@ -317,7 +316,11 @@ void configure::setVideoCodec()
 void configure::setColorSpace()
 {
     QString codec = ui->selectCodec->currentText();
-    QString colorspace = inputColorSpace;
+    QString colorspace = inputColorSpaces[ui->selectVideoStream->currentIndex()];
+    if (colorspace == "RGB")
+    {
+        colorspace = "RGB24";
+    }
     QStringList colorspaceoptions;
     colorspaceoptions.append("YUV420P8");
 
@@ -461,7 +464,7 @@ void configure::setAudioCodec()
     if (ui->selectContainer->currentText() == "MOV")
     {
         canCopyAudio(MOV);
-        codecs.append({ "AAC", "ALAC" });
+        codecs.append({ "AAC", "ALAC", "PCM" });
     }
     if (ui->selectContainer->currentText() == "MP4")
     {
@@ -515,14 +518,13 @@ void configure::setAudioMode()
 
 void configure::getAltAudioCodecs(QString newAudio)
 {
-    checkmedia cm;
-    QList<QStringList> newAudioInfo = cm.getMediaInfo(newAudio);
+    queue queue;
+    QList<QStringList> newAudioInfo = queue.getInputDetails(newAudio);
     int streamcount = newAudioInfo[0][1].toInt();
-//    QMessageBox::information(this,"derp","newAudioInfo[7][1]");
     if (streamcount > 0)
     {
         altAudioStreams = streamcount;
-        altAudioCodecs = newAudioInfo[9];
+        altAudioCodecs = newAudioInfo[10];
         ui->externalAudioSource->setText(newAudio);
         setAudioStream();
     }
@@ -585,7 +587,7 @@ void configure::on_buttonBox_accepted()
                                       videoEncMode, videoEncPreset, videoEncTune, QString::number(videoEncBitrate), outputAudioSource, outputAudioStream, outputAudioCodec,
                                     audioEncMode, QString::number(audioEncBitrate),QString::number(copyaudio)};
 
-    fs.chnageSettings(selectedFile, configurationList);
+    fs.changeSettings(selectedFile, inputVideoBitDepths[ui->selectVideoStream->currentIndex()], configurationList);
 
     this->close();
 }
@@ -594,7 +596,8 @@ void configure::on_recontainer_clicked()
 {
     if (selectedFile < 0)
     {
-        fs.setupRecontainer();
+        queue queue;
+        queue.setupRecontainer();
         QMessageBox::information(this,"Settings Changed", "Settings changed to recontainer all files in the queue compatible with possible output containers.");
         this->close();
     }
@@ -667,10 +670,26 @@ void configure::on_browseOutput_clicked()
     dialog.setFileMode(QFileDialog::Directory);
     dialog.setOption(QFileDialog::ShowDirsOnly);
     QString outputFolder = dialog.getExistingDirectory(this,"Select Output Directory");
-    if (outputFolder.right(outputFolder.size()) != "/" && outputFolder != "")
+    if (outputFolder != "")
     {
-        outputFolder = outputFolder + "/";
-        ui->outputFolder->setText(outputFolder);
+        if (outputFolder.right(1) != "/")
+            outputFolder = outputFolder + "/";
+
+        //QFileInfo testDir(outputFolder);
+        //testDir.permission(QFile::WriteUser)
+
+//        QFile testDir(outputFolder + ".AMVtooltest");
+
+        filesettings fs;
+        if (fs.checkFolder(outputFolder))
+        {
+            ui->outputFolder->setText(outputFolder);
+        }
+        else
+        {
+            QMessageBox::warning(this,"Error","Destination folder is not writable!");
+        }
+
     }
 }
 
@@ -680,6 +699,7 @@ void configure::on_selectVideoStream_currentIndexChanged(int index)
     if (ui->selectMatrix->currentIndex() != -1)
     {
         outputColorMatrix = "DETECT";
+        setColorSpace();
         setColorMatrix();
     }
 
@@ -782,7 +802,7 @@ void configure::on_copyAudio_toggled(bool checked)
     setAudioVisibility();
 }
 
-void configure::on_encodeIncompatible_toggled(bool checked)
+void configure::on_encodeIncompatible_toggled()
 {
     setAudioVisibility();
 }

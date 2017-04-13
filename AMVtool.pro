@@ -15,7 +15,10 @@ SOURCES += Source/main.cpp\
         Source/amvtool.cpp \
     Source/configure.cpp \
     Source/filesettings.cpp \
-    Source/setupencode.cpp
+    Source/setupencode.cpp \
+    Source/queue.cpp \
+    Source/progress.cpp \
+    Source/dependencies.cpp
 
 linux: SOURCES += Source/checkmedia.cpp
 macx: SOURCES += Source/checkmedia.cpp
@@ -25,7 +28,10 @@ HEADERS  += Source/amvtool.h \
     Source/configure.h \
     Source/filesettings.h \
     Source/checkmedia.h \
-    Source/setupencode.h
+    Source/setupencode.h \
+    Source/queue.h \
+    Source/progress.h \
+    Source/dependencies.h
 
 FORMS    += Source/amvtool.ui \
             Source/configure.ui
@@ -37,7 +43,7 @@ DEPENDPATH += $$PWD/Resources
 linux: LIBS += -lmediainfo
 linux: CONFIG += c++11
 macx: LIBS += -L$$PWD/Resources -lmediainfo.0
-win32:CONFIG(release, debug|release): LIBS +=  -lMediaInfo
+win32:CONFIG(release, debug|release): LIBS +=  -lmediainfo -lavisynthwrapper
 
 
 macx: ICON = Resources/icon.icns

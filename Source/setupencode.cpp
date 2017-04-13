@@ -29,9 +29,9 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
     outputfile = OutputFile(fileInfo[1], container.toLower());
     if (inputDetails[0][2] == "VapourSynth")
     {
-        if (inputDetails[3][vstream].contains("RGB"))
+        if (inputDetails[4][vstream].contains("RGB"))
         {
-            ffmpegcommand.append({ "-f", "rawvideo", "-pix_fmt", "gbrp", "-s", inputDetails[5][vstream] + "x" + inputDetails[6][vstream], "-r", inputDetails[7][vstream]});
+            ffmpegcommand.append({ "-f", "rawvideo", "-pix_fmt", "gbrp", "-s", inputDetails[6][vstream] + "x" + inputDetails[7][vstream], "-r", inputDetails[8][vstream]});
         }
         ffmpegcommand.append({ "-i", "pipe:" });
     }
@@ -70,7 +70,7 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
             {
                 for (int i = 0; i < inputDetails[0][1].toInt(); i++)
                 {
-                    streamID = inputDetails[8][i].toInt()-1;
+                    streamID = inputDetails[9][i].toInt()-1;
                     if (streamID < 0)
                     {
                         streamID = 0;
@@ -78,7 +78,7 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
                     bool usestream = true;
                     if (acodec == "copy" && container != "MKV")
                     {
-                        usestream = canCopyAudio(container, inputDetails[9][i]);
+                        usestream = canCopyAudio(container, inputDetails[10][i]);
                     }
                     if (usestream)
                     {
@@ -90,7 +90,7 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
             if (astream.toLower() != "all" && astream.toLower() != "none")
             {
                 int stream = astream.toInt()-1;
-                streamID = inputDetails[8][stream].toInt()-1;
+                streamID = inputDetails[9][stream].toInt()-1;
                 if (streamID < 0)
                 {
                     streamID = 0;
@@ -183,7 +183,6 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
     {
         ffmpegcommand.append("-an");
     }
-
     ffmpegcommand.append("-y");
 
     if (mainQueueInfo[queue][3] == "1" && vmode.contains("Bitrate"))

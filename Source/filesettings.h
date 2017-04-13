@@ -1,15 +1,12 @@
 #ifndef FILESETTINGS_H
 #define FILESETTINGS_H
-#include <QStringList>
+#include <QList>
 
-#ifdef __APPLE__
-#define lcontainer "MOV"
-#define lastreams "ALL"
-#define lacodec "ALAC"
+#ifdef WIN32
+#define _UNICODE
+#define OS "Windows"
 #else
-#define lcontainer "AVI"
-#define lastreams "1"
-#define lacodec "PCM"
+#define OS "Unix"
 #endif
 
 extern QList<QStringList> mainQueueInfo;
@@ -18,20 +15,13 @@ extern QList<QStringList> outputConfig;
 
 class filesettings
 {
-
-
 public:
-    filesettings();
-    QString InputFiles(QString inputFile);
-    void chnageSettings(int ql, QStringList configurationList);
-    void removeSettings(int ql);
-    QList<QStringList> getInputDetails(QString mediafile);
-    void setupLossless();
-    void setupRecontainer();
-    QString pickContainer(QString container, QString codec);
-
-private:
+    bool checkFolder(QString folder);
     void addSettings(QString originalLocation, bool isVPY);
+    void changeSettings(int ql, QString bitdepth, QStringList configurationList);
+    void removeSettings(int ql);
+    void recontainerSettings(QList<QStringList> mediaInfo, int vstream, int queue);
+    QString pickContainer(QString container, QString codec);
 };
 
 #endif // FILESETTINGS_H

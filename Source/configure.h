@@ -5,9 +5,6 @@
 #include "filesettings.h"
 
 
-
-
-
 namespace Ui {
 class configure;
 }
@@ -49,12 +46,12 @@ private slots:
 
     void on_copyAudio_toggled(bool checked);
 
-    void on_encodeIncompatible_toggled(bool checked);
+    void on_encodeIncompatible_toggled();
 
     void on_recontainer_clicked();
 
 private:
-    Ui::configure *ui;
+    Ui::configure *ui;    
     filesettings fs;
 
     int selectedFile;
@@ -64,6 +61,7 @@ private:
     QString inputContainer;
     int altAudioStreams;
 
+    QStringList inputVideoBitDepths;
     QStringList inputVideoCodecs;
     QStringList inputVideoHeight;
     QStringList inputColorSpaces;
@@ -92,8 +90,7 @@ private:
     void getAltAudioCodecs(QString newAudio);
     bool externalaudio = false;
 
-    QString inputVideoCodec;
-    QString inputColorSpace;
+
 
     QString outputLocation;
     QString outputContainer;

@@ -17,39 +17,44 @@ class checkmedia : public QObject
     Q_OBJECT
 
 public:
+    QString checkFormats();
     checkmedia(QObject *parent = 0);
-    QList<QStringList> getMediaInfo(QString inputFile);
-    QList<QStringList> checkVPY(QString inputScript);
-
-
+    QList<QStringList> checkMedia(QString inputFile);
 
 private slots:
-    void setVPYDetails(int, QProcess::ExitStatus);
+    void readErrors();
     void readOutput();
 
 private:
-        QString vpyWidth;
-        QString vpyHeight;
-        QString vpyFrames;
-        QString vpyFPS;
-        QString vpyColorSpace;
-        bool vpyfail;
-        QProcess *vspipe;
-        QList<QStringList> inputMediaInfo;
+    QList<QStringList> getMediaInfo(QString inputFile);
+    QList<QStringList> checkAVS(QString inputScript);
+    QList<QStringList> checkVPY(QString inputScript);
+    void setVPYDetails();
 
-        int inputVideoStreams;
-        int inputAudioStreams;
-        QString inputContainer;
-        QStringList inputVideoStreamIDs;
-        QStringList inputVideoCodecs;
-        QStringList inputColorSpaces;
-        QStringList inputColorMatrix;
-        QStringList inputVideoWidth;
-        QStringList inputVideoHeight;
-        int inputDuration;
-        QStringList inputFPS;
-        QStringList inputAudioStreamIDs;
-        QStringList inputAudioCodecs;
+    QString vpyWidth;
+    QString vpyHeight;
+    QString vpyFrames;
+    QString vpyFPS;
+    QString vpyColorSpace;
+    QString vpyBitDepth;
+    bool vpyfail;
+    QProcess *vspipe;
+    QList<QStringList> inputMediaInfo;
+
+    int inputVideoStreams;
+    int inputAudioStreams;
+    QString inputContainer;
+    QStringList inputVideoStreamIDs;
+    QStringList inputVideoBitDepths;
+    QStringList inputVideoCodecs;
+    QStringList inputColorSpaces;
+    QStringList inputColorMatrix;
+    QStringList inputVideoWidth;
+    QStringList inputVideoHeight;
+    int inputDuration;
+    QStringList inputFPS;
+    QStringList inputAudioStreamIDs;
+    QStringList inputAudioCodecs;
 
 };
 

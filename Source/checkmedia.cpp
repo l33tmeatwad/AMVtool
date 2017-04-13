@@ -10,6 +10,50 @@ checkmedia::checkmedia(QObject *parent) : QObject(parent)
 
 }
 
+QString checkmedia::checkFormats()
+{
+    QString mediaformats = "Media Files (*.avi *.avs *m2ts *.m4v *.mov *.mkv *.mp4 *ts *.vpy)";
+    vpyfail = false;
+    vspipe = new QProcess(this);
+    QStringList vspipecommand = { "--version" };
+    connect(vspipe, SIGNAL(readyReadStandardOutput()), this, SLOT(readOutput()));
+    connect(vspipe, SIGNAL(error(QProcess::ProcessError)), this, SLOT(readErrors()));
+    vspipe->setProcessChannelMode(QProcess::MergedChannels);
+    vspipe->start(vspipeexec, vspipecommand);
+    vspipe->waitForFinished();
+    vspipe->deleteLater();
+
+    if (vpyfail == true)
+    {
+        mediaformats.replace(" *.vpy", "");
+    }
+
+    mediaformats.replace(" *.avs", "");
+
+    return mediaformats;
+}
+
+QList<QStringList> checkmedia::checkMedia(QString inputFile)
+{
+    if (inputFile.right(3).toLower() == "vpy")
+    {
+        inputMediaInfo = checkVPY(inputFile);
+    }
+    else
+    {
+        if (inputFile.right(3).toLower() == "avs")
+        {
+            inputMediaInfo = checkAVS(inputFile);
+        }
+        else
+        {
+            inputMediaInfo = getMediaInfo(inputFile);
+        }
+    }
+    return inputMediaInfo;
+}
+
+
 QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
 {
     QStringList inputMediaDetails;
@@ -31,10 +75,27 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
         for (int i = 0; i < inputVideoStreams; i++)
         {
             inputVideoStreamIDs.append(QString::fromStdString(MI.Get(Stream_Video, i, __T("ID"), Info_Text, Info_Name)));
+            QString bitdepth = QString::fromStdString(MI.Get(Stream_Video, i, __T("BitDepth"), Info_Text, Info_Name));
             QString VideoCodec = QString::fromStdString(MI.Get(Stream_Video, i, __T("Format"), Info_Text, Info_Name));
             if (VideoCodec == "YUV" || VideoCodec == "RGBA" || VideoCodec == "RGB")
                 VideoCodec = QString::fromStdString(MI.Get(Stream_Video, i, __T("CodecID"), Info_Text, Info_Name));
 
+            QStringList UTcodec = { "ULRG", "ULRA", "UQRG", "UQRA", "ULY0", "ULY2", "ULH0", "ULH2", "UQY2" };
+            foreach (QString codec, UTcodec)
+            {
+                if (VideoCodec.contains(codec))
+                {
+                    VideoCodec = codec;
+                    if (VideoCodec.contains("Q"))
+                    {
+                        bitdepth = "10";
+                    }
+                    else
+                    {
+                        bitdepth = "8";
+                    }
+                }
+            }
             inputVideoCodecs.append(VideoCodec);
 
             QString colorspace = QString::fromStdString(MI.Get(Stream_Video, i, __T("ColorSpace"), Info_Text, Info_Name));
@@ -42,35 +103,48 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
 
             if (inputContainer.toLower() == "quicktime")
             {
-                if (inputVideoCodecs[i] == "ULRG")
+                if (inputVideoCodecs[i].contains("ULRG"))
                 {
                     colorspace = "RGB24";
                 }
-                if (inputVideoCodecs[i] == "ULRA")
+                if (inputVideoCodecs[i].contains("ULRA"))
                 {
                     colorspace = "RGBA";
                 }
-                if (inputVideoCodecs[i] == "ULY0" || inputVideoCodecs[i] == "ULY2")
+                if (inputVideoCodecs[i].contains("ULY0") || inputVideoCodecs[i].contains("ULY2"))
                 {
                     colorspace = "YUV";
                     colormatrix = "BT.601";
                 }
-                if (inputVideoCodecs[i] == "ULH0" || inputVideoCodecs[i] == "ULH2" || inputVideoCodecs[i] == "UQY2")
+                if (inputVideoCodecs[i].contains("ULH0") || inputVideoCodecs[i].contains("ULH2") || inputVideoCodecs[i].contains("UQY2"))
                 {
                     colorspace = "YUV";
                     colormatrix = "BT.709";
                 }
             }
+
+
+
+
             if (colorspace.toLower() == "yuv")
             {
                 colorspace.append(QString::fromStdString(MI.Get(Stream_Video, i, __T("ChromaSubsampling"), Info_Text, Info_Name))).replace(":","");
-                colorspace.append("P" + QString::fromStdString(MI.Get(Stream_Video, i, __T("BitDepth"), Info_Text, Info_Name)));
+                colorspace.append("P" + bitdepth);
 
             }
 
             inputColorSpaces.append(colorspace);
             inputColorMatrix.append(colormatrix);
 
+            if (bitdepth == "")
+            {
+                bitdepth = "Bitdepth Unknown";
+            }
+            else
+            {
+                bitdepth = bitdepth + "bit";
+            }
+            inputVideoBitDepths.append(bitdepth);
 
 
             inputVideoWidth.append(QString::fromStdString(MI.Get(Stream_Video, i, __T("Width"), Info_Text, Info_Name)));
@@ -94,9 +168,19 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
         inputMediaDetails.append({ "0", "0", "Error", "0" });
     }
     MI.Close();
-    inputMediaInfo = { inputMediaDetails, inputVideoStreamIDs, inputVideoCodecs, inputColorSpaces, inputColorMatrix, inputVideoWidth, inputVideoHeight, inputFPS, inputAudioStreamIDs, inputAudioCodecs };
+    inputMediaInfo = { inputMediaDetails, inputVideoStreamIDs, inputVideoBitDepths, inputVideoCodecs, inputColorSpaces, inputColorMatrix, inputVideoWidth, inputVideoHeight, inputFPS, inputAudioStreamIDs, inputAudioCodecs };
 
     return inputMediaInfo;
+}
+
+QList<QStringList> checkmedia::checkAVS(QString inputScript)
+{
+    QStringList inputMediaDetails;
+    inputMediaDetails.append({ "0", "0", "Error", "0" });
+
+    inputMediaInfo = { inputMediaDetails, {"1"}, {"8bit"}, inputVideoCodecs, inputColorSpaces, inputColorMatrix, inputVideoWidth, inputVideoHeight, inputFPS, {"2"}, inputAudioCodecs };
+    return inputMediaInfo;
+
 }
 
 QList<QStringList> checkmedia::checkVPY(QString inputScript)
@@ -106,16 +190,17 @@ QList<QStringList> checkmedia::checkVPY(QString inputScript)
     vspipe = new QProcess(this);
     QStringList vspipecommand = { "--info", inputScript, "-" };
     connect(vspipe, SIGNAL(readyReadStandardOutput()), this, SLOT(readOutput()));
-    connect(vspipe, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(setVPYDetails(int, QProcess::ExitStatus)));
+    connect(vspipe, SIGNAL(error(QProcess::ProcessError)), this, SLOT(readErrors()));
     vspipe->setProcessChannelMode(QProcess::MergedChannels);
     vspipe->start(vspipeexec, vspipecommand);
     vspipe->waitForFinished();
     vspipe->deleteLater();
+    setVPYDetails();
 
     return inputMediaInfo;
 }
 
-void checkmedia::setVPYDetails(int, QProcess::ExitStatus)
+void checkmedia::setVPYDetails()
 {
     QStringList inputMediaDetails;
     if (vpyfail == false)
@@ -126,6 +211,7 @@ void checkmedia::setVPYDetails(int, QProcess::ExitStatus)
         float fpsden = vpyFPS.right(vpyFPS.indexOf("/")-1).toInt();
         int duration = (vpyFrames.toFloat()/(fpsnum/fpsden))*1000;
 
+        inputVideoBitDepths.append(vpyBitDepth + "bit");
         inputVideoCodecs.append("Script");
         inputColorSpaces.append(vpyColorSpace);
         inputColorMatrix.append("DETECT");
@@ -142,8 +228,14 @@ void checkmedia::setVPYDetails(int, QProcess::ExitStatus)
         inputMediaDetails.append({ "0", "0", "Error", "0" });
     }
 
-    inputMediaInfo = { inputMediaDetails, {"1"}, inputVideoCodecs, inputColorSpaces, inputColorMatrix, inputVideoWidth, inputVideoHeight, inputFPS, {"0"}, inputAudioCodecs };
+    inputMediaInfo = { inputMediaDetails, {"1"}, inputVideoBitDepths, inputVideoCodecs, inputColorSpaces, inputColorMatrix, inputVideoWidth, inputVideoHeight, inputFPS, {"0"}, inputAudioCodecs };
 
+}
+
+void checkmedia::readErrors()
+{
+    vpyfail = true;
+    vspipe->kill();
 }
 
 void checkmedia::readOutput()
@@ -175,6 +267,10 @@ void checkmedia::readOutput()
         if (vsline.contains("Format Name") )
         {
             vpyColorSpace = vsline.simplified().replace("Format Name: ", "");
+        }
+        if (vsline.contains("Bits: ") )
+        {
+            vpyBitDepth = vsline.simplified().replace("Bits: ", "");
         }
     }
 }

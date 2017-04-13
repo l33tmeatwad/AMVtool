@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>600</width>
-    <height>350</height>
+    <height>370</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -19,20 +19,20 @@
   <property name="minimumSize">
    <size>
     <width>600</width>
-    <height>350</height>
+    <height>370</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>600</width>
-    <height>350</height>
+    <height>370</height>
    </size>
   </property>
   <property name="acceptDrops">
    <bool>false</bool>
   </property>
   <property name="windowTitle">
-   <string>AMVtool (Beta 5)</string>
+   <string>AMVtool (Beta 6)</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QListWidget" name="fileList">
@@ -61,11 +61,11 @@
      </rect>
     </property>
    </widget>
-   <widget class="QWidget" name="mainbuttonsLayoutWidget">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>250</y>
+      <y>252</y>
       <width>581</width>
       <height>91</height>
      </rect>
@@ -74,7 +74,7 @@
      <item row="0" column="0">
       <widget class="QPushButton" name="addFiles">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -103,7 +103,7 @@
      <item row="0" column="3">
       <widget class="QPushButton" name="removeFiles">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -120,7 +120,7 @@
        </property>
        <property name="sizeHint" stdset="0">
         <size>
-         <width>78</width>
+         <width>68</width>
          <height>20</height>
         </size>
        </property>
@@ -129,20 +129,7 @@
      <item row="0" column="5">
       <widget class="QPushButton" name="configAll">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>Configure All</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="6">
-      <widget class="QPushButton" name="convertFiles">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -154,7 +141,26 @@
         </size>
        </property>
        <property name="text">
-        <string>GO</string>
+        <string>Configure All</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="6">
+      <widget class="QPushButton" name="convertFiles">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>106</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>START</string>
        </property>
        <property name="default">
         <bool>true</bool>
@@ -171,7 +177,7 @@
        </property>
        <property name="minimumSize">
         <size>
-         <width>120</width>
+         <width>121</width>
          <height>0</height>
         </size>
        </property>
@@ -259,21 +265,11 @@
     </layout>
    </widget>
   </widget>
-  <action name="actionDerp">
-   <property name="text">
-    <string>Derp</string>
+  <widget class="QStatusBar" name="statusBar">
+   <property name="sizeGripEnabled">
+    <bool>false</bool>
    </property>
-  </action>
-  <action name="actionSpanish">
-   <property name="text">
-    <string>Spanish</string>
-   </property>
-  </action>
-  <action name="actionSpanish_2">
-   <property name="text">
-    <string>Spanish</string>
-   </property>
-  </action>
+  </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

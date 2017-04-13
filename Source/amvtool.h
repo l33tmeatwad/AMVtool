@@ -1,20 +1,15 @@
 #ifndef AMVTOOL_H
 #define AMVTOOL_H
-#include "setupencode.h"
 #include <QMainWindow>
 #include <QProcess>
 #include <QDragEnterEvent>
 #include <QFileDialog>
+#include <QLabel>
 
 #ifdef WIN32
 #define _UNICODE
-#define ffmpegexec qApp->applicationDirPath() + "/" + "ffmpeg.exe"
 #define vspipeexec qApp->applicationDirPath() + "/" + "vspipe.exe"
-#elif __linux__
-#define ffmpegexec "/usr/bin/ffmpeg"
-#define vspipeexec "/usr/local/bin/vspipe"
 #else
-#define ffmpegexec qApp->applicationDirPath() + "/" + "ffmpeg"
 #define vspipeexec "/usr/local/bin/vspipe"
 #endif
 
@@ -32,31 +27,18 @@ public:
     explicit AMVtool(QWidget *parent = 0);
     ~AMVtool();
 
-
-
-
 private slots:
-
-
     void on_addFiles_clicked();
-
     void encodeFinished(int exitcode, QProcess::ExitStatus);
-
     void on_removeFiles_clicked();
-
     void readyReadStandardOutput();
-
     void on_configEncSettings_clicked();
-
     void on_fileList_doubleClicked(const QModelIndex &index);
-
     void on_convertFiles_clicked();
-
     void on_fileList_clicked();
-
     void on_configAll_clicked();
-
     void on_showDetails_clicked();
+    void readErrors();
 
 protected:
     void dragEnterEvent(QDragEnterEvent *e);
@@ -64,31 +46,33 @@ protected:
 
 private:
     Ui::AMVtool *ui;
+    QLabel *timeRemaining;
+    QString checkDependencies();
     void addFilesToQueue(QStringList inputFiles);
     void openConfigBox(int selectedfile);
-    float parseTimecode(QString timecode);
-    int currentProcess(QString currentstatus);
     void changeEnabled(bool status, QString button);
-
+    void updateQueue(int pos, QString status);
     void CheckQueue();
-    void Encode(int queue, QList<QStringList> inputDetails, QStringList configList);
+    void ProcessFile(int pos);
+    QString selectNewFolder();
+    void Encode(int pos, QList<QStringList> inputDetails, QStringList configList);
+
+    QString ffmpegexec;
     QString mediatypes;
-    QString outputfile;
+//    QString outputfile;
     QString mOutputString;
 
     QFileDialog dialog;
 
     QProcess *encode;
     QProcess *pipe;
-    int queue;
-    float progress;
+    int position;
     bool stopprocess;
     bool outputcreated;
 
 
     int inputDuration;
 
-    QString timecode = "time=+([0-9][0-9]):([0-9][0-9]):([0-9][0-9](\\.[0-9][0-9]?)?)";
 };
 
 #endif // AMVTOOL_H

@@ -57,7 +57,7 @@ checkmedia::checkmedia(QObject *parent) : QObject(parent)
 
 QString checkmedia::checkFormats()
 {
-    QString mediaformats = "Media Files (*.avi *.avs *m2ts *.m4v *.mov *.mkv *.mp4 *ts *.vpy)";
+    QString mediaformats = "Media Files (*.avi *.avs *.m4v *.mov *.mkv *.mp4 *.vpy)";
     vpyfail = false;
     vspipe = new QProcess(this);
     QStringList vspipecommand = { "--version" };
@@ -130,14 +130,17 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
         inputMediaDetails.append({ QString::number(inputVideoStreams),QString::number(inputAudioStreams),inputContainer, QString::number(inputDuration) });
         for (int i = 0; i < inputVideoStreams; i++)
         {
-            int videoID = QString::fromStdWString(MI.Get(Stream_Video, i, __T("ID"), Info_Text, Info_Name).c_str()).toInt();
+            QString videoID;
             if (inputContainer == "AVI")
             {
-                videoID = videoID + 1;
+                videoID = QString::fromStdWString(MI.Get(Stream_Video, i, __T("ID"), Info_Text, Info_Name).c_str());
+            }
+            else
+            {
+                videoID = QString::fromStdWString(MI.Get(Stream_Video, i, __T("StreamOrder"), Info_Text, Info_Name).c_str());
             }
 
-
-            inputVideoStreamIDs.append(QString::number(videoID));
+            inputVideoStreamIDs.append(videoID);
             QString bitdepth = QString::fromStdWString(MI.Get(Stream_Video, i, __T("BitDepth"), Info_Text, Info_Name).c_str());
             QString VideoCodec = QString::fromStdWString(MI.Get(Stream_Video, i, __T("Format"), Info_Text, Info_Name).c_str());
             if (VideoCodec == "YUV" || VideoCodec == "RGBA" || VideoCodec == "RGB")
@@ -212,12 +215,16 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
         }
         for (int i = 0; i < inputAudioStreams; i++)
         {
-            int audioID = QString::fromStdWString(MI.Get(Stream_Audio, i, __T("ID"), Info_Text, Info_Name).c_str()).toInt();
+            QString audioID;
             if (inputContainer == "AVI")
             {
-                audioID = audioID + 1;
+                audioID = QString::fromStdWString(MI.Get(Stream_Audio, i, __T("ID"), Info_Text, Info_Name).c_str());
             }
-            inputAudioStreamIDs.append(QString::number(audioID));
+            else
+            {
+                audioID = QString::fromStdWString(MI.Get(Stream_Audio, i, __T("StreamOrder"), Info_Text, Info_Name).c_str());
+            }
+            inputAudioStreamIDs.append(audioID);
 
             inputAudioCodecs.append(QString::fromStdWString(MI.Get(Stream_Audio, i, __T("Format"), Info_Text, Info_Name).c_str()));
         }

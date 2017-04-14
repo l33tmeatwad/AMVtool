@@ -12,7 +12,7 @@ checkmedia::checkmedia(QObject *parent) : QObject(parent)
 
 QString checkmedia::checkFormats()
 {
-    QString mediaformats = "Media Files (*.avi *.avs *m2ts *.m4v *.mov *.mkv *.mp4 *ts *.vpy)";
+    QString mediaformats = "Media Files (*.avi *.avs *.m4v *.mov *.mkv *.mp4 *.vpy)";
     vpyfail = false;
     vspipe = new QProcess(this);
     QStringList vspipecommand = { "--version" };
@@ -74,14 +74,17 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
         inputMediaDetails.append({ QString::number(inputVideoStreams),QString::number(inputAudioStreams),inputContainer, QString::number(inputDuration) });
         for (int i = 0; i < inputVideoStreams; i++)
         {
-            int videoID = QString::fromStdString(MI.Get(Stream_Video, i, __T("ID"), Info_Text, Info_Name)).toInt();
+            QString videoID;
             if (inputContainer == "AVI")
             {
-                videoID = videoID + 1;
+                videoID = QString::fromStdString(MI.Get(Stream_Video, i, __T("ID"), Info_Text, Info_Name));
+            }
+            else
+            {
+                videoID = QString::fromStdString(MI.Get(Stream_Video, i, __T("StreamOrder"), Info_Text, Info_Name));
             }
 
-
-            inputVideoStreamIDs.append(QString::number(videoID));
+            inputVideoStreamIDs.append(videoID);
             QString bitdepth = QString::fromStdString(MI.Get(Stream_Video, i, __T("BitDepth"), Info_Text, Info_Name));
             QString VideoCodec = QString::fromStdString(MI.Get(Stream_Video, i, __T("Format"), Info_Text, Info_Name));
             if (VideoCodec == "YUV" || VideoCodec == "RGBA" || VideoCodec == "RGB")
@@ -160,12 +163,16 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
         }
         for (int i = 0; i < inputAudioStreams; i++)
         {
-            int audioID = QString::fromStdString(MI.Get(Stream_Audio, i, __T("ID"), Info_Text, Info_Name)).toInt();
+            QString audioID;
             if (inputContainer == "AVI")
             {
-                audioID = audioID + 1;
+                audioID = QString::fromStdString(MI.Get(Stream_Audio, i, __T("ID"), Info_Text, Info_Name));
             }
-            inputAudioStreamIDs.append(QString::number(audioID));
+            else
+            {
+                audioID = QString::fromStdString(MI.Get(Stream_Audio, i, __T("StreamOrder"), Info_Text, Info_Name));
+            }
+            inputAudioStreamIDs.append(audioID);
 
             QString audiocodec = QString::fromStdString(MI.Get(Stream_Audio, i, __T("Format"), Info_Text, Info_Name));
             if (audiocodec == "MPEG Audio")
@@ -191,7 +198,7 @@ QList<QStringList> checkmedia::checkAVS(QString inputScript)
     QStringList inputMediaDetails;
     inputMediaDetails.append({ "0", "0", "Error", "0" });
 
-    inputMediaInfo = { inputMediaDetails, {"1"}, {"8bit"}, inputVideoCodecs, inputColorSpaces, inputColorMatrix, inputVideoWidth, inputVideoHeight, inputFPS, {"2"}, inputAudioCodecs };
+    inputMediaInfo = { inputMediaDetails, {"0"}, {"8bit"}, inputVideoCodecs, inputColorSpaces, inputColorMatrix, inputVideoWidth, inputVideoHeight, inputFPS, {"1"}, inputAudioCodecs };
     return inputMediaInfo;
 
 }
@@ -241,7 +248,7 @@ void checkmedia::setVPYDetails()
         inputMediaDetails.append({ "0", "0", "Error", "0" });
     }
 
-    inputMediaInfo = { inputMediaDetails, {"1"}, inputVideoBitDepths, inputVideoCodecs, inputColorSpaces, inputColorMatrix, inputVideoWidth, inputVideoHeight, inputFPS, {"0"}, inputAudioCodecs };
+    inputMediaInfo = { inputMediaDetails, {"0"}, inputVideoBitDepths, inputVideoCodecs, inputColorSpaces, inputColorMatrix, inputVideoWidth, inputVideoHeight, inputFPS, {"1"}, inputAudioCodecs };
 
 }
 

@@ -47,13 +47,8 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
 
     if (inputDetails[0][0].toInt() > 1 || inputDetails[0][1].toInt() > 0 || asource != "Original Audio")
     {
-        int streamID = inputDetails[1][vstream].toInt();
-        if (streamID > 0)
-        {
-            streamID = streamID-1;
-        }
 
-        ffmpegcommand.append({"-map", "0:" +  QString::number(streamID)});
+        ffmpegcommand.append({"-map", "0:" +  inputDetails[1][vstream]});
         if (astream != "None")
         {
             QString source;
@@ -70,11 +65,6 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
             {
                 for (int i = 0; i < inputDetails[0][1].toInt(); i++)
                 {
-                    streamID = inputDetails[9][i].toInt()-1;
-                    if (streamID < 0)
-                    {
-                        streamID = 0;
-                    }
                     bool usestream = true;
                     if (acodec == "copy" && container != "MKV")
                     {
@@ -82,7 +72,7 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
                     }
                     if (usestream)
                     {
-                        ffmpegcommand.append({"-map", source + ":" + QString::number(streamID)});
+                        ffmpegcommand.append({"-map", source + ":" + inputDetails[9][i]});
                     }
 
                 }
@@ -90,12 +80,7 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
             if (astream.toLower() != "all" && astream.toLower() != "none")
             {
                 int stream = astream.toInt()-1;
-                streamID = inputDetails[9][stream].toInt()-1;
-                if (streamID < 0)
-                {
-                    streamID = 0;
-                }
-                ffmpegcommand.append({"-map", source + ":" + QString::number(streamID)});
+                ffmpegcommand.append({"-map", source + ":" + inputDetails[9][stream]});
             }
         }
     }

@@ -130,7 +130,14 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
         inputMediaDetails.append({ QString::number(inputVideoStreams),QString::number(inputAudioStreams),inputContainer, QString::number(inputDuration) });
         for (int i = 0; i < inputVideoStreams; i++)
         {
-            inputVideoStreamIDs.append(QString::fromStdWString(MI.Get(Stream_Video, i, __T("ID"), Info_Text, Info_Name).c_str()));
+            int videoID = QString::fromStdWString(MI.Get(Stream_Video, i, __T("ID"), Info_Text, Info_Name).c_str()).toInt();
+            if (inputContainer == "AVI")
+            {
+                videoID = videoID + 1;
+            }
+
+
+            inputVideoStreamIDs.append(QString::number(videoID));
             QString bitdepth = QString::fromStdWString(MI.Get(Stream_Video, i, __T("BitDepth"), Info_Text, Info_Name).c_str());
             QString VideoCodec = QString::fromStdWString(MI.Get(Stream_Video, i, __T("Format"), Info_Text, Info_Name).c_str());
             if (VideoCodec == "YUV" || VideoCodec == "RGBA" || VideoCodec == "RGB")
@@ -205,7 +212,13 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
         }
         for (int i = 0; i < inputAudioStreams; i++)
         {
-            inputAudioStreamIDs.append(QString::fromStdWString(MI.Get(Stream_Audio, i, __T("ID"), Info_Text, Info_Name).c_str()));
+            int audioID = QString::fromStdWString(MI.Get(Stream_Audio, i, __T("ID"), Info_Text, Info_Name).c_str()).toInt();
+            if (inputContainer == "AVI")
+            {
+                audioID = audioID + 1;
+            }
+            inputAudioStreamIDs.append(QString::number(audioID));
+
             inputAudioCodecs.append(QString::fromStdWString(MI.Get(Stream_Audio, i, __T("Format"), Info_Text, Info_Name).c_str()));
         }
 

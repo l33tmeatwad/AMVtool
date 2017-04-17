@@ -113,6 +113,11 @@ QString filesettings::pickContainer(QString container, QString codec)
         if (MP4.contains(codec))
             newcontainer = "MP4";
     }
+    if (container == "BDAV")
+    {
+        if (MP4.contains(codec))
+            newcontainer = "MP4";
+    }
     if (container == "Matroska")
     {
         if (AVI.contains(codec))

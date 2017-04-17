@@ -75,7 +75,7 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
                     bool usestream = true;
                     if (acodec == "copy" && container != "MKV")
                     {
-                        usestream = canCopyAudio(container, inputDetails[11][i]);
+                        usestream = canCopyAudio(container, inputDetails[10][i]);
                     }
                     if (usestream)
                     {

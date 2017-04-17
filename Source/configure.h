@@ -111,9 +111,9 @@ private:
 
     int vsIndex;
     int asIndex;
-    QStringList AVI = { "ULRG", "ULRA", "ULY0", "ULH0", "ULY2", "ULH2", "YQY2", "XviD", "MP3", "PCM"};
+    QStringList AVI = { "ULRG", "ULRA", "ULY0", "ULH0", "ULY2", "ULH2", "YQY2", "XviD", "MPEG Audio", "PCM"};
     QStringList MOV = { "AVC", "HEVC", "MPEG-4", "ULRG", "ULRA", "ULY0", "ULH0", "ULY2", "ULH2", "YQY2", "AAC", "AC-3", "PCM"};
-    QStringList MP4 = { "AVC", "HEVC", "MPEG-4", "AAC", "AC-3", "MP3"};
+    QStringList MP4 = { "AVC", "HEVC", "MPEG-4", "AAC", "AC-3", "MPEG Audio"};
 };
 
 #endif // CONFIGURE_H

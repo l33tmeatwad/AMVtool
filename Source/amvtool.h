@@ -59,7 +59,6 @@ private:
 
     QString ffmpegexec;
     QString mediatypes;
-//    QString outputfile;
     QString mOutputString;
 
     QFileDialog dialog;
@@ -71,7 +70,7 @@ private:
     bool outputcreated;
 
 
-    int inputDuration;
+    float inputDuration;
 
 };
 

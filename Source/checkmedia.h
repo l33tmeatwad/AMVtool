@@ -43,6 +43,7 @@ private:
 
     int inputVideoStreams;
     int inputAudioStreams;
+    float inputDuration;
     QString inputContainer;
     QStringList inputVideoStreamIDs;
     QStringList inputVideoBitDepths;
@@ -51,7 +52,6 @@ private:
     QStringList inputColorMatrix;
     QStringList inputVideoWidth;
     QStringList inputVideoHeight;
-    int inputDuration;
     QStringList inputFPS;
     QStringList inputAudioStreamIDs;
     QStringList inputAudioCodecs;

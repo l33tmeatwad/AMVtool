@@ -387,7 +387,7 @@ QString AMVtool::selectNewFolder()
 
 void AMVtool::Encode(int pos, QList<QStringList> inputDetails, QStringList configList)
 {
-    inputDuration = inputDetails[0][3].toInt();
+    inputDuration = inputDetails[0][3].toFloat();
     outputcreated = false;
     setupencode se;
     encode = new QProcess(this);

@@ -34,21 +34,29 @@ QList<QString> progress::currentProcess(QString currentstatus, float duration)
 
 QString progress::generateTimeLeft(float spd, float dur, float prog)
 {
-    float milli = 1000;
-    float timeleft = ((dur-prog)/milli)/spd;
-    float time = 60;
-    float hours = (timeleft/time)/time;
-    hours = floor(hours);
-    timeleft = timeleft-((hours*time)*time);
-    float minutes = (timeleft/time);
-    minutes = floor(minutes);
-    timeleft = timeleft-(minutes*time);
-    if (QString::number(timeleft).length() < 6)
+    QString remainingTime;
+    if (prog > dur)
     {
-        timeleft = timeleft + 0.0001;
+        remainingTime = "Unknown";
     }
+    else
+    {
+        float milli = 1000;
+        float timeleft = ((dur-prog)/milli)/spd;
+        float time = 60;
+        float hours = (timeleft/time)/time;
+        hours = floor(hours);
+        timeleft = timeleft-((hours*time)*time);
+        float minutes = (timeleft/time);
+        minutes = floor(minutes);
+        timeleft = timeleft-(minutes*time);
+        if (QString::number(timeleft).length() < 6)
+        {
+            timeleft = timeleft + 0.0001;
+        }
 
-    QString remainingTime = buildTimecode(hours) + ":" + buildTimecode(minutes) + ":" + buildTimecode(timeleft);
+        remainingTime = buildTimecode(hours) + ":" + buildTimecode(minutes) + ":" + buildTimecode(timeleft);
+    }
     return remainingTime;
 }
 

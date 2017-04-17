@@ -117,6 +117,8 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
     std::wstring mediaFile = inputFile.toStdWString();
     if (MI.Open(mediaFile))
     {
+        QStringList TSVOB = { "BDAV", "MPEG-PS", "MPEG-TS" };
+        QStringList acontainers = { "ADTS", "AVI", "MPEG Audio", "Wave" };
 
         inputContainer = QString::fromStdWString(MI.Get(Stream_General, 0, __T("Format_Profile"), Info_Text, Info_Name).c_str());
         if (inputContainer.toLower() != "quicktime")
@@ -131,7 +133,7 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
         for (int i = 0; i < inputVideoStreams; i++)
         {
             QString videoID;
-            if (inputContainer == "AVI")
+            if (TSVOB.contains(inputContainer) || inputContainer == "AVI")
             {
                 videoID = QString::fromStdWString(MI.Get(Stream_Video, i, __T("ID"), Info_Text, Info_Name).c_str());
             }
@@ -140,9 +142,20 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
                 videoID = QString::fromStdWString(MI.Get(Stream_Video, i, __T("StreamOrder"), Info_Text, Info_Name).c_str());
             }
 
+            if (TSVOB.contains(inputContainer))
+            {
+                QString IDfix = QString::fromStdWString(MI.Get(Stream_Video, i, __T("ID/String"), Info_Text, Info_Name).c_str());
+                videoID = IDfix.replace(videoID, "").replace("(","").replace(")", "").replace(" ","");
+                if (videoID.contains("0xE"))
+                {
+                    videoID = videoID.replace("0x", "0x1");
+                }
+            }
+
+
             inputVideoStreamIDs.append(videoID);
             QString bitdepth = QString::fromStdWString(MI.Get(Stream_Video, i, __T("BitDepth"), Info_Text, Info_Name).c_str());
-            QString VideoCodec = QString::fromStdWString(MI.Get(Stream_Video, i, __T("Format"), Info_Text, Info_Name).c_str());
+            QString VideoCodec = QString::fromStdWString(MI.Get(Stream_Video, i, __T("Format_Commercial"), Info_Text, Info_Name).c_str());
             if (VideoCodec == "YUV" || VideoCodec == "RGBA" || VideoCodec == "RGB")
                 VideoCodec = QString::fromStdWString(MI.Get(Stream_Video, i, __T("CodecID"), Info_Text, Info_Name).c_str());
 
@@ -216,17 +229,38 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
         for (int i = 0; i < inputAudioStreams; i++)
         {
             QString audioID;
-            if (inputContainer == "AVI")
+            if (TSVOB.contains(inputContainer) || acontainers.contains(inputContainer))
             {
                 audioID = QString::fromStdWString(MI.Get(Stream_Audio, i, __T("ID"), Info_Text, Info_Name).c_str());
+                if (audioID == "")
+                    audioID = "0";
             }
             else
             {
                 audioID = QString::fromStdWString(MI.Get(Stream_Audio, i, __T("StreamOrder"), Info_Text, Info_Name).c_str());
             }
-            inputAudioStreamIDs.append(audioID);
 
-            inputAudioCodecs.append(QString::fromStdWString(MI.Get(Stream_Audio, i, __T("Format"), Info_Text, Info_Name).c_str()));
+            if (TSVOB.contains(inputContainer))
+            {
+                QString IDfix = QString::fromStdWString(MI.Get(Stream_Audio, i, __T("ID/String"), Info_Text, Info_Name).c_str());
+
+                if (IDfix.count("x") > 1)
+                {
+                    audioID = IDfix.right(5).left(4);
+                }
+                else
+                {
+                    audioID = IDfix.replace(audioID, "").replace("(", "").replace(")","").replace(" ","");
+                }
+            }
+
+
+
+            QString audiocodec = QString::fromStdWString(MI.Get(Stream_Audio, i, __T("Format"), Info_Text, Info_Name).c_str());
+
+            inputAudioStreamIDs.append(audioID);
+            inputAudioCodecs.append(audiocodec);
+
         }
 
     }
@@ -261,7 +295,7 @@ QList<QStringList> checkmedia::checkAVS(QString inputScript)
         float fpsnum = vinfo->raten;
         float fpsden = vinfo->rated;
         float avsframes = vinfo->num_frames;
-        int duration = (avsframes/(fpsnum/fpsden))*1000;
+        float duration = (avsframes/(fpsnum/fpsden))*1000;
 
         inputVideoCodecs.append("Script");
         inputColorSpaces.append("RGB");
@@ -322,7 +356,7 @@ void checkmedia::setVPYDetails()
 
         float fpsnum = vpyFPS.left(vpyFPS.indexOf("/")).toInt();
         float fpsden = vpyFPS.right(vpyFPS.indexOf("/")-1).toInt();
-        int duration = (vpyFrames.toFloat()/(fpsnum/fpsden))*1000;
+        float duration = (vpyFrames.toFloat()/(fpsnum/fpsden))*1000;
 
         inputVideoBitDepths.append(vpyBitDepth + "bit");
         inputVideoCodecs.append("Script");

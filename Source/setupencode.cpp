@@ -23,6 +23,7 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
     QString acodec = getAudioCodecName(configList[12]);
     QString amode = configList[13];
     QString abitrate = configList[14];
+    bool acopy = configList[15].toInt();
     QStringList containerCompatibility;
 
     QStringList ffmpegcommand;
@@ -75,7 +76,7 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
                     bool usestream = true;
                     if (acodec == "copy" && container != "MKV")
                     {
-                        usestream = canCopyAudio(container, inputDetails[11][i]);
+                        usestream = canCopyAudio(container, inputDetails[10][i]);
                     }
                     if (usestream)
                     {
@@ -147,12 +148,23 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
 
     if (astream != "None")
     {
-        if (astream == "All" && acodec != "Copy")
+        if (astream == "All" && acodec != "copy")
         {
             for (int i = 0; i < inputDetails[0][1].toInt(); i++)
             {
-                ffmpegcommand.append({"-c:a:" + QString::number(i), acodec });
-                if (acodec == "aac" || acodec == "libmp3lame")
+                bool copystream = canCopyAudio(container, inputDetails[10][i]);
+                QString audiocodec;
+                if (copystream && acopy)
+                {
+                    audiocodec = "copy";
+                }
+                else
+                {
+                    audiocodec = acodec;
+                }
+
+                ffmpegcommand.append({"-c:a:" + QString::number(i), audiocodec });
+                if (audiocodec == "aac" || audiocodec == "libmp3lame")
                 {
                     if (amode == "Quality")
                     {

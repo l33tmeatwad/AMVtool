@@ -402,7 +402,7 @@ void AMVtool::Encode(int pos, QList<QStringList> inputDetails, QStringList confi
     {
         debugbox += EncodeOptions[i] + " ";
     }
-//    QMessageBox::information(this,"Encode Options", debugbox);
+    QMessageBox::information(this,"Encode Options", debugbox);
     pipe = new QProcess(this);
     if (inputDetails[0][2] == "VapourSynth")
     {

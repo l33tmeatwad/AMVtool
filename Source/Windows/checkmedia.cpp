@@ -60,7 +60,7 @@ checkmedia::checkmedia(QObject *parent) : QObject(parent)
 
 QString checkmedia::checkFormats()
 {
-    QString mediaformats = "Media Files (*.avi *.avs *.m4v *.mov *.mkv *.mp4 *.vpy)";
+    QString mediaformats = "Media Files (*.avi *.avs *.m2ts *.m4v *.mov *.mkv *.mp4 *.mts *.ts *.vob *.vpy)";
     vpyfail = false;
     vspipe = new QProcess(this);
     QStringList vspipecommand = { "--version" };
@@ -335,7 +335,7 @@ QList<QStringList> checkAVS(QString inputScript)
     }
     delete vinfo;
 
-    QList<QStringList> inputMediaInfo = { inputMediaDetails, {"1"}, {"8bit"}, inputVideoCodecs, inputColorSpaces, inputColorMatrix, inputVideoWidth, inputVideoHeight, inputFPS, {"2"}, inputAudioCodecs };
+    QList<QStringList> inputMediaInfo = { inputMediaDetails, {"0"}, {"8bit"}, inputVideoCodecs, inputColorSpaces, inputColorMatrix, inputVideoWidth, inputVideoHeight, inputFPS, {"1"}, inputAudioCodecs };
     return inputMediaInfo;
 
 }
@@ -411,7 +411,7 @@ void checkmedia::setVPYDetails()
         inputMediaDetails.append({ "0", "0", "Error", "0" });
     }
 
-    inputMediaInfo = { inputMediaDetails, {"1"}, inputVideoBitDepths, inputVideoCodecs, inputColorSpaces, inputColorMatrix, inputVideoWidth, inputVideoHeight, inputFPS, {"0"}, inputAudioCodecs };
+    inputMediaInfo = { inputMediaDetails, {"0"}, inputVideoBitDepths, inputVideoCodecs, inputColorSpaces, inputColorMatrix, inputVideoWidth, inputVideoHeight, inputFPS, {""}, inputAudioCodecs };
 
 }
 

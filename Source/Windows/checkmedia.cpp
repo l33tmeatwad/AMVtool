@@ -5,6 +5,9 @@
 #include <iostream>
 #include <iomanip>
 
+QString AVScolorspace(int colornum);
+QList<QStringList> checkAVS(QString inputScript);
+
 typedef struct AVSDLLVideoInfo {
     int mt_import;
 
@@ -204,8 +207,6 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
             if (colorspace.toLower() == "yuv")
             {
                 colorspace.append(QString::fromStdWString(MI.Get(Stream_Video, i, __T("ChromaSubsampling"), Info_Text, Info_Name).c_str())).replace(":","");
-                colorspace.append("P" + QString::fromStdWString(MI.Get(Stream_Video, i, __T("BitDepth"), Info_Text, Info_Name).c_str()));
-
             }
 
             inputColorSpaces.append(colorspace);
@@ -275,8 +276,19 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
 }
 
 
-QList<QStringList> checkmedia::checkAVS(QString inputScript)
+QList<QStringList> checkAVS(QString inputScript)
 {
+    int inputAudioStreams;
+    float inputDuration;
+    QStringList inputVideoCodecs;
+    QStringList inputColorSpaces;
+    QStringList inputColorMatrix;
+    QStringList inputVideoWidth;
+    QStringList inputVideoHeight;
+    QStringList inputFPS;
+    QStringList inputAudioCodecs;
+
+
     QStringList inputMediaDetails;
     QString funcstr = "Import";
     QByteArray func = funcstr.toLocal8Bit();
@@ -286,7 +298,7 @@ QList<QStringList> checkmedia::checkAVS(QString inputScript)
     void* avs = new intptr_t(0);
 
     AVSDLLVideoInfo *vinfo = new AVSDLLVideoInfo();
-    int avisynth = dimzon_avs_init(avs,func.data(), file.data(), vi);
+    int avisynth = dimzon_avs_init(avs,func.data(), file.data(), vinfo);
     dimzon_avs_destroy(avs);
     delete avs;
 
@@ -298,12 +310,11 @@ QList<QStringList> checkmedia::checkAVS(QString inputScript)
         float duration = (avsframes/(fpsnum/fpsden))*1000;
 
         inputVideoCodecs.append("Script");
-        inputColorSpaces.append("RGB");
+        inputColorSpaces.append(AVScolorspace(vinfo->pixel_type));
         inputColorMatrix.append("DETECT");
         inputVideoWidth.append(QString::number(vinfo->width));
         inputVideoHeight.append(QString::number(vinfo->height));
         inputFPS.append(QString::number(vinfo->raten) + "/" + QString::number(vinfo->rated));
-        inputDuration = duration;
 
         if (vinfo->nchannels > 0)
         {
@@ -324,9 +335,34 @@ QList<QStringList> checkmedia::checkAVS(QString inputScript)
     }
     delete vinfo;
 
-    inputMediaInfo = { inputMediaDetails, {"1"}, {"8bit"}, inputVideoCodecs, inputColorSpaces, inputColorMatrix, inputVideoWidth, inputVideoHeight, inputFPS, {"2"}, inputAudioCodecs };
+    QList<QStringList> inputMediaInfo = { inputMediaDetails, {"1"}, {"8bit"}, inputVideoCodecs, inputColorSpaces, inputColorMatrix, inputVideoWidth, inputVideoHeight, inputFPS, {"2"}, inputAudioCodecs };
     return inputMediaInfo;
 
+}
+
+QString AVScolorspace(int colornum)
+{
+    QString colorspace = "RGB24";
+    if (colornum == -536870912)
+        colorspace = "Gray";
+    if (colornum == -1610612728)
+        colorspace = "YV12";
+    if (colornum == -1610612720)
+        colorspace = "YUV420";
+    if (colornum == -1610611959)
+        colorspace = "YV411";
+    if (colornum == 1610612740)
+        colorspace = "YUY2";
+    if (colornum == -1610611960)
+        colorspace = "YV24";
+    if (colornum == -1610611957)
+        colorspace = "YV24";
+    if (colornum == 1342177281)
+        colorspace = "RGB24";
+    if (colornum == 1342177282)
+        colorspace = "RGBA";
+
+    return colorspace;
 }
 
 
@@ -414,6 +450,11 @@ void checkmedia::readOutput()
         if (vsline.contains("Format Name") )
         {
             vpyColorSpace = vsline.simplified().replace("Format Name: ", "");
+            if (vpyColorSpace.contains("P") && !vpyColorSpace.contains("COMPAT"))
+            {
+                QRegExp findbitdpeth("P");
+                vpyColorSpace = vpyColorSpace.left(findbitdpeth.indexIn(vpyColorSpace));
+            }
         }
         if (vsline.contains("Bits: ") )
         {

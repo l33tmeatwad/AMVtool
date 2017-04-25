@@ -259,9 +259,9 @@ QString setupencode::getColorSpace(QString colorspace)
     {
         colorspace = "rgba";
     }
-    if (colorspace.contains("P8"))
+    if (colorspace.contains("YUV"))
     {
-        colorspace.replace("P8","P");
+        colorspace = colorspace + "P";
     }
     return colorspace.toLower();
 }

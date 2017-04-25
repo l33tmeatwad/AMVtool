@@ -322,20 +322,20 @@ void configure::setColorSpace()
         colorspace = "RGB24";
     }
     QStringList colorspaceoptions;
-    colorspaceoptions.append("YUV420P8");
+    colorspaceoptions.append("YUV420");
 
-    if (colorspace.contains("RGB") || colorspace.contains("422"))
+    if (colorspace.contains("RGB") || colorspace.contains("422") || colorspace.contains("444") || colorspace.contains("BGR"))
     {
-        colorspaceoptions.append("YUV422P8");
-    }
-    if (colorspace.contains("RGB") || colorspace.contains("444"))
-    {
-        colorspaceoptions.append("YUV444P8");
+        colorspaceoptions.append("YUV422");
+        if (!colorspace.contains("422"))
+        {
+            colorspaceoptions.append("YUV444");
+        }
     }
     if (codec == "UT Video")
     {
         colorspaceoptions.clear();
-        colorspaceoptions.append({"YUV420P8", "YUV422P8", "RGB24","RGBA"});
+        colorspaceoptions.append({"YUV420", "YUV422", "RGB24","RGBA"});
     }
     ui->selectColorSpace->clear();
     ui->selectColorSpace->addItems(colorspaceoptions);

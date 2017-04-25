@@ -27,7 +27,6 @@ private slots:
 
 private:
     QList<QStringList> getMediaInfo(QString inputFile);
-    QList<QStringList> checkAVS(QString inputScript);
     QList<QStringList> checkVPY(QString inputScript);
     void setVPYDetails();
 

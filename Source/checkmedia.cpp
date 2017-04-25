@@ -268,7 +268,7 @@ void checkmedia::setVPYDetails()
         inputMediaDetails.append({ "0", "0", "Error", "0" });
     }
 
-    inputMediaInfo = { inputMediaDetails, {"0"}, inputVideoBitDepths, inputVideoCodecs, inputColorSpaces, inputColorMatrix, inputVideoWidth, inputVideoHeight, inputFPS, {"1"}, inputAudioCodecs };
+    inputMediaInfo = { inputMediaDetails, {"0"}, inputVideoBitDepths, inputVideoCodecs, inputColorSpaces, inputColorMatrix, inputVideoWidth, inputVideoHeight, inputFPS, {""}, inputAudioCodecs };
 
 }
 

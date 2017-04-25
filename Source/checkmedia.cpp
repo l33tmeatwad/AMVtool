@@ -12,7 +12,7 @@ checkmedia::checkmedia(QObject *parent) : QObject(parent)
 
 QString checkmedia::checkFormats()
 {
-    QString mediaformats = "Media Files (*.avi *.avs *.m2ts *.m4v *.mov *.mkv *.mp4 *.ts *.vob *.vpy)";
+    QString mediaformats = "Media Files (*.avi *.m2ts *.m4v *.mov *.mkv *.mp4 *.mts *.ts *.vob *.vpy)";
     vpyfail = false;
     vspipe = new QProcess(this);
     QStringList vspipecommand = { "--version" };
@@ -27,8 +27,6 @@ QString checkmedia::checkFormats()
     {
         mediaformats.replace(" *.vpy", "");
     }
-
-    mediaformats.replace(" *.avs", "");
 
     return mediaformats;
 }
@@ -52,14 +50,7 @@ QList<QStringList> checkmedia::checkMedia(QString inputFile)
     }
     else
     {
-        if (inputFile.right(3).toLower() == "avs")
-        {
-            inputMediaInfo = checkAVS(inputFile);
-        }
-        else
-        {
-            inputMediaInfo = getMediaInfo(inputFile);
-        }
+        inputMediaInfo = getMediaInfo(inputFile);
     }
     return inputMediaInfo;
 }
@@ -164,8 +155,6 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
             if (colorspace.toLower() == "yuv")
             {
                 colorspace.append(QString::fromStdString(MI.Get(Stream_Video, i, __T("ChromaSubsampling"), Info_Text, Info_Name))).replace(":","");
-                colorspace.append("P" + bitdepth);
-
             }
 
             inputColorSpaces.append(colorspace);
@@ -232,16 +221,6 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
     inputMediaInfo = { inputMediaDetails, inputVideoStreamIDs, inputVideoBitDepths, inputVideoCodecs, inputColorSpaces, inputColorMatrix, inputVideoWidth, inputVideoHeight, inputFPS, inputAudioStreamIDs, inputAudioCodecs };
 
     return inputMediaInfo;
-}
-
-QList<QStringList> checkmedia::checkAVS(QString inputScript)
-{
-    QStringList inputMediaDetails;
-    inputMediaDetails.append({ "0", "0", "Error", "0" });
-
-    inputMediaInfo = { inputMediaDetails, {"0"}, {"8bit"}, inputVideoCodecs, inputColorSpaces, inputColorMatrix, inputVideoWidth, inputVideoHeight, inputFPS, {"1"}, inputAudioCodecs };
-    return inputMediaInfo;
-
 }
 
 QList<QStringList> checkmedia::checkVPY(QString inputScript)
@@ -328,6 +307,11 @@ void checkmedia::readOutput()
         if (vsline.contains("Format Name") )
         {
             vpyColorSpace = vsline.simplified().replace("Format Name: ", "");
+            if (vpyColorSpace.contains("P") && !vpyColorSpace.contains("COMPAT"))
+            {
+                QRegExp findbitdpeth("P");
+                vpyColorSpace = vpyColorSpace.left(findbitdpeth.indexIn(vpyColorSpace));
+            }
         }
         if (vsline.contains("Bits: ") )
         {

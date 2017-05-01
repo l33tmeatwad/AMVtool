@@ -36,15 +36,12 @@ HEADERS  += Source/amvtool.h \
 FORMS    += Source/amvtool.ui \
             Source/configure.ui
 
-
-INCLUDEPATH += $$PWD/Resources
-DEPENDPATH += $$PWD/Resources
+LIBPATH += $$PWD/Resources
 
 linux: LIBS += -lmediainfo
 linux: CONFIG += c++11
-macx: LIBS += -L$$PWD/Resources -lmediainfo.0
-win32:CONFIG(release, debug|release): LIBS +=  -lmediainfo -lavisynthwrapper
-
+macx: LIBS += -lmediainfo.0
+win32: LIBS +=  -lmediainfo -lavisynthwrapper
 
 macx: ICON = Resources/icon.icns
 win32: RC_ICONS = Resources/icon.ico

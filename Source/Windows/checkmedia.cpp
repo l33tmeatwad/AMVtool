@@ -60,7 +60,7 @@ checkmedia::checkmedia(QObject *parent) : QObject(parent)
 
 QString checkmedia::checkFormats()
 {
-    QString mediaformats = "Media Files (*.avi *.avs *.m2ts *.m4v *.mov *.mkv *.mp4 *.mts *.ts *.vob *.vpy)";
+    QString mediaformats = "Media Files (*.avi *.avs *.m2ts *.m4v *.mkv *.mov *.mp4 *.mpg *.mts *.ts *.vob *.vpy)";
     vpyfail = false;
     vspipe = new QProcess(this);
     QStringList vspipecommand = { "--version" };
@@ -132,7 +132,6 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
         inputVideoStreams = QString::fromStdWString(MI.Get(Stream_General,0, __T("VideoCount"), Info_Text, Info_Name).c_str()).toInt();
         inputAudioStreams = QString::fromStdWString(MI.Get(Stream_General,0, __T("AudioCount"), Info_Text, Info_Name).c_str()).toInt();
 
-        inputMediaDetails.append({ QString::number(inputVideoStreams),QString::number(inputAudioStreams),inputContainer, QString::number(inputDuration) });
         for (int i = 0; i < inputVideoStreams; i++)
         {
             QString videoID;
@@ -227,7 +226,8 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
             inputVideoHeight.append(QString::fromStdWString(MI.Get(Stream_Video, i, __T("Height"), Info_Text, Info_Name).c_str()));
             inputFPS.append(QString::fromStdWString(MI.Get(Stream_Video, i, __T("FrameRate"), Info_Text, Info_Name).c_str()));
         }
-        for (int i = 0; i < inputAudioStreams; i++)
+        int audioCount = inputAudioStreams;
+        for (int i = 0; i < audioCount; i++)
         {
             QString audioID;
             if (TSVOB.contains(inputContainer) || acontainers.contains(inputContainer))
@@ -259,8 +259,18 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
 
             QString audiocodec = QString::fromStdWString(MI.Get(Stream_Audio, i, __T("Format"), Info_Text, Info_Name).c_str());
 
-            inputAudioStreamIDs.append(audioID);
-            inputAudioCodecs.append(audiocodec);
+            if (audiocodec.contains("TrueHD / AC-3"))
+            {
+                int astream = inputVideoStreams+i;
+                inputAudioStreamIDs.append({QString::number(astream),QString::number(astream+1)});
+                inputAudioCodecs.append({"TrueHD","AC-3"});
+                inputAudioStreams = inputAudioStreams+1;
+            }
+            else
+            {
+                inputAudioStreamIDs.append(audioID);
+                inputAudioCodecs.append(audiocodec);
+            }
 
         }
 
@@ -270,6 +280,8 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
         inputMediaDetails.append({ "0", "0", "Error", "0" });
     }
     MI.Close();
+
+    inputMediaDetails.append({ QString::number(inputVideoStreams),QString::number(inputAudioStreams),inputContainer, QString::number(inputDuration) });
     inputMediaInfo = { inputMediaDetails, inputVideoStreamIDs, inputVideoBitDepths, inputVideoCodecs, inputColorSpaces, inputColorMatrix, inputVideoWidth, inputVideoHeight, inputFPS, inputAudioStreamIDs, inputAudioCodecs };
 
     return inputMediaInfo;

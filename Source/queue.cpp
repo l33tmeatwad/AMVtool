@@ -24,7 +24,7 @@ QString queue::InputFiles(QString inputFile)
         QString filename(fileInfo.fileName());
         QString Location = inputFile;
         mainQueueInfo.append({inputFile, filename, mediainfo[2][0], "Pending", "1"});
-        fs.addSettings(Location.replace(filename,""), isVPY);
+        fs.addSettings(Location.replace(filename,""), mediainfo[5][0], mediainfo[7][0].toInt(), isVPY);
         openedFileInfo = mediainfo[2][0] + " | " + filename;
     }
 
@@ -41,7 +41,7 @@ QList<QStringList> queue::getInputDetails(QString mediafile)
     }
     else
     {
-        QList<QStringList> mediaDetails = { { "1", "1", "Real Media" }, {"0"}, {"8bit"}, {"Real Video"}, {"YUV420P8"}, {"BT.709" }, {"1280"}, {"720"}, {"23.976"}, {"0"}, {"Real Audio"} };
+        QList<QStringList> mediaDetails = { { "1", "1", "Real Media" }, {"0"}, {"8"}, {"Real Video"}, {"YUV420"}, {"BT.709" }, {"1280"}, {"720"}, {"23.976"}, {"0"}, {"Real Audio"} };
         return mediaDetails;
     }
 
@@ -67,16 +67,16 @@ QList<QStringList> queue::checkInput(int position)
 {
     checkmedia cm;
     QList<QStringList> inputDetails = cm.checkMedia(mainQueueInfo[position][0]);
-    if (outputConfig[position][10] != "Original Audio")
+    if (outputConfig[position][11] != "Original Audio")
     {
-        QList<QStringList> audioDetails = cm.checkMedia(outputConfig[position][10]);
+        QList<QStringList> audioDetails = cm.checkMedia(outputConfig[position][11]);
         inputDetails[0][1] = audioDetails[0][1];
         inputDetails[9] = audioDetails[9];
     }
 
     int vstreamcount = inputDetails[0][0].toInt();
     int astreamcount = inputDetails[0][1].toInt();
-    QString audiosel = outputConfig[position][11];
+    QString audiosel = outputConfig[position][12];
     audiosel = audiosel.replace("All", inputDetails[0][1]);
 
 

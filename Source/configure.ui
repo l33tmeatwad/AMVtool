@@ -813,41 +813,6 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="containerLayoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>11</x>
-     <y>50</y>
-     <width>413</width>
-     <height>26</height>
-    </rect>
-   </property>
-   <layout class="QHBoxLayout" name="containerLayout">
-    <item>
-     <widget class="QLabel" name="labelContainer">
-      <property name="text">
-       <string>Container:</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QComboBox" name="selectContainer"/>
-    </item>
-    <item>
-     <spacer name="containerSpacer">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>232</width>
-        <height>20</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-   </layout>
-  </widget>
   <widget class="QWidget" name="outputLayoutWidget">
    <property name="geometry">
     <rect>
@@ -901,6 +866,79 @@
       <property name="text">
        <string>Browse</string>
       </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>11</x>
+     <y>50</y>
+     <width>411</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QLabel" name="labelContainer">
+      <property name="text">
+       <string>Container:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QComboBox" name="selectContainer">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>80</width>
+        <height>16777215</height>
+       </size>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="2">
+     <spacer name="containerSpacer">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>58</width>
+        <height>17</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="0" column="3">
+     <widget class="QLabel" name="lableBitDepth">
+      <property name="text">
+       <string>Video Bit Depth:</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="4">
+     <widget class="QComboBox" name="selectBitDepth">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <item>
+       <property name="text">
+        <string>8</string>
+       </property>
+      </item>
      </widget>
     </item>
    </layout>

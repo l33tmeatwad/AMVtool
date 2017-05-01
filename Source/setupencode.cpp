@@ -12,18 +12,18 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
     QString container = configList[1];
     int vstream = configList[2].toInt();
     QString colorspace = getColorSpace(configList[3]);
-    QString colormatrix = getColorMatrix(configList[4]);
-    QString codecname = getCodecName(configList[5]);
-    QString vmode = configList[6];
-    QString preset = configList[7];
-    QString tune = configList[8];
-    QString bitrate = configList[9];
-    QString asource = configList[10];
-    QString astream = configList[11];
-    QString acodec = getAudioCodecName(configList[12]);
-    QString amode = configList[13];
-    QString abitrate = configList[14];
-    bool acopy = configList[15].toInt();
+    QString colormatrix = getColorMatrix(configList[5]);
+    QString codecname = getCodecName(configList[6]);
+    QString vmode = configList[7];
+    QString preset = configList[8];
+    QString tune = configList[9];
+    QString bitrate = configList[10];
+    QString asource = configList[11];
+    QString astream = configList[12];
+    QString acodec = getAudioCodecName(configList[13]);
+    QString amode = configList[14];
+    QString abitrate = configList[15];
+    bool acopy = configList[16].toInt();
     QStringList containerCompatibility;
 
     QStringList ffmpegcommand;
@@ -179,6 +179,10 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
         }
         else
         {
+            if (acopy && canCopyAudio(container,inputDetails[10][astream.toInt()-1]))
+            {
+                acodec = "copy";
+            }
             ffmpegcommand.append({"-c:a", acodec });
             if (acodec == "aac" || acodec == "libmp3lame")
             {

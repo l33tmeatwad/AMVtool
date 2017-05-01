@@ -41,6 +41,10 @@ QString AMVtool::checkDependencies()
         ui->statusBar->showMessage("FFMPEG executable is missing!");
         depStatus[1].replace("Not Found: ", "");
     }
+    else
+    {
+        ui->statusBar->showMessage("Ready");
+    }
     ffmpegexec = depStatus[1];
     return depStatus[0];
 
@@ -172,6 +176,7 @@ void AMVtool::on_fileList_doubleClicked(const QModelIndex &index)
 {
     int pos = index.row();
     updateQueue(pos,"Pending");
+    ui->statusBar->showMessage("Ready");
 }
 
 void AMVtool::openConfigBox(int selectedfile)
@@ -218,8 +223,8 @@ void AMVtool::on_showDetails_clicked()
     else
     {
         ui->showDetails->setText("Show Details");
-        QMainWindow::setMaximumHeight(370);
-        QMainWindow::setMinimumHeight(370);
+        QMainWindow::setMaximumHeight(365);
+        QMainWindow::setMinimumHeight(365);
         QMainWindow::adjustSize();
     }
 }

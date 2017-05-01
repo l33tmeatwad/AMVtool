@@ -36,19 +36,20 @@ void configure::setData(const int &selFile, QList<QStringList> inputMediaInfo, c
     outputContainer = configurationList[1];
     outputVideoStream = configurationList[2].toInt();
     outputColorSpace = configurationList[3];
-    outputColorMatrix = configurationList[4];
-    outputVideoCodec = configurationList[5];
-    videoEncMode = configurationList[6];
-    videoEncPreset = configurationList[7];
-    videoEncTune = configurationList[8];
-    videoEncBitrate = configurationList[9].toInt();
-    outputAudioSource = configurationList[10];
-    outputAudioStream = configurationList[11];
-    outputAudioCodec = configurationList[12];
-    audioEncMode = configurationList[13];
-    audioEncBitrate = configurationList[14].toInt();
+    outputBitDepth = configurationList[4];
+    outputColorMatrix = configurationList[5];
+    outputVideoCodec = configurationList[6];
+    videoEncMode = configurationList[7];
+    videoEncPreset = configurationList[8];
+    videoEncTune = configurationList[9];
+    videoEncBitrate = configurationList[10].toInt();
+    outputAudioSource = configurationList[11];
+    outputAudioStream = configurationList[12];
+    outputAudioCodec = configurationList[13];
+    audioEncMode = configurationList[14];
+    audioEncBitrate = configurationList[15].toInt();
 
-    ui->copyAudio->setChecked(configurationList[15].toInt());
+    ui->copyAudio->setChecked(configurationList[16].toInt());
     if (outputAudioCodec != "Copy")
     {
         ui->encodeIncompatible->setChecked(true);
@@ -238,16 +239,12 @@ void configure::setVideoStream()
 }
 
 
-
-
 void configure::setContainer()
 {
     ui->selectContainer->addItems({"AVI","MKV", "MOV", "MP4"});
     int containerindex = ui->selectContainer->findText(outputContainer);
     ui->selectContainer->setCurrentIndex(containerindex);
 }
-
-
 
 void configure::setVideoCodec()
 {
@@ -278,7 +275,7 @@ void configure::setVideoCodec()
         {
             codecs.append("Copy");
         }
-        codecs.append({"UT Video", "x264", "x265" });
+        codecs.append({"UT Video","x264", "x265"});
     }
     if (ui->selectContainer->currentText() == "MOV")
     {
@@ -286,7 +283,7 @@ void configure::setVideoCodec()
         {
             codecs.append("Copy");
         }
-        codecs.append({"UT Video", "x264", "x265"});
+        codecs.append({"UT Video","x264", "x265"});
     }
     if (ui->selectContainer->currentText() == "MP4")
     {
@@ -335,7 +332,14 @@ void configure::setColorSpace()
     if (codec == "UT Video")
     {
         colorspaceoptions.clear();
-        colorspaceoptions.append({"YUV420", "YUV422", "RGB24","RGBA"});
+        if (ui->selectBitDepth->currentText() == "8")
+        {
+            colorspaceoptions.append({"YUV420", "YUV422", "RGB24","RGBA"});
+        }
+        else
+        {
+            colorspaceoptions.append({"YUV422", "RGB24","RGBA"});
+        }
     }
     ui->selectColorSpace->clear();
     ui->selectColorSpace->addItems(colorspaceoptions);
@@ -344,6 +348,7 @@ void configure::setColorSpace()
     else { ui->selectColorSpace->setCurrentIndex(0); }
 
 }
+
 
 void configure::setColorMatrix()
 {
@@ -538,6 +543,54 @@ void configure::getAltAudioCodecs(QString newAudio)
 
 }
 
+void configure::setAudioBitrate()
+{
+    int min;
+    int max;
+    int value;
+    QString valueinfo;
+
+    if (ui->selectAudioMode->currentText() == "Quality")
+    {
+        QString codec = ui->selectAudioCodec->currentText();
+        if (codec == "AAC")
+        {
+            min = 1;
+            max = 5;
+            value = 4;
+            valueinfo = "5 (Best) to 1 (Worst)";
+        }
+        if (codec == "MP3")
+        {
+            min = 0;
+            max = 9;
+            value = 5;
+            valueinfo = "0 (Best) to 9 (Worst)";
+        }
+        if (codec == "ALAC" || codec == "FLAC" || codec == "PCM" || codec == "Copy")
+        {
+            min = 0;
+            max = 0;
+            value = 0;
+            valueinfo = "";
+        }
+
+    }
+    else
+    {
+        min = 45;
+        max = 320;
+        value = 128;
+        valueinfo = "Kbps";
+    }
+    ui->bitrateBoxAudio->setMinimum(min);
+    ui->bitrateBoxAudio->setMaximum(max);
+    ui->bitrateBoxAudio->setValue(value);
+
+    ui->labelAudioBitrate->setText(valueinfo);
+}
+
+
 // BUTTON ACTIONS
 
 
@@ -548,6 +601,7 @@ void configure::on_buttonBox_accepted()
     outputVideoStream = ui->selectVideoStream->currentIndex();
     outputVideoCodec = ui->selectCodec->currentText();
     outputColorSpace = ui->selectColorSpace->currentText();
+    outputBitDepth = ui->selectBitDepth->currentText();
     outputColorMatrix = ui->selectMatrix->currentText();
     videoEncMode = ui->selectMode->currentText();
     videoEncPreset = ui->selectPreset->currentText();
@@ -583,7 +637,7 @@ void configure::on_buttonBox_accepted()
     }
 
 
-    QStringList configurationList = { outputLocation, outputContainer, QString::number(outputVideoStream), outputColorSpace, outputColorMatrix, outputVideoCodec,
+    QStringList configurationList = { outputLocation, outputContainer, QString::number(outputVideoStream), outputColorSpace, outputBitDepth, outputColorMatrix, outputVideoCodec,
                                       videoEncMode, videoEncPreset, videoEncTune, QString::number(videoEncBitrate), outputAudioSource, outputAudioStream, outputAudioCodec,
                                     audioEncMode, QString::number(audioEncBitrate),QString::number(copyaudio)};
 
@@ -637,6 +691,16 @@ void configure::on_selectContainer_currentIndexChanged()
     setAudioStream();
 }
 
+
+void configure::on_selectBitDepth_currentIndexChanged()
+{
+    if (ui->selectCodec->currentIndex() != -1)
+    {
+        setVideoCodec();
+    }
+    setVideoVisibility();
+}
+
 void configure::on_selectCodec_currentIndexChanged()
 {
     setColorSpace();
@@ -674,11 +738,6 @@ void configure::on_browseOutput_clicked()
     {
         if (outputFolder.right(1) != "/")
             outputFolder = outputFolder + "/";
-
-        //QFileInfo testDir(outputFolder);
-        //testDir.permission(QFile::WriteUser)
-
-//        QFile testDir(outputFolder + ".AMVtooltest");
 
         filesettings fs;
         if (fs.checkFolder(outputFolder))
@@ -724,52 +783,6 @@ void configure::on_selectAudioMode_currentIndexChanged()
     setAudioBitrate();
 }
 
-void configure::setAudioBitrate()
-{
-    int min;
-    int max;
-    int value;
-    QString valueinfo;
-
-    if (ui->selectAudioMode->currentText() == "Quality")
-    {
-        QString codec = ui->selectAudioCodec->currentText();
-        if (codec == "AAC")
-        {
-            min = 1;
-            max = 5;
-            value = 4;
-            valueinfo = "5 (Best) to 1 (Worst)";
-        }
-        if (codec == "MP3")
-        {
-            min = 0;
-            max = 9;
-            value = 5;
-            valueinfo = "0 (Best) to 9 (Worst)";
-        }
-        if (codec == "ALAC" || codec == "FLAC" || codec == "PCM" || codec == "Copy")
-        {
-            min = 0;
-            max = 0;
-            value = 0;
-            valueinfo = "";
-        }
-
-    }
-    else
-    {
-        min = 45;
-        max = 320;
-        value = 128;
-        valueinfo = "Kbps";
-    }
-    ui->bitrateBoxAudio->setMinimum(min);
-    ui->bitrateBoxAudio->setMaximum(max);
-    ui->bitrateBoxAudio->setValue(value);
-
-    ui->labelAudioBitrate->setText(valueinfo);
-}
 
 void configure::on_selectAudioCodec_currentIndexChanged()
 {
@@ -806,5 +819,3 @@ void configure::on_encodeIncompatible_toggled()
 {
     setAudioVisibility();
 }
-
-

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>600</width>
-    <height>370</height>
+    <height>365</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -19,20 +19,20 @@
   <property name="minimumSize">
    <size>
     <width>600</width>
-    <height>370</height>
+    <height>365</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>600</width>
-    <height>370</height>
+    <height>365</height>
    </size>
   </property>
   <property name="acceptDrops">
    <bool>false</bool>
   </property>
   <property name="windowTitle">
-   <string>AMVtool (Beta 9)</string>
+   <string>AMVtool (Beta 10)</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QListWidget" name="fileList">

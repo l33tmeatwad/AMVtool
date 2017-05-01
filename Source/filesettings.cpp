@@ -23,9 +23,25 @@ bool filesettings::checkFolder(QString folder)
     return validpath;
 }
 
-void filesettings::addSettings(QString originalLocation, bool isVPY)
+void filesettings::addSettings(QString originalLocation, QString colormatrix, int videoheight, bool isVPY)
 {
     outputConfig.append(defaultConfiguration);
+    QStringList matrixlist = {"BT.601","BT.709"};
+    if (!matrixlist.contains(colormatrix))
+    {
+        if (videoheight > 580)
+        {
+            outputConfig[outputConfig.count()-1][5] = "BT.709";
+        }
+        else
+        {
+            outputConfig[outputConfig.count()-1][5] = "BT.601";
+        }
+    }
+    else
+    {
+        outputConfig[outputConfig.count()-1][5] = colormatrix;
+    }
 
     if (defaultConfiguration[0] == "Original File Location")
     {
@@ -33,7 +49,7 @@ void filesettings::addSettings(QString originalLocation, bool isVPY)
     }
     if (isVPY)
     {
-        outputConfig[outputConfig.count()-1][11] = "None";
+        outputConfig[outputConfig.count()-1][12] = "None";
     }
 }
 
@@ -52,12 +68,12 @@ void filesettings::changeSettings(int ql, QString bitdepth, QStringList configur
         for (int i = 0; i < outputConfig.count(); i++)
         {
             configurationList[2] = outputConfig[i][2];
-            configurationList[10] = outputConfig[i][10];
+            configurationList[10] = outputConfig[i][11];
             if (configurationList[0] == "Original File Location")
             {
                 configurationList[0] = outputConfig[i][0];
             }
-            if (mainQueueInfo[i][1].right(3) == "vpy" && outputConfig[i][10] == "Original Audio")
+            if (mainQueueInfo[i][1].right(3) == "vpy" && outputConfig[i][11] == "Original Audio")
             {
                 configurationList[11] = "None";
             }
@@ -85,15 +101,15 @@ void filesettings::recontainerSettings(QList<QStringList> mediaInfo, int vstream
         if (container != "Error")
         {
             outputConfig[queue][1] = container;
-            outputConfig[queue][5] = "Copy";
-            outputConfig[queue][15] = "1";
+            outputConfig[queue][6] = "Copy";
+            outputConfig[queue][16] = "1";
             if (container == "MP4")
             {
-                outputConfig[queue][12] = "AAC";
+                outputConfig[queue][13] = "AAC";
             }
             else
             {
-                outputConfig[queue][12] = "PCM";
+                outputConfig[queue][13] = "PCM";
             }
         }
     }

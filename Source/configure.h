@@ -50,6 +50,8 @@ private slots:
 
     void on_recontainer_clicked();
 
+    void on_selectBitDepth_currentIndexChanged();
+
 private:
     Ui::configure *ui;    
     filesettings fs;
@@ -96,6 +98,7 @@ private:
     QString outputContainer;
     int outputVideoStream;
     QString outputColorSpace;
+    QString outputBitDepth;
     QString outputColorMatrix;
     QString outputVideoCodec;
     QString videoEncMode;

@@ -20,7 +20,7 @@ public:
     void addSettings(QString originalLocation, QString colormatrix, int videoheight, bool isVPY);
     void changeSettings(int ql, QString bitdepth, QStringList configurationList);
     void removeSettings(int ql);
-    void recontainerSettings(QList<QStringList> mediaInfo, int vstream, int queue);
+    void recontainerSettings(QList<QStringList> mediaInfo, int vstream, int queue, bool incaudio);
     QString pickContainer(QString container, QString codec);
 };
 

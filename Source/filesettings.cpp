@@ -68,7 +68,7 @@ void filesettings::changeSettings(int ql, QString bitdepth, QStringList configur
         for (int i = 0; i < outputConfig.count(); i++)
         {
             configurationList[2] = outputConfig[i][2];
-            configurationList[10] = outputConfig[i][11];
+            configurationList[11] = outputConfig[i][11];
             if (configurationList[0] == "Original File Location")
             {
                 configurationList[0] = outputConfig[i][0];
@@ -92,7 +92,7 @@ void filesettings::removeSettings(int ql)
 }
 
 
-void filesettings::recontainerSettings(QList<QStringList> mediaInfo, int vstream, int queue)
+void filesettings::recontainerSettings(QList<QStringList> mediaInfo, int vstream, int queue, bool incaudio)
 {
     if (mediaInfo[0][2] != "Error")
     {
@@ -110,6 +110,10 @@ void filesettings::recontainerSettings(QList<QStringList> mediaInfo, int vstream
             else
             {
                 outputConfig[queue][13] = "PCM";
+            }
+            if (!incaudio)
+            {
+                outputConfig[queue][12] = "None";
             }
         }
     }

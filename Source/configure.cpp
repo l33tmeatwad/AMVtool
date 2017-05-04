@@ -651,7 +651,12 @@ void configure::on_recontainer_clicked()
     if (selectedFile < 0)
     {
         queue queue;
-        queue.setupRecontainer();
+        bool incaudio = false;
+        if (QMessageBox::question(this,"Audio Option", "Would you like to include the audio?", QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes)
+        {
+            incaudio = true;
+        }
+        queue.setupRecontainer(incaudio);
         QMessageBox::information(this,"Settings Changed", "Settings changed to recontainer all files in the queue compatible with possible output containers.");
         this->close();
     }

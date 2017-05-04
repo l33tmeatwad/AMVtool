@@ -13,7 +13,7 @@ public:
     QList<QStringList> getInputDetails(QString mediafile);
     int findPosition();
     QList<QStringList> checkInput(int position);
-    void setupRecontainer();
+    void setupRecontainer(bool incaudio);
 
 };
 

@@ -32,7 +32,7 @@
    <bool>false</bool>
   </property>
   <property name="windowTitle">
-   <string>AMVtool (Beta 10)</string>
+   <string>AMVtool (Beta 11)</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QListWidget" name="fileList">

@@ -97,13 +97,13 @@ QList<QStringList> queue::checkInput(int position)
     return inputDetails;
 }
 
-void queue::setupRecontainer()
+void queue::setupRecontainer(bool incaudio)
 {
     for (int i = 0; i < mainQueueInfo.count(); i++)
     {
         filesettings fs;
         int vstream = outputConfig[i][2].toInt();
         QList<QStringList> mediaInfo = getInputDetails(mainQueueInfo[i][0]);
-        fs.recontainerSettings(mediaInfo, vstream, i);
+        fs.recontainerSettings(mediaInfo, vstream, i, incaudio);
     }
 }

@@ -126,6 +126,9 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
             QString colorspace = QString::fromStdString(MI.Get(Stream_Video, i, __T("ColorSpace"), Info_Text, Info_Name));
             QString colormatrix = QString::fromStdString(MI.Get(Stream_Video, i, __T("matrix_coefficients"), Info_Text, Info_Name));
 
+            if (inputContainer == "MPEG-4")
+                inputContainer = "MP4";
+
             if (inputContainer.toLower() == "quicktime")
             {
                 if (inputVideoCodecs[i].contains("ULRG"))

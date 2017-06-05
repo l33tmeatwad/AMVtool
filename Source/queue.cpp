@@ -27,6 +27,11 @@ QString queue::InputFiles(QString inputFile)
         fs.addSettings(Location.replace(filename,""), mediainfo[5][0], mediainfo[7][0].toInt(), isVPY);
         openedFileInfo = mediainfo[2][0] + " | " + filename;
     }
+    if (RecontainerSettings[0])
+    {
+        filesettings fs;
+        fs.recontainerSettings(mediainfo,0,findPosition(),RecontainerSettings[1]);
+    }
 
     return openedFileInfo;
 }
@@ -97,13 +102,15 @@ QList<QStringList> queue::checkInput(int position)
     return inputDetails;
 }
 
-void queue::setupRecontainer(bool incaudio)
+void queue::setupRecontainer(bool autoCon)
 {
+    RecontainerSettings[0] = true;
+    RecontainerSettings[1] = autoCon;
     for (int i = 0; i < mainQueueInfo.count(); i++)
     {
         filesettings fs;
         int vstream = outputConfig[i][2].toInt();
         QList<QStringList> mediaInfo = getInputDetails(mainQueueInfo[i][0]);
-        fs.recontainerSettings(mediaInfo, vstream, i, incaudio);
+        fs.recontainerSettings(mediaInfo, vstream, i, autoCon);
     }
 }

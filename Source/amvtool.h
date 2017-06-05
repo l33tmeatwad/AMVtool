@@ -13,8 +13,6 @@
 #define vspipeexec "/usr/local/bin/vspipe"
 #endif
 
-extern QList<QStringList> mainQueueInfo;
-
 namespace Ui {
 class AMVtool;
 }

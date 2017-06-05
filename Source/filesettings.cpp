@@ -92,18 +92,26 @@ void filesettings::removeSettings(int ql)
 }
 
 
-void filesettings::recontainerSettings(QList<QStringList> mediaInfo, int vstream, int queue, bool incaudio)
+void filesettings::recontainerSettings(QList<QStringList> mediaInfo, int vstream, int queue, bool autoCon)
 {
-    if (mediaInfo[0][2] != "Error")
+    if (mediaInfo[0][2] != "Error" && mediaInfo[0][2] != "AviSynth" && mediaInfo[0][2] != "VapourSynth")
     {
-        QString container = pickContainer(mediaInfo[0][2], mediaInfo[3][vstream]);
+        QStringList containers = findContainers(mediaInfo[3][vstream]);
 
-        if (container != "Error")
+        if (autoCon == true && containers[0] == mediaInfo[0][2])
         {
-            outputConfig[queue][1] = container;
+            containers.removeFirst();
+            outputConfig[queue][1] = containers[0];
+        }
+        if (autoCon == false && !containers.contains(outputConfig[queue][1]))
+        {
+
+        }
+        else
+        {
             outputConfig[queue][6] = "Copy";
             outputConfig[queue][16] = "1";
-            if (container == "MP4")
+            if (outputConfig[queue][1] == "MP4")
             {
                 outputConfig[queue][13] = "AAC";
             }
@@ -111,56 +119,20 @@ void filesettings::recontainerSettings(QList<QStringList> mediaInfo, int vstream
             {
                 outputConfig[queue][13] = "PCM";
             }
-            if (!incaudio)
-            {
-                outputConfig[queue][12] = "None";
-            }
         }
     }
 }
 
-QString filesettings::pickContainer(QString container, QString codec)
+QStringList filesettings::findContainers(QString codec)
 {
-    QStringList AVI = { "ULRG", "ULRA", "ULY0", "ULH0", "ULY2", "ULH2", "YQY2", "XviD"};
-    QStringList MOV = { "AVC", "HEVC", "MPEG-4", "ULRG", "ULRA", "ULY0", "ULH0", "ULY2", "ULH2", "YQY2"};
-    QStringList MP4 = { "AVC", "HEVC", "MPEG-4"};
-    QString newcontainer = "Error";
+    QStringList containerlist;
+    if (MP4.contains(codec))
+        containerlist.append("MP4");
+    if (AVI.contains(codec))
+        containerlist.append("AVI");
+    if (MOV.contains(codec))
+        containerlist.append("MOV");
 
-    if (container == "AVI")
-    {
-        if (MOV.contains(codec))
-            newcontainer = "MOV";
-        if (MP4.contains(codec))
-            newcontainer = "MP4";
-    }
-    if (container == "BDAV")
-    {
-        if (MP4.contains(codec))
-            newcontainer = "MP4";
-    }
-    if (container == "Matroska")
-    {
-        if (AVI.contains(codec))
-            newcontainer = "AVI";
-        if (MP4.contains(codec))
-            newcontainer = "MP4";
-    }
-    if (container == "QuickTime")
-    {
-        if (AVI.contains(codec))
-            newcontainer = "AVI";
-        if (MP4.contains(codec))
-            newcontainer = "MP4";
-    }
-    if (container == "MPEG-4")
-    {
-        if (MOV.contains(codec))
-            newcontainer = "MOV";
-    }
-    if (container == "MPEG-TS")
-    {
-        if (MP4.contains(codec))
-            newcontainer = "MP4";
-    }
-    return newcontainer;
+    containerlist.append("MKV");
+    return containerlist;
 }

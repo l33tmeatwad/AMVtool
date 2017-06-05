@@ -10,6 +10,8 @@ configure::configure(QWidget *parent) :
     ui(new Ui::configure)
 {
     ui->setupUi(this);
+    ui->copyVideo->setVisible(false);
+    ui->autoContainer->setVisible(false);
 }
 
 configure::~configure()
@@ -19,6 +21,15 @@ configure::~configure()
 
 void configure::setData(const int &selFile, QList<QStringList> inputMediaInfo, const QStringList configurationList)
 {
+
+    if (selFile == -1)
+    {
+        ui->copyVideo->setVisible(true);
+        ui->copyVideo->setChecked(RecontainerSettings[0]);
+        ui->autoContainer->setChecked(RecontainerSettings[1]);
+    }
+
+
     selectedFile = selFile;
 
     inputVideoStreams = inputMediaInfo[0][0].toInt();
@@ -271,7 +282,7 @@ void configure::setVideoCodec()
     }
     if (ui->selectContainer->currentText() == "MKV")
     {
-        if (inputVideoCodecs[vsIndex] != "Script")
+        if (inputVideoCodecs[vsIndex] != "Script" && selectedFile != -1)
         {
             codecs.append("Copy");
         }
@@ -484,6 +495,12 @@ void configure::setAudioCodec()
         index = 0;
     }
     ui->selectAudioCodec->setCurrentIndex(index);
+    if (selectedFile == -1)
+    {
+        cancopyaudio = true;
+
+    }
+
     setAudioVisibility();
 }
 
@@ -641,31 +658,63 @@ void configure::on_buttonBox_accepted()
                                       videoEncMode, videoEncPreset, videoEncTune, QString::number(videoEncBitrate), outputAudioSource, outputAudioStream, outputAudioCodec,
                                     audioEncMode, QString::number(audioEncBitrate),QString::number(copyaudio)};
 
+
     fs.changeSettings(selectedFile, inputVideoBitDepths[ui->selectVideoStream->currentIndex()], configurationList);
+
+    if (selectedFile == -1 && ui->copyVideo->isChecked())
+    {
+        queue queue;
+        queue.setupRecontainer(ui->autoContainer->isChecked());
+    }
+
 
     this->close();
 }
 
 void configure::on_recontainer_clicked()
 {
-    if (selectedFile < 0)
+    if (QMessageBox::question(this,"Audio Option", "Would you like to include the audio?", QMessageBox::Yes|QMessageBox::No) == QMessageBox::No)
     {
-        queue queue;
-        bool incaudio = false;
-        if (QMessageBox::question(this,"Audio Option", "Would you like to include the audio?", QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes)
+        int index = ui->selectAudioStream->findText("None");
+        if (index < 0)
         {
-            incaudio = true;
+            index = 0;
         }
-        queue.setupRecontainer(incaudio);
-        QMessageBox::information(this,"Settings Changed", "Settings changed to recontainer all files in the queue compatible with possible output containers.");
-        this->close();
+        ui->selectAudioStream->setCurrentIndex(index);
     }
     else
     {
-        QString container = fs.pickContainer(inputContainer,inputVideoCodecs[vsIndex]);
-        if (container != "Error")
+        if (ui->selectAudioStream->currentText() == "None")
         {
-            int containerindex = ui->selectContainer->findText(container);
+            ui->selectAudioStream->setCurrentIndex(0);
+        }
+    }
+    if (selectedFile < 0)
+    {
+        ui->copyVideo->setChecked(true);
+        if (QMessageBox::question(this,"Audio Option", "Would you like to only recontainer videos compatible with " + ui->selectContainer->currentText() + "?", QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes)
+        {
+            ui->autoContainer->setChecked(false);
+        }
+        else
+        {
+            ui->autoContainer->setChecked(true);
+        }
+
+    }
+    else
+    {
+        filesettings fs;
+        QStringList containers = fs.findContainers(inputVideoCodecs[ui->selectVideoStream->currentIndex()]);
+
+        if (containers[0] == inputContainer)
+        {
+            containers.removeFirst();
+        }
+
+        if (containers[0] != "None")
+        {
+            int containerindex = ui->selectContainer->findText(containers[0]);
             ui->selectContainer->setCurrentIndex(containerindex);
             int index = ui->selectCodec->findText("Copy");
             if (index == -1)
@@ -823,4 +872,9 @@ void configure::on_copyAudio_toggled(bool checked)
 void configure::on_encodeIncompatible_toggled()
 {
     setAudioVisibility();
+}
+
+void configure::on_copyVideo_toggled(bool checked)
+{
+    ui->autoContainer->setVisible(checked);
 }

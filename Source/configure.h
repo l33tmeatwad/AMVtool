@@ -18,7 +18,6 @@ public:
     ~configure();
     void setData(const int &selFile, QList<QStringList> inputMediaInfo, const QStringList configurationList);
 
-
 private slots:
     void on_buttonBox_accepted();
 
@@ -51,6 +50,8 @@ private slots:
     void on_recontainer_clicked();
 
     void on_selectBitDepth_currentIndexChanged();
+
+    void on_copyVideo_toggled(bool checked);
 
 private:
     Ui::configure *ui;    

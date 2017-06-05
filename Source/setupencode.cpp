@@ -300,9 +300,9 @@ bool setupencode::canCopyAudio(QString container, QString format)
     QStringList containerlist;
 
     if (container == "AVI")
-        containerlist.append( {"MPEG Audio", "WAV"} );
+        containerlist.append( {"MPEG Audio", "PCM"} );
     if (container == "MOV")
-        containerlist.append( {"AAC", "AC-3", "WAV"} );
+        containerlist.append( {"AAC", "AC-3", "PCM"} );
     if (container == "MP4")
         containerlist.append( {"AAC", "AC-3", "MPEG Audio"} );
 

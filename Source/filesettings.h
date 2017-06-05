@@ -12,6 +12,7 @@
 extern QList<QStringList> mainQueueInfo;
 extern QStringList defaultConfiguration;
 extern QList<QStringList> outputConfig;
+extern QList<bool> RecontainerSettings;
 
 class filesettings
 {
@@ -20,8 +21,12 @@ public:
     void addSettings(QString originalLocation, QString colormatrix, int videoheight, bool isVPY);
     void changeSettings(int ql, QString bitdepth, QStringList configurationList);
     void removeSettings(int ql);
-    void recontainerSettings(QList<QStringList> mediaInfo, int vstream, int queue, bool incaudio);
-    QString pickContainer(QString container, QString codec);
+    void recontainerSettings(QList<QStringList> mediaInfo, int vstream, int queue, bool autoCon);
+    QStringList findContainers(QString codec);
+private:
+    QStringList AVI = { "ULRG", "ULRA", "ULY0", "ULH0", "ULY2", "ULH2", "YQY2", "XviD"};
+    QStringList MOV = { "AVC", "HEVC", "MPEG-4", "ULRG", "ULRA", "ULY0", "ULH0", "ULY2", "ULH2", "YQY2"};
+    QStringList MP4 = { "AVC", "HEVC", "MPEG-4"};
 };
 
 #endif // FILESETTINGS_H

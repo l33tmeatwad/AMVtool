@@ -45,3 +45,5 @@ win32: LIBS +=  -lmediainfo -lavisynthwrapper
 
 macx: ICON = Resources/icon.icns
 win32: RC_ICONS = Resources/icon.ico
+
+QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.10

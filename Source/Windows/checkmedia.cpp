@@ -294,7 +294,6 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
 QList<QStringList> checkAVS(QString inputScript)
 {
     int inputAudioStreams;
-    float inputDuration;
     QStringList inputVideoCodecs;
     QStringList inputColorSpaces;
     QStringList inputColorMatrix;

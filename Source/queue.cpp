@@ -91,7 +91,7 @@ QList<QStringList> queue::checkInput(int position)
         {
             if (audiosel.toInt() > astreamcount)
             {
-                mainQueueInfo[position][3] = "Error";
+                outputConfig[position][12] = "None";
             }
         }
     }

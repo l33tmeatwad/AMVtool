@@ -38,7 +38,7 @@ QString AMVtool::checkDependencies()
     QStringList depStatus = dep.checkDependencies();
     if (depStatus[1].contains("Not Found"))
     {
-        ui->statusBar->showMessage("FFMPEG executable is missing!");
+        ui->statusBar->showMessage("FFmpeg executable is missing!");
         depStatus[1].replace("Not Found: ", "");
     }
     else
@@ -476,7 +476,7 @@ void AMVtool::readErrors()
     if (error.contains("No such file or directory"))
     {
         encode->kill();
-        ui->statusBar->showMessage("FFMPEG executable is missing!");
+        ui->statusBar->showMessage("FFmpeg executable is missing!");
     }
     ui->progressBar->setValue(0);
     setAcceptDrops(true);

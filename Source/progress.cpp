@@ -18,7 +18,7 @@ QList<QString> progress::currentProcess(QString currentstatus, float duration)
 
     QRegExp findspeed("speed=");
     int speedspot = findspeed.indexIn(currentstatus);
-    float encspeed = 0.01;
+    float encspeed = 0.01f;
     QString encodespeed;
     if (currentstatus.contains("speed="))
     {

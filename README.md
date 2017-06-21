@@ -1,4 +1,4 @@
-AMVtool is a GUI for FFMPEG that is geared towards the needs of AMV editors.  In addition to handling almost all the formats that editors will use, it also helps out by automatically adjusting certain encode settings that are often incorrectly selected by many editors.  Here are some of the features:
+AMVtool is a GUI for FFMpeg that is geared towards the needs of AMV editors.  In addition to handling almost all the formats that editors will use, it also helps out by automatically adjusting certain encode settings that are often incorrectly selected by many editors.  Here are some of the features:
 
 
 - Available on Linux, macOS, and Windows.

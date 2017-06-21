@@ -20,10 +20,6 @@ SOURCES += Source/main.cpp\
     Source/progress.cpp \
     Source/dependencies.cpp
 
-linux: SOURCES += Source/checkmedia.cpp
-macx: SOURCES += Source/checkmedia.cpp
-win32: SOURCES += Source/Windows/checkmedia.cpp
-
 HEADERS  += Source/amvtool.h \
     Source/configure.h \
     Source/filesettings.h \
@@ -38,12 +34,27 @@ FORMS    += Source/amvtool.ui \
 
 LIBPATH += $$PWD/Resources
 
-linux: LIBS += -lmediainfo
-linux: CONFIG += c++11
-macx: LIBS += -lmediainfo.0
-win32: LIBS +=  -lmediainfo -lavisynthwrapper
+linux{
+    SOURCES += Source/checkmedia.cpp
+    LIBS += -lmediainfo
+    CONFIG += c++11
+}
 
-macx: ICON = Resources/icon.icns
-win32: RC_ICONS = Resources/icon.ico
+macx{
+    SOURCES += Source/checkmedia.cpp
+    LIBS += -lmediainfo.0
+    QMAKE_INFO_PLIST = Resources/Info.plist
+    QMAKE_APP_OR_DLL = Resources/
+    ICON = Resources/icon.icns
+    QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.10
+}
 
-QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.10
+win32{
+    SOURCES += Source/Windows/checkmedia.cpp
+    LIBS +=  -lmediainfo -lavisynthwrapper
+    RC_ICONS = Resources/icon.ico
+    VERSION = 1.0.0.0
+    QMAKE_TARGET_PRODUCT = "AMVtool"
+    QMAKE_TARGET_DESCRIPTION = "GUI for FFmpeg designed for AMV editors."
+    QMAKE_TARGET_COPYRIGHT = "\\251 2017 by l33tmeatwad"
+}

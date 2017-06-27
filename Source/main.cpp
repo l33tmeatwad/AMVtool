@@ -10,6 +10,7 @@ QList<bool> RecontainerSettings = { false, true };
 
 int main(int argc, char *argv[])
 {
+    QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QApplication a(argc, argv);
     AMVtool w;
     w.show();

@@ -444,7 +444,7 @@ void AMVtool::encodeFinished(int exitcode, QProcess::ExitStatus)
         ui->progressBar->setValue(100);
         if (outputcreated == true)
         {
-            if (mainQueueInfo[position][4] == "1" && outputConfig[position][6].contains("2 Pass") )
+            if (mainQueueInfo[position][4] == "1" && outputConfig[position][7].contains("2 Pass") )
             {
                 mainQueueInfo[position][4] = "2";
             }

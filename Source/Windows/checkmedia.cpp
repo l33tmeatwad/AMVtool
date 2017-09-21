@@ -255,10 +255,12 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
                 else
                 {
                     audioID = IDfix.replace(audioID, "").replace("(", "").replace(")","").replace(" ","");
+                    if (audioID.contains("0xC") || audioID.contains("0xD"))
+                    {
+                        audioID = audioID.replace("0x", "0x1");
+                    }
                 }
             }
-
-
 
             QString audiocodec = QString::fromStdWString(MI.Get(Stream_Audio, i, __T("Format"), Info_Text, Info_Name).c_str());
 

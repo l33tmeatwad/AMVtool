@@ -31,6 +31,24 @@ QString checkmedia::checkFormats()
     return mediaformats;
 }
 
+QString checkmedia::checkColorMatrix(QString colormatrix, QString videoWidth, QString videoHeight)
+{
+    QStringList matrixlist = {"BT.601","BT.709"};
+    if (!matrixlist.contains(colormatrix))
+    {
+        if (videoWidth > 940 || videoHeight > 580)
+        {
+            colormatrix = "BT.709";
+        }
+        else
+        {
+            colormatrix = "BT.601";
+        }
+    }
+
+    return colormatrix;
+}
+
 QList<QStringList> checkmedia::checkMedia(QString inputFile)
 {
     inputVideoStreamIDs.clear();
@@ -155,6 +173,10 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
             {
                 colorspace.append(QString::fromStdString(MI.Get(Stream_Video, i, __T("ChromaSubsampling"), Info_Text, Info_Name))).replace(":","");
             }
+            QString videowidth = QString::fromStdString(MI.Get(Stream_Video, i, __T("Width"), Info_Text, Info_Name));
+            QString videoheight = QString::fromStdString(MI.Get(Stream_Video, i, __T("Height"), Info_Text, Info_Name));
+
+            colormatrix = checkColorMatrix(colormatrix, videowidth, videoheight);
 
             inputColorSpaces.append(colorspace);
             inputColorMatrix.append(colormatrix);
@@ -170,8 +192,8 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
             inputVideoBitDepths.append(bitdepth);
 
 
-            inputVideoWidth.append(QString::fromStdString(MI.Get(Stream_Video, i, __T("Width"), Info_Text, Info_Name)));
-            inputVideoHeight.append(QString::fromStdString(MI.Get(Stream_Video, i, __T("Height"), Info_Text, Info_Name)));
+            inputVideoWidth.append(videowidth);
+            inputVideoHeight.append(videoheight);
             inputFPS.append(QString::fromStdString(MI.Get(Stream_Video, i, __T("FrameRate"), Info_Text, Info_Name)));
         }
         int audioCount = inputAudioStreams;

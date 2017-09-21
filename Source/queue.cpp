@@ -24,7 +24,7 @@ QString queue::InputFiles(QString inputFile)
         QString filename(fileInfo.fileName());
         QString Location = inputFile;
         mainQueueInfo.append({inputFile, filename, mediainfo[2][0], "Pending", "1"});
-        fs.addSettings(Location.replace(filename,""), mediainfo[5][0], mediainfo[7][0].toInt(), isVPY);
+        fs.addSettings(Location.replace(filename,""), mediainfo[5][0], isVPY);
         openedFileInfo = mediainfo[2][0] + " | " + filename;
     }
     if (RecontainerSettings[0])

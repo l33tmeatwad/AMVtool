@@ -23,25 +23,10 @@ bool filesettings::checkFolder(QString folder)
     return validpath;
 }
 
-void filesettings::addSettings(QString originalLocation, QString colormatrix, int videoheight, bool isVPY)
+void filesettings::addSettings(QString originalLocation, QString colormatrix, bool isVPY)
 {
     outputConfig.append(defaultConfiguration);
-    QStringList matrixlist = {"BT.601","BT.709"};
-    if (!matrixlist.contains(colormatrix))
-    {
-        if (videoheight > 580)
-        {
-            outputConfig[outputConfig.count()-1][5] = "BT.709";
-        }
-        else
-        {
-            outputConfig[outputConfig.count()-1][5] = "BT.601";
-        }
-    }
-    else
-    {
-        outputConfig[outputConfig.count()-1][5] = colormatrix;
-    }
+    outputConfig[outputConfig.count()-1][5] = colormatrix;
 
     if (defaultConfiguration[0] == "Original File Location")
     {

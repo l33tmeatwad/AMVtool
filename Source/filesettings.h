@@ -18,7 +18,7 @@ class filesettings
 {
 public:
     bool checkFolder(QString folder);
-    void addSettings(QString originalLocation, QString colormatrix, int videoheight, bool isVPY);
+    void addSettings(QString originalLocation, QString colormatrix, bool isVPY);
     void changeSettings(int ql, QString bitdepth, QStringList configurationList);
     void removeSettings(int ql);
     void recontainerSettings(QList<QStringList> mediaInfo, int vstream, int queue, bool autoCon);

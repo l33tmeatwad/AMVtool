@@ -36,7 +36,7 @@ QString checkmedia::checkColorMatrix(QString colormatrix, QString videoWidth, QS
     QStringList matrixlist = {"BT.601","BT.709"};
     if (!matrixlist.contains(colormatrix))
     {
-        if (videoWidth > 940 || videoHeight > 580)
+        if (videoWidth.toInt() > 940 || videoHeight.toInt() > 580)
         {
             colormatrix = "BT.709";
         }

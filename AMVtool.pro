@@ -53,7 +53,7 @@ win32{
     SOURCES += Source/Windows/checkmedia.cpp
     LIBS +=  -lmediainfo -lavisynthwrapper
     RC_ICONS = Resources/icon.ico
-    VERSION = 1.0.0.3
+    VERSION = 1.0.0.4
     QMAKE_TARGET_PRODUCT = "AMVtool"
     QMAKE_TARGET_DESCRIPTION = "GUI for FFmpeg designed for AMV editors."
     QMAKE_TARGET_COPYRIGHT = "\\251 2018 by l33tmeatwad"

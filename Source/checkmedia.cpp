@@ -2,6 +2,8 @@
 #include "MediaInfoDLL/MediaInfoDLL_Static.h"
 #include "ZenLib/Ztring.h"
 
+QString checkColorMatrix(QString matrix, QString videoWidth, QString videoHeight);
+
 using namespace MediaInfoDLL;
 using namespace ZenLib;
 
@@ -31,7 +33,7 @@ QString checkmedia::checkFormats()
     return mediaformats;
 }
 
-QString checkmedia::checkColorMatrix(QString colormatrix, QString videoWidth, QString videoHeight)
+QString checkColorMatrix(QString colormatrix, QString videoWidth, QString videoHeight)
 {
     QStringList matrixlist = {"BT.601","BT.709"};
     if (!matrixlist.contains(colormatrix))

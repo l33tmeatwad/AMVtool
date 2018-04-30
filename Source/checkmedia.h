@@ -26,7 +26,6 @@ private slots:
     void readOutput();
 
 private:
-    QString checkColorMatrix(QString matrix, QString videoWidth, QString videoHeight);
     QList<QStringList> getMediaInfo(QString inputFile);
     QList<QStringList> checkVPY(QString inputScript);
     void setVPYDetails();

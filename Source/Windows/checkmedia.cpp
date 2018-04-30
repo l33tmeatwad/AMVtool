@@ -5,6 +5,7 @@
 #include <iostream>
 #include <iomanip>
 
+QString checkColorMatrix(QString matrix, QString videoWidth, QString videoHeight);
 QString AVScolorspace(int colornum);
 QList<QStringList> checkAVS(QString inputScript);
 
@@ -91,7 +92,7 @@ QString checkmedia::checkFormats()
     return mediaformats;
 }
 
-QString checkmedia::checkColorMatrix(QString colormatrix, QString videoWidth, QString videoHeight)
+QString checkColorMatrix(QString colormatrix, QString videoWidth, QString videoHeight)
 {
     QStringList matrixlist = {"BT.601","BT.709"};
     if (!matrixlist.contains(colormatrix))
@@ -346,12 +347,14 @@ QList<QStringList> checkAVS(QString inputScript)
         float fpsden = vinfo->rated;
         float avsframes = vinfo->num_frames;
         float duration = (avsframes/(fpsnum/fpsden))*1000;
+        QString avsWidth = QString::number(vinfo->width);
+        QString avsHeight = QString::number(vinfo->height);
 
         inputVideoCodecs.append("Script");
         inputColorSpaces.append(AVScolorspace(vinfo->pixel_type));
-        inputColorMatrix.append("DETECT");
-        inputVideoWidth.append(QString::number(vinfo->width));
-        inputVideoHeight.append(QString::number(vinfo->height));
+        inputColorMatrix.append(checkColorMatrix("",avsWidth,avsHeight));
+        inputVideoWidth.append(avsWidth);
+        inputVideoHeight.append(avsHeight);
         inputFPS.append(QString::number(vinfo->raten) + "/" + QString::number(vinfo->rated));
 
         if (vinfo->nchannels > 0)

@@ -294,7 +294,7 @@ void checkmedia::setVPYDetails()
         inputVideoBitDepths.append(vpyBitDepth + "bit");
         inputVideoCodecs.append("Script");
         inputColorSpaces.append(vpyColorSpace);
-        inputColorMatrix.append("DETECT");
+        inputColorMatrix.append(checkColorMatrix("",vpyWidth,vpyHeight));
         inputVideoWidth.append(vpyWidth);
         inputVideoHeight.append(vpyHeight);
         inputFPS.append(vpyFPS);

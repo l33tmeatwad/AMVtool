@@ -38,6 +38,12 @@ linux{
     SOURCES += Source/checkmedia.cpp
     LIBS += -lmediainfo
     CONFIG += c++11
+    icon.path = /usr/share/pixmaps
+    icon.files = Resources/AMVtool.png
+    shortcut.path = /usr/share/applications
+    shortcut.files = Resources/AMVtool.desktop
+    target.path = /usr/local/bin
+    INSTALLS += target icon shortcut
 }
 
 macx{

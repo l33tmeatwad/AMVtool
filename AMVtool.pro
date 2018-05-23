@@ -33,6 +33,7 @@ FORMS    += Source/amvtool.ui \
             Source/configure.ui
 
 LIBPATH += $$PWD/Resources
+INCLUDEPATH += $$PWD/Resources
 
 linux{
     SOURCES += Source/checkmedia.cpp

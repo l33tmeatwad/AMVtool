@@ -46,6 +46,8 @@ QString AMVtool::checkDependencies()
         ui->statusBar->showMessage("Ready");
     }
     ffmpegexec = depStatus[1];
+    hibitdepth = { depStatus[2].toInt(), depStatus[3].toInt(), depStatus[4].toInt(), depStatus[5].toInt() };
+
     return depStatus[0];
 
 }
@@ -200,7 +202,7 @@ void AMVtool::openConfigBox(int selectedfile)
     {
         setAcceptDrops(false);
         configure *configwindow = new configure(this);
-        configwindow->setData(selectedfile, inputMediaInfo, configList);
+        configwindow->setData(selectedfile, inputMediaInfo, configList, hibitdepth);
         configwindow->setAttribute(Qt::WA_DeleteOnClose);
         configwindow->exec();
         setAcceptDrops(true);
@@ -407,7 +409,7 @@ void AMVtool::Encode(int pos, QList<QStringList> inputDetails, QStringList confi
     {
         debugbox += EncodeOptions[i] + " ";
     }
-//    QMessageBox::information(this,"Encode Options", debugbox);
+    QMessageBox::information(this,"Encode Options", debugbox);
     pipe = new QProcess(this);
     if (inputDetails[0][2] == "VapourSynth")
     {

@@ -28,7 +28,7 @@ private:
     bool canCopyAudio(QString container, QString format);
     QString OutputFile(QString originalfile, QString newtype);
     QString getCodecName(QString codecname);
-    QString getColorSpace(QString colorspace);
+    QString getColorSpace(QString colorspace, QString bitdepth);
     QString getColorMatrix(QString colormatrix);
     QString getAudioCodecName(QString codecname);
 

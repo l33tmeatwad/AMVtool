@@ -1,6 +1,6 @@
 #include "../checkmedia.h"
 #include <QDir>
-#include "../MediaInfoDLL/MediaInfoDLL.h"
+#include <MediaInfoDLL/MediaInfoDLL.h>
 #define MediaInfoNameSpace MediaInfoDLL;
 #include <iostream>
 #include <iomanip>
@@ -94,12 +94,17 @@ QString checkmedia::checkFormats()
 
 QString checkColorMatrix(QString colormatrix, QString videoWidth, QString videoHeight)
 {
-    QStringList matrixlist = {"BT.601","BT.709"};
+    colormatrix.replace(" non-constant","NC");
+    colormatrix.replace(" constant","C");
+    QStringList matrixlist = {"BT.601","BT.709","BT.2020NC","BT.2020C"};
     if (!matrixlist.contains(colormatrix))
     {
         if (videoWidth.toInt() > 940 || videoHeight.toInt() > 580)
         {
-            colormatrix = "BT.709";
+            if (videoWidth.toInt() > 2048 || videoHeight.toInt() > 1080)
+                colormatrix = "BT.2020NC";
+            else
+                colormatrix = "BT.709";
         }
         else
         {

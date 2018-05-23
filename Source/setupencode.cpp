@@ -11,7 +11,7 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
     QString outputdir = configList[0];
     QString container = configList[1];
     int vstream = configList[2].toInt();
-    QString colorspace = getColorSpace(configList[3]);
+    QString colorspace = getColorSpace(configList[3],configList[4]);
     QString colormatrix = getColorMatrix(configList[5]);
     QString codecname = getCodecName(configList[6]);
     QString vmode = configList[7];
@@ -135,7 +135,9 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
                 ffmpegcommand.append({ "-pass",mainQueueInfo[queue][4] });
             }
         }
-    ffmpegcommand.append({ "-preset", preset.toLower().replace(" ",""), "-tune", tune.toLower() });
+    ffmpegcommand.append({ "-preset", preset.toLower().replace(" ","") });
+    if (tune != "(None)")
+        ffmpegcommand.append({ "-tune", tune.toLower().replace(" ","") });
     }
     if (codecname != "copy")
     {
@@ -253,20 +255,23 @@ QString setupencode::getCodecName(QString codecname)
     return codecname;
 }
 
-QString setupencode::getColorSpace(QString colorspace)
+QString setupencode::getColorSpace(QString colorspace, QString bitdepth)
 {
-    if (colorspace == "RGBA")
+    if (colorspace == "RGB24")
     {
         colorspace = "gbrp";
     }
     if (colorspace == "RGBA")
     {
-        colorspace = "rgba";
+        colorspace = "gbrap";
     }
     if (colorspace.contains("YUV"))
     {
         colorspace = colorspace + "P";
     }
+    if (bitdepth != "8")
+        colorspace.append(bitdepth+"le");
+
     return colorspace.toLower();
 }
 
@@ -306,7 +311,7 @@ bool setupencode::canCopyAudio(QString container, QString format)
     if (container == "MP4")
         containerlist.append( {"AAC", "AC-3", "MPEG Audio"} );
 
-    if (containerlist.contains(format))
+    if (containerlist.contains(format) || container == "MKV")
     {
         cancopyaudio = true;
     }

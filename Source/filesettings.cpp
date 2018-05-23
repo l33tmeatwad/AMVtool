@@ -26,6 +26,9 @@ bool filesettings::checkFolder(QString folder)
 void filesettings::addSettings(QString originalLocation, QString colormatrix, bool isVPY)
 {
     outputConfig.append(defaultConfiguration);
+    if (defaultConfiguration[6] == "Ut Video" && defaultConfiguration[3].contains("YUV") && colormatrix.contains("BT.2020"))
+        outputConfig[outputConfig.count()-1][3] = "RGB24";
+
     outputConfig[outputConfig.count()-1][5] = colormatrix;
 
     if (defaultConfiguration[0] == "Original File Location")
@@ -52,6 +55,8 @@ void filesettings::changeSettings(int ql, QString bitdepth, QStringList configur
 
         for (int i = 0; i < outputConfig.count(); i++)
         {
+            if (configurationList[6] == "Ut Video" && configurationList[3].contains("YUV") && outputConfig[i][5].contains("BT.2020"))
+                configurationList[3] = "RGB24";
             configurationList[2] = outputConfig[i][2];
             configurationList[5] = outputConfig[i][5];
             configurationList[11] = outputConfig[i][11];

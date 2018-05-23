@@ -16,7 +16,7 @@ class configure : public QDialog
 public:
     explicit configure(QWidget *parent = 0);
     ~configure();
-    void setData(const int &selFile, QList<QStringList> inputMediaInfo, const QStringList configurationList);
+    void setData(const int &selFile, QList<QStringList> inputMediaInfo, const QStringList configurationList, QList<int> hibitdepth);
 
 private slots:
     void on_buttonBox_accepted();
@@ -49,8 +49,6 @@ private slots:
 
     void on_recontainer_clicked();
 
-    void on_selectBitDepth_currentIndexChanged();
-
     void on_copyVideo_toggled(bool checked);
 
 private:
@@ -58,6 +56,10 @@ private:
     filesettings fs;
 
     int selectedFile;
+    bool newExtAudio;
+
+    QList<bool> x264bitdepth;
+    QList<bool> x265bitdepth;
 
     int inputVideoStreams;
     int inputAudioStreams;
@@ -72,12 +74,13 @@ private:
     QStringList inputAudioCodecs;
     QStringList altAudioCodecs;
 
-
+    void enableBitDepth(QList<int> hibitdepth);
     void setVideoStream();
     void setVideoVisibility();
     void setAudioVisibility();
     void setColorSpace();
     void setColorMatrix();
+    void setBitDepth();
     void setPreset();
     void setMode();
     void setTune();

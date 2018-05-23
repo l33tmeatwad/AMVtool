@@ -21,11 +21,14 @@ public:
 
 private slots:
     void readErrors();
+    void readOutput();
 private:
     QProcess *exec;
     bool execfail;
     QString findDir(QString executable);
-    bool checkEXEC(QString execDir);
+    bool checkEXEC(QString execDir, QStringList execCommand);
+    bool hibit10 = false;
+    bool hibit12 = false;
 };
 
 #endif // DEPENDENCIES_H

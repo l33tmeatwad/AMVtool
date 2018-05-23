@@ -19,8 +19,9 @@ configure::~configure()
     delete ui;
 }
 
-void configure::setData(const int &selFile, QList<QStringList> inputMediaInfo, const QStringList configurationList)
+void configure::setData(const int &selFile, QList<QStringList> inputMediaInfo, const QStringList configurationList, QList<int> hibitdepth)
 {
+    enableBitDepth(hibitdepth);
 
     if (selFile == -1)
     {
@@ -82,6 +83,7 @@ void configure::setData(const int &selFile, QList<QStringList> inputMediaInfo, c
 
     setContainer();
     setVideoCodec();
+    setBitDepth();
     setColorSpace();
     setColorMatrix();
     setPreset();
@@ -96,6 +98,23 @@ void configure::setData(const int &selFile, QList<QStringList> inputMediaInfo, c
 }
 
 // SHOW OR HIDE OPTIONS
+
+void configure::enableBitDepth(QList<int> hibitdepth)
+{
+    if (!hibitdepth.contains(1))
+    {
+        ui->selectBitDepth->setVisible(false);
+        ui->labelBitDepth->setVisible(false);
+    }
+
+    bool x264hi10 = hibitdepth[0];
+    bool x264hi12 = hibitdepth[1];
+    x264bitdepth = {x264hi10,x264hi12};
+
+    bool x265hi10 = hibitdepth[2];
+    bool x265hi12 = hibitdepth[3];
+    x265bitdepth = {x265hi10,x265hi12};
+}
 
 void configure::setVideoVisibility()
 {
@@ -321,6 +340,36 @@ void configure::setVideoCodec()
     ui->selectCodec->setCurrentIndex(index);
 }
 
+void configure::setBitDepth()
+{
+    QString outputbit;
+    QList<bool> bitdepth = {false,false};
+    if (ui->selectBitDepth->currentIndex() != -1)
+        outputbit = ui->selectBitDepth->currentText();
+    else
+        outputbit = outputBitDepth;
+
+    ui->selectBitDepth->clear();
+
+    ui->selectBitDepth->addItem("8");
+
+    if (ui->selectCodec->currentText() == "x264")
+        bitdepth = x264bitdepth;
+
+    if (ui->selectCodec->currentText() == "x265")
+        bitdepth = x265bitdepth;
+
+    if (bitdepth[0])
+        ui->selectBitDepth->addItem("10");
+    if (bitdepth[1])
+        ui->selectBitDepth->addItem("12");
+
+    int index = ui->selectBitDepth->findText(outputbit);
+    if(index != -1) { ui->selectBitDepth->setCurrentIndex(index); }
+    else { ui->selectBitDepth->setCurrentIndex(0); }
+
+}
+
 void configure::setColorSpace()
 {
     QString codec = ui->selectCodec->currentText();
@@ -343,13 +392,20 @@ void configure::setColorSpace()
     if (codec == "UT Video")
     {
         colorspaceoptions.clear();
+        int cvs = ui->selectVideoStream->currentIndex();
         if (ui->selectBitDepth->currentText() == "8")
         {
-            colorspaceoptions.append({"YUV420", "YUV422", "RGB24","RGBA"});
+            if (inputColorMatrix[cvs].contains("BT.2020") && !inputColorSpaces[cvs].contains("RGB"))
+                colorspaceoptions.append({"RGB24","RGBA"});
+            else
+                colorspaceoptions.append({"YUV420", "YUV422", "RGB24","RGBA"});
         }
         else
         {
-            colorspaceoptions.append({"YUV422", "RGB24","RGBA"});
+            if (inputColorMatrix[cvs].contains("BT.2020"))
+                colorspaceoptions.append({"RGB24","RGBA"});
+            else
+                colorspaceoptions.append({"YUV422", "RGB24","RGBA"});
         }
     }
     ui->selectColorSpace->clear();
@@ -360,30 +416,14 @@ void configure::setColorSpace()
 
 }
 
-
 void configure::setColorMatrix()
 {
-    if (outputColorMatrix == "DETECT")
-    {
-        if (inputColorMatrix[vsIndex] != "")
-        {
-            outputColorMatrix = inputColorMatrix[vsIndex];
-        }
-        else
-        {
-            if (inputVideoHeight[vsIndex].toInt() > 580)
-            {
-                outputColorMatrix = "BT.709";
-            }
-            else
-            {
-                outputColorMatrix = "BT.601";
-            }
-        }
-    }
-
     ui->selectMatrix->clear();
     ui->selectMatrix->addItems({"BT.601", "BT.709"});
+
+    if (ui->selectCodec->currentText() != "UT Video")
+        ui->selectMatrix->addItems({"BT.2020NC","BT.2020C"});
+
     int index = ui->selectMatrix->findText(outputColorMatrix);
     if(index != -1) { ui->selectMatrix->setCurrentIndex(index); }
     else { ui->selectMatrix->setCurrentIndex(0); }
@@ -404,8 +444,25 @@ void configure::setPreset()
 
 void configure::setTune()
 {
-    int encTuneIndex = ui->selectTune->findText(videoEncTune);
-    ui->selectTune->setCurrentIndex(encTuneIndex);
+    if (ui->selectCodec->currentText().contains("x26"))
+    {
+        QString outputtune;
+        if (ui->selectTune->currentIndex() != -1 && ui->selectTune->currentText() != "(None)")
+            outputtune = ui->selectTune->currentText();
+        else
+            outputtune = videoEncTune;
+
+        ui->selectTune->clear();
+        ui->selectTune->addItem("(None)");
+        if (ui->selectCodec->currentText() == "x264")
+            ui->selectTune->addItems({"Film","Animation","Still Image"});
+
+        ui->selectTune->addItems({"Grain","Fast Decode","Zero Latency","PSNR","SSIM"});
+
+        int index = ui->selectTune->findText(outputtune);
+        if(index != -1) { ui->selectTune->setCurrentIndex(index); }
+        else { ui->selectTune->setCurrentIndex(0); }
+    }
 }
 
 
@@ -414,14 +471,10 @@ void configure::setTune()
 void configure::setAudioStream()
 {
     int audioStreams;
-    if (externalaudio && ui->externalAudioSource->text() != "")
-    {
+    if (externalaudio || ui->externalAudioSource->text() != "")
         audioStreams = altAudioStreams;
-    }
     else
-    {
         audioStreams = inputAudioStreams;
-    }
 
     ui->selectAudioStream->clear();
     if (ui->selectContainer->currentText() != "AVI")
@@ -436,17 +489,17 @@ void configure::setAudioStream()
         ui->selectAudioStream->addItem(QString::number(i));
     }
     ui->selectAudioStream->addItem("None");
-    if (outputAudioStream != "All")
-    {
-        if (outputAudioStream.toInt() < audioStreams )
-        {
-            ui->selectAudioStream->setCurrentIndex(outputAudioStream.toInt());
-        }
-    }
-
     int index = ui->selectAudioStream->findText(outputAudioStream);
-    if(index != -1) { ui->selectAudioStream->setCurrentIndex(index); }
-    else { ui->selectAudioStream->setCurrentIndex(0); }
+
+    if (newExtAudio && ui->externalAudio->isChecked())
+        index = 0;
+    if (outputAudioSource != "Original Audio" && ui->internalAudio->isChecked())
+        index = 0;
+
+    if(index != -1)
+        ui->selectAudioStream->setCurrentIndex(index);
+    else
+        ui->selectAudioStream->setCurrentIndex(0);
 
 }
 
@@ -622,7 +675,8 @@ void configure::on_buttonBox_accepted()
     outputColorMatrix = ui->selectMatrix->currentText();
     videoEncMode = ui->selectMode->currentText();
     videoEncPreset = ui->selectPreset->currentText();
-    videoEncTune = ui->selectTune->currentText();
+    if (ui->selectTune->currentIndex() != -1)
+        videoEncTune = ui->selectTune->currentText();
     videoEncBitrate = ui->bitrateBox->value();
     outputAudioStream = ui->selectAudioStream->currentText();
     bool copyaudio = false;
@@ -634,7 +688,7 @@ void configure::on_buttonBox_accepted()
     }
     else
     {
-        if (ui->encodeIncompatible->isChecked())
+        if (ui->copyAudio->isChecked() && ui->encodeIncompatible->isChecked())
         {
             copyaudio = true;
         }
@@ -745,19 +799,12 @@ void configure::on_selectContainer_currentIndexChanged()
     setAudioStream();
 }
 
-
-void configure::on_selectBitDepth_currentIndexChanged()
-{
-    if (ui->selectCodec->currentIndex() != -1)
-    {
-        setVideoCodec();
-    }
-    setVideoVisibility();
-}
-
 void configure::on_selectCodec_currentIndexChanged()
 {
+    setBitDepth();
     setColorSpace();
+    setColorMatrix();
+    setTune();
     setVideoVisibility();
 }
 
@@ -811,7 +858,8 @@ void configure::on_selectVideoStream_currentIndexChanged(int index)
     vsIndex = index;
     if (ui->selectMatrix->currentIndex() != -1)
     {
-        outputColorMatrix = "DETECT";
+        outputColorMatrix = inputColorMatrix[index];
+        setBitDepth();
         setColorSpace();
         setColorMatrix();
     }
@@ -849,8 +897,15 @@ void configure::on_selectAudioCodec_currentIndexChanged()
 void configure::on_externalAudio_toggled(bool checked)
 {
     externalaudio = checked;
-    setAudioStream();
-    setAudioCodec();
+    if (ui->externalAudioSource->text() != "")
+    {
+        setAudioStream();
+        setAudioCodec();
+    }
+    else
+    {
+        setAudioVisibility();
+    }
 }
 
 void configure::on_browseAudio_clicked()
@@ -858,9 +913,11 @@ void configure::on_browseAudio_clicked()
     QString newAudio = QFileDialog::getOpenFileName(this, tr("Open Media File"), "", "Media Files (*.avi *aac *m2ts *.m4v *mka *.mkv *.mov *mp3 *.mp4 *ts *wav)");
     if (newAudio != "")
     {
+        newExtAudio = true;
         getAltAudioCodecs(newAudio);
     }
     setAudioCodec();
+    setAudioStream();
 }
 
 void configure::on_copyAudio_toggled(bool checked)

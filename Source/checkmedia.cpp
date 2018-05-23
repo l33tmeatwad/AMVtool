@@ -1,5 +1,5 @@
 #include "checkmedia.h"
-#include "MediaInfoDLL/MediaInfoDLL_Static.h"
+#include <MediaInfoDLL/MediaInfoDLL_Static.h>
 #include "ZenLib/Ztring.h"
 
 QString checkColorMatrix(QString matrix, QString videoWidth, QString videoHeight);
@@ -14,7 +14,7 @@ checkmedia::checkmedia(QObject *parent) : QObject(parent)
 
 QString checkmedia::checkFormats()
 {
-    QString mediaformats = "Media Files (*.avi *.avs *.m2ts *.m4v *.mkv *.mov *.mp4 *.mpg *.mts *.ts *.vob *.vpy)";
+    QString mediaformats = "Media Files (*.avi *.m2ts *.m4v *.mkv *.mov *.mp4 *.mpg *.mts *.ts *.vob *.vpy)";
     vpyfail = false;
     vspipe = new QProcess(this);
     QStringList vspipecommand = { "--version" };
@@ -35,12 +35,17 @@ QString checkmedia::checkFormats()
 
 QString checkColorMatrix(QString colormatrix, QString videoWidth, QString videoHeight)
 {
-    QStringList matrixlist = {"BT.601","BT.709"};
+    colormatrix.replace(" non-constant","NC");
+    colormatrix.replace(" constant","C");
+    QStringList matrixlist = {"BT.601","BT.709","BT.2020NC","BT.2020C"};
     if (!matrixlist.contains(colormatrix))
     {
         if (videoWidth.toInt() > 940 || videoHeight.toInt() > 580)
         {
-            colormatrix = "BT.709";
+            if (videoWidth.toInt() > 2048 || videoHeight.toInt() > 1080)
+                colormatrix = "BT.2020NC";
+            else
+                colormatrix = "BT.709";
         }
         else
         {

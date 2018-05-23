@@ -58,6 +58,7 @@ private:
     QString ffmpegexec;
     QString mediatypes;
     QString mOutputString;
+    QList<int> hibitdepth;
 
     QFileDialog dialog;
 

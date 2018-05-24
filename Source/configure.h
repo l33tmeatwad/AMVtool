@@ -56,7 +56,7 @@ private:
     filesettings fs;
 
     int selectedFile;
-    bool newExtAudio;
+    bool newExtAudio = false;
 
     QList<bool> x264bitdepth;
     QList<bool> x265bitdepth;

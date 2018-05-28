@@ -68,7 +68,7 @@ void AMVtool::dropEvent(QDropEvent *e)
     QStringList fileList;
     foreach (const QUrl &url, e->mimeData()->urls())
     {
-        if (mediatypes.contains(url.toLocalFile().right(3)))
+        if (mediatypes.contains(url.toLocalFile().right(3).toLower()))
         {
             fileList.append(url.toLocalFile());
         }

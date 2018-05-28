@@ -1,5 +1,5 @@
 [Desktop Entry]
-Version=1.0.0.8
+Version=1.0.0.9
 Name=AMVtool
 Comment=GUI for FFmpeg designed for AMV editors.
 Exec=AMVtool

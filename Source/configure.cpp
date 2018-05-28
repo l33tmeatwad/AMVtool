@@ -727,22 +727,6 @@ void configure::on_buttonBox_accepted()
 
 void configure::on_recontainer_clicked()
 {
-    if (QMessageBox::question(this,"Audio Option", "Would you like to include the audio?", QMessageBox::Yes|QMessageBox::No) == QMessageBox::No)
-    {
-        int index = ui->selectAudioStream->findText("None");
-        if (index < 0)
-        {
-            index = 0;
-        }
-        ui->selectAudioStream->setCurrentIndex(index);
-    }
-    else
-    {
-        if (ui->selectAudioStream->currentText() == "None")
-        {
-            ui->selectAudioStream->setCurrentIndex(0);
-        }
-    }
     if (selectedFile < 0)
     {
         ui->copyVideo->setChecked(true);
@@ -779,6 +763,23 @@ void configure::on_recontainer_clicked()
             ui->copyAudio->setChecked(true);
         }
     }
+    if (QMessageBox::question(this,"Audio Option", "Would you like to include the audio?", QMessageBox::Yes|QMessageBox::No) == QMessageBox::No)
+    {
+        int index = ui->selectAudioStream->findText("None");
+        if (index < 0)
+        {
+            index = 0;
+        }
+        ui->selectAudioStream->setCurrentIndex(index);
+    }
+    else
+    {
+        if (ui->selectAudioStream->currentText() == "None")
+        {
+            ui->selectAudioStream->setCurrentIndex(0);
+        }
+    }
+
 }
 
 // CHANGED VALUE EVENTS

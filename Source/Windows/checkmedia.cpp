@@ -117,6 +117,17 @@ QString checkColorMatrix(QString colormatrix, QString videoWidth, QString videoH
 
 QList<QStringList> checkmedia::checkMedia(QString inputFile)
 {
+    inputVideoStreamIDs.clear();
+    inputVideoBitDepths.clear();
+    inputVideoCodecs.clear();
+    inputColorSpaces.clear();
+    inputColorMatrix.clear();
+    inputVideoWidth.clear();
+    inputVideoHeight.clear();
+    inputFPS.clear();
+    inputAudioStreamIDs.clear();
+    inputAudioCodecs.clear();
+    
     if (inputFile.right(3).toLower() == "vpy")
     {
         inputMediaInfo = checkVPY(inputFile);

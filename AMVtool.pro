@@ -49,7 +49,7 @@ linux{
 
 macx{
     SOURCES += Source/checkmedia.cpp
-    LIBS += -lmediainfo.0
+    LIBS += -lmediainfo -lzen -lz
     QMAKE_INFO_PLIST = Resources/Info.plist
     QMAKE_APP_OR_DLL = Resources/
     ICON = Resources/icon.icns
@@ -60,7 +60,7 @@ win32{
     SOURCES += Source/Windows/checkmedia.cpp
     LIBS +=  -lmediainfo -lavisynthwrapper
     RC_ICONS = Resources/icon.ico
-    VERSION = 1.0.0.9
+    VERSION = 1.0.1.0
     QMAKE_TARGET_PRODUCT = "AMVtool"
     QMAKE_TARGET_DESCRIPTION = "GUI for FFmpeg designed for AMV editors."
     QMAKE_TARGET_COPYRIGHT = "\\251 2018 by l33tmeatwad"

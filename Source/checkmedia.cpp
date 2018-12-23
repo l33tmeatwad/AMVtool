@@ -125,61 +125,63 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
 
 
             inputVideoStreamIDs.append(videoID);
-            QString bitdepth = QString::fromStdString(MI.Get(Stream_Video, i, __T("BitDepth"), Info_Text, Info_Name));
             QString VideoCodec = QString::fromStdString(MI.Get(Stream_Video, i, __T("Format_Commercial"), Info_Text, Info_Name));
             if (VideoCodec == "YUV" || VideoCodec == "RGBA" || VideoCodec == "RGB")
                 VideoCodec = QString::fromStdString(MI.Get(Stream_Video, i, __T("CodecID"), Info_Text, Info_Name));
 
-            QStringList UTcodec = { "ULRG", "ULRA", "UQRG", "UQRA", "ULY0", "ULY2", "ULH0", "ULH2", "UQY2" };
-            foreach (QString codec, UTcodec)
+            QString bitdepth;
+            QString colorspace;
+            QString colormatrix;
+            QStringList UTcodec = { "ULRG", "UMRG", "ULRA", "UMRA", "UQRG", "UQRA", "ULY0", "ULY2", "UMY2", "ULY4", "UMY4", "ULH0", "ULH2", "UMH2", "ULH4", "UMH4", "UQY2" };
+
+
+            if (UTcodec.contains(VideoCodec))
             {
-                if (VideoCodec.contains(codec))
+                if (VideoCodec.contains("Q"))
                 {
-                    VideoCodec = codec;
-                    if (VideoCodec.contains("Q"))
-                    {
-                        bitdepth = "10";
-                    }
-                    else
-                    {
-                        bitdepth = "8";
-                    }
+                    bitdepth = "10";
                 }
+                else
+                {
+                    bitdepth = "8";
+                }
+                if (VideoCodec.contains("R"))
+                {
+                    if (VideoCodec.contains("A"))
+                        colorspace = "RGBA";
+                    else
+                        colorspace = "RGB24";
+                }
+                else
+                {
+                    if (VideoCodec.contains("0"))
+                        colorspace = "YUV420";
+                    if (VideoCodec.contains("2"))
+                        colorspace = "YUV422";
+                    if (VideoCodec.contains("4"))
+                        colorspace = "YUV444";
+                    if (VideoCodec.contains("ULY") || VideoCodec.contains("UMY"))
+                        colormatrix = "BT.601";
+                    if (VideoCodec.contains("ULH") || VideoCodec.contains("UMH"))
+                        colormatrix = "BT.709";
+
+
+                }
+
+            }
+            else
+            {
+                bitdepth = QString::fromStdString(MI.Get(Stream_Video, i, __T("BitDepth"), Info_Text, Info_Name));
+                colorspace = QString::fromStdString(MI.Get(Stream_Video, i, __T("ColorSpace"), Info_Text, Info_Name));
+                if (colorspace.toLower() == "yuv")
+                    colorspace.append(QString::fromStdString(MI.Get(Stream_Video, i, __T("ChromaSubsampling"), Info_Text, Info_Name))).replace(":","");
+                colormatrix = QString::fromStdString(MI.Get(Stream_Video, i, __T("matrix_coefficients"), Info_Text, Info_Name));
             }
             inputVideoCodecs.append(VideoCodec);
-
-            QString colorspace = QString::fromStdString(MI.Get(Stream_Video, i, __T("ColorSpace"), Info_Text, Info_Name));
-            QString colormatrix = QString::fromStdString(MI.Get(Stream_Video, i, __T("matrix_coefficients"), Info_Text, Info_Name));
 
             if (inputContainer == "MPEG-4")
                 inputContainer = "MP4";
 
-            if (inputContainer.toLower() == "quicktime")
-            {
-                if (inputVideoCodecs[i].contains("ULRG"))
-                {
-                    colorspace = "RGB24";
-                }
-                if (inputVideoCodecs[i].contains("ULRA"))
-                {
-                    colorspace = "RGBA";
-                }
-                if (inputVideoCodecs[i].contains("ULY0") || inputVideoCodecs[i].contains("ULY2"))
-                {
-                    colorspace = "YUV";
-                    colormatrix = "BT.601";
-                }
-                if (inputVideoCodecs[i].contains("ULH0") || inputVideoCodecs[i].contains("ULH2") || inputVideoCodecs[i].contains("UQY2"))
-                {
-                    colorspace = "YUV";
-                    colormatrix = "BT.709";
-                }
-            }
-
-            if (colorspace.toLower() == "yuv")
-            {
-                colorspace.append(QString::fromStdString(MI.Get(Stream_Video, i, __T("ChromaSubsampling"), Info_Text, Info_Name))).replace(":","");
-            }
             QString videowidth = QString::fromStdString(MI.Get(Stream_Video, i, __T("Width"), Info_Text, Info_Name));
             QString videoheight = QString::fromStdString(MI.Get(Stream_Video, i, __T("Height"), Info_Text, Info_Name));
 

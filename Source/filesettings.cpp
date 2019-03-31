@@ -60,15 +60,13 @@ void filesettings::changeSettings(int ql, QString bitdepth, QStringList configur
             configurationList[2] = outputConfig[i][2];
             configurationList[5] = outputConfig[i][5];
             configurationList[11] = outputConfig[i][11];
-            if (configurationList[0] == "Original File Location")
-            {
-                configurationList[0] = outputConfig[i][0];
-            }
             if (mainQueueInfo[i][1].right(3) == "vpy" && outputConfig[i][11] == "Original Audio")
-            {
                 configurationList[12] = "None";
-            }
+
+            QString fileLoc = outputConfig[i][0];
             outputConfig[i] = configurationList;
+            if (configurationList[0] == "Original File Location")
+                outputConfig[i][0] = fileLoc;
         }
 
     }

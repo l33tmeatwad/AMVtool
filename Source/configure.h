@@ -114,6 +114,7 @@ private:
     QString outputAudioCodec;
     QString audioEncMode;
     int audioEncBitrate;
+    QString maxMux;
 
 
     int vsIndex;

@@ -65,6 +65,7 @@ private:
     QProcess *encode;
     QProcess *pipe;
     int position;
+    bool packetbuffererror = false;
     bool stopprocess;
     bool outputcreated;
 

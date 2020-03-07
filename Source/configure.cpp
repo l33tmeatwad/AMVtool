@@ -60,6 +60,7 @@ void configure::setData(const int &selFile, QList<QStringList> inputMediaInfo, c
     outputAudioCodec = configurationList[13];
     audioEncMode = configurationList[14];
     audioEncBitrate = configurationList[15].toInt();
+    maxMux = configurationList[17];
 
     ui->copyAudio->setChecked(configurationList[16].toInt());
     if (outputAudioCodec != "Copy")
@@ -710,7 +711,7 @@ void configure::on_buttonBox_accepted()
 
     QStringList configurationList = { outputLocation, outputContainer, QString::number(outputVideoStream), outputColorSpace, outputBitDepth, outputColorMatrix, outputVideoCodec,
                                       videoEncMode, videoEncPreset, videoEncTune, QString::number(videoEncBitrate), outputAudioSource, outputAudioStream, outputAudioCodec,
-                                    audioEncMode, QString::number(audioEncBitrate),QString::number(copyaudio)};
+                                    audioEncMode, QString::number(audioEncBitrate),QString::number(copyaudio),maxMux};
 
 
     fs.changeSettings(selectedFile, inputVideoBitDepths[ui->selectVideoStream->currentIndex()], configurationList);

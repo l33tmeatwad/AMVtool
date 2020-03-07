@@ -245,9 +245,17 @@ void AMVtool::updateQueue(int pos, QString status)
     }
     if (status == "Error")
     {
-        ui->fileList->item(pos)->setText("ERROR | " + ui->fileList->item(pos)->text());
-        ui->fileList->item(pos)->setBackgroundColor(Qt::red);
-        mainQueueInfo[pos][3] = "Error";
+        if (packetbuffererror == true && outputConfig[pos][17] == "")
+        {
+            outputConfig[pos][17] = "9999";
+        }
+        else
+        {
+            packetbuffererror = false;
+            ui->fileList->item(pos)->setText("ERROR | " + ui->fileList->item(pos)->text());
+            ui->fileList->item(pos)->setBackgroundColor(Qt::red);
+            mainQueueInfo[pos][3] = "Error";
+        }
     }
     if (status == "Pending")
     {
@@ -262,7 +270,6 @@ void AMVtool::updateQueue(int pos, QString status)
         ui->fileList->item(pos)->setBackgroundColor(Qt::yellow);
         mainQueueInfo[pos][3] = "Skipped";
     }
-
 
 }
 
@@ -326,7 +333,7 @@ void AMVtool::ProcessFile(int pos)
             }
 
         }
-        if (mainQueueInfo[pos][3] != "Skipped")
+        if (mainQueueInfo[pos][3] != "Skipped" && packetbuffererror != true)
         {
             QFileInfo file_exists(outputConfig[pos][0] + mainQueueInfo[pos][1].left(mainQueueInfo[pos][1].length()-4) + "-AMVtool." + outputConfig[pos][1].toLower());
             if (file_exists.exists() && mainQueueInfo[pos][4] != "2")
@@ -343,6 +350,10 @@ void AMVtool::ProcessFile(int pos)
                     updateQueue(pos,"Skipped");
                 }
             }
+        }
+        else
+        {
+            packetbuffererror = false;
         }
     }
 
@@ -394,6 +405,7 @@ QString AMVtool::selectNewFolder()
 
 void AMVtool::Encode(int pos, QList<QStringList> inputDetails, QStringList configList)
 {
+    ui->statusBar->showMessage("Starting Encode");
     inputDuration = inputDetails[0][3].toFloat();
     outputcreated = false;
     setupencode se;
@@ -490,6 +502,8 @@ void AMVtool::readyReadStandardOutput()
 {
     float duration = inputDuration;
     QString readline = encode->readAllStandardOutput();
+    if (readline.contains("Too many packets buffered for output stream"))
+        packetbuffererror = true;
 
     if (readline.contains("time="))
     {
@@ -511,6 +525,7 @@ void AMVtool::readyReadStandardOutput()
         timeRemaining->setText("");
         ui->statusBar->showMessage("Finished");
     }
+
 
 
 

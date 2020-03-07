@@ -24,6 +24,7 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
     QString amode = configList[14];
     QString abitrate = configList[15];
     bool acopy = configList[16].toInt();
+    QString MaxMuxing = configList[17];
     QStringList containerCompatibility;
 
     QStringList ffmpegcommand;
@@ -102,7 +103,10 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
             }
         }
     }
-
+    if (MaxMuxing != "")
+    {
+        ffmpegcommand.append({"-max_muxing_queue_size",MaxMuxing});
+    }
 
     ffmpegcommand.append("-f");
 

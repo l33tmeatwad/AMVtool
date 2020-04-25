@@ -49,6 +49,7 @@ linux{
 
 macx{
     SOURCES += Source/checkmedia.cpp
+	LIBPATH += $$PWD/Resources/MacOS
     LIBS += -lmediainfo -lzen -lz
     QMAKE_INFO_PLIST = Resources/Info.plist
     QMAKE_APP_OR_DLL = Resources/

@@ -25,7 +25,7 @@ private slots:
 private:
     QProcess *exec;
     bool execfail;
-    QString findDir(QString executable);
+    QString findDir(QString executable, QString version);
     bool checkEXEC(QString execDir, QStringList execCommand);
     bool hibit10 = false;
     bool hibit12 = false;

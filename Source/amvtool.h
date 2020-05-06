@@ -6,12 +6,7 @@
 #include <QFileDialog>
 #include <QLabel>
 
-#ifdef WIN32
-#define _UNICODE
-#define vspipeexec qApp->applicationDirPath() + "/" + "vspipe.exe"
-#else
-#define vspipeexec "/usr/local/bin/vspipe"
-#endif
+extern QString vspipeexec;
 
 namespace Ui {
 class AMVtool;

@@ -9,7 +9,7 @@ dependencies::dependencies(QObject *parent) : QObject(parent)
 
 QStringList dependencies::checkDependencies()
 {
-    QString ffmpegLoc = findDir("ffmpeg");
+    QString ffmpegLoc = findDir("ffmpeg","-version");
     QList<bool> x264;
     QList<bool> x265;
     bool ffmpegFail;
@@ -26,19 +26,19 @@ QStringList dependencies::checkDependencies()
         x264 = {false,false};
         x265 = {false,false};
     }
-
+    QString vspipeLoc = findDir("vspipe","--version");
 
     checkmedia cm;
-    QStringList depStatus = { cm.checkFormats(), ffmpegLoc, QString::number(x264[0]), QString::number(x264[1]), QString::number(x265[0]), QString::number(x265[1]) };
+    QStringList depStatus = { cm.checkFormats(vspipeLoc.contains("Not Found")), vspipeLoc, ffmpegLoc, QString::number(x264[0]), QString::number(x264[1]), QString::number(x265[0]), QString::number(x265[1]) };
     return depStatus;
 }
 
-QString dependencies::findDir(QString executable)
+QString dependencies::findDir(QString executable, QString version)
 {
     QString execDir = qApp->applicationDirPath() + "/" + executable;
     if (OS == "Windows")
         execDir = execDir + ".exe";
-    bool pathfail = checkEXEC(execDir, {"-version"});
+    bool pathfail = checkEXEC(execDir, {version});
 
     if (OS == "Unix" && pathfail)
     {

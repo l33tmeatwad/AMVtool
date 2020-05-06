@@ -4,12 +4,7 @@
 #include <QObject>
 #include <QProcess>
 
-#ifdef WIN32
-#define _UNICODE
-#define vspipeexec qApp->applicationDirPath() + "/" + "vspipe.exe"
-#else
-#define vspipeexec "/usr/local/bin/vspipe"
-#endif
+extern QString vspipeexec;
 
 class checkmedia : public QObject
 {
@@ -17,7 +12,7 @@ class checkmedia : public QObject
     Q_OBJECT
 
 public:
-    QString checkFormats();
+    QString checkFormats(bool vpyfail);
     checkmedia(QObject *parent = 0);
     QList<QStringList> checkMedia(QString inputFile);
 

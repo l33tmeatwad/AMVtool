@@ -12,19 +12,9 @@ checkmedia::checkmedia(QObject *parent) : QObject(parent)
 
 }
 
-QString checkmedia::checkFormats()
+QString checkmedia::checkFormats(bool vpyfail)
 {
     QString mediaformats = "Media Files (*.avi *.m2ts *.m4v *.mkv *.mov *.mp4 *.mpg *.mts *.ts *.vob *.vpy *.webm)";
-    vpyfail = false;
-    vspipe = new QProcess(this);
-    QStringList vspipecommand = { "--version" };
-    connect(vspipe, SIGNAL(readyReadStandardOutput()), this, SLOT(readOutput()));
-    connect(vspipe, SIGNAL(error(QProcess::ProcessError)), this, SLOT(readErrors()));
-    vspipe->setProcessChannelMode(QProcess::MergedChannels);
-    vspipe->start(vspipeexec, vspipecommand);
-    vspipe->waitForFinished();
-    vspipe->deleteLater();
-
     if (vpyfail == true)
     {
         mediaformats.replace(" *.vpy", "");

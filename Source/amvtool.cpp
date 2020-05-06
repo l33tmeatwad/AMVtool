@@ -36,17 +36,23 @@ QString AMVtool::checkDependencies()
 {
     dependencies dep;
     QStringList depStatus = dep.checkDependencies();
-    if (depStatus[1].contains("Not Found"))
+    if (depStatus[1].contains("Not Found: "))
+    {
+        depStatus[1].replace("Not Found: ", "");
+    }
+
+    if (depStatus[2].contains("Not Found: "))
     {
         ui->statusBar->showMessage("FFmpeg executable is missing!");
-        depStatus[1].replace("Not Found: ", "");
+        depStatus[2].replace("Not Found: ", "");
     }
     else
     {
         ui->statusBar->showMessage("Ready");
     }
-    ffmpegexec = depStatus[1];
-    hibitdepth = { depStatus[2].toInt(), depStatus[3].toInt(), depStatus[4].toInt(), depStatus[5].toInt() };
+    vspipeexec = depStatus[1];
+    ffmpegexec = depStatus[2];
+    hibitdepth = { depStatus[3].toInt(), depStatus[4].toInt(), depStatus[5].toInt(), depStatus[6].toInt() };
 
     return depStatus[0];
 

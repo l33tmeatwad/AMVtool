@@ -320,7 +320,7 @@ void checkmedia::readOutput()
     while (vspipe->canReadLine())
     {
         QString vsline = vspipe->readLine();
-        if (vsline.contains("Script evaluation failed") || vsline.contains("Library not loaded"))
+        if (vsline.contains("Script evaluation failed") || vsline.contains("Library not loaded") || vsline.contains("Failed to retrieve output node."))
         {
             vpyfail = true;
         }

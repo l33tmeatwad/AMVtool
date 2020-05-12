@@ -27,10 +27,10 @@ QString queue::InputFiles(QString inputFile)
         fs.addSettings(Location.replace(filename,""), mediainfo[5][0], isVPY);
         openedFileInfo = mediainfo[2][0] + " | " + filename;
     }
-    if (RecontainerSettings[0])
+    if (RecontainerSettings[0] && openedFileInfo[0] != "Error")
     {
         filesettings fs;
-        fs.recontainerSettings(mediainfo,0,findPosition(),RecontainerSettings[1]);
+        fs.recontainerSettings(mediainfo,0,mainQueueInfo.count()-1,RecontainerSettings[1]);
     }
 
     return openedFileInfo;

@@ -87,16 +87,12 @@ void filesettings::recontainerSettings(QList<QStringList> mediaInfo, int vstream
     {
         QStringList containers = findContainers(mediaInfo[3][vstream]);
 
-        if (autoCon == true && containers[0] == mediaInfo[0][2])
+        if (autoCon == true)
         {
-            containers.removeFirst();
+            containers.removeAll(mediaInfo[0][2]);
             outputConfig[queue][1] = containers[0];
         }
-        if (autoCon == false && !containers.contains(outputConfig[queue][1]))
-        {
-
-        }
-        else
+        if (containers.contains(outputConfig[queue][1]))
         {
             outputConfig[queue][6] = "Copy";
             outputConfig[queue][16] = "1";

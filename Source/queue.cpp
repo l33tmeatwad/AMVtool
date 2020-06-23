@@ -77,6 +77,7 @@ QList<QStringList> queue::checkInput(int position)
         QList<QStringList> audioDetails = cm.checkMedia(outputConfig[position][11]);
         inputDetails[0][1] = audioDetails[0][1];
         inputDetails[9] = audioDetails[9];
+        inputDetails[10] = audioDetails[10];
     }
 
     int vstreamcount = inputDetails[0][0].toInt();

@@ -154,7 +154,7 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
 
     if (astream != "None")
     {
-        if (astream == "All" && acodec != "copy")
+        if (astream == "All" || acodec != "copy")
         {
             for (int i = 0; i < inputDetails[0][1].toInt(); i++)
             {

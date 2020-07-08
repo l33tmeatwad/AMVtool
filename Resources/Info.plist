@@ -7,7 +7,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>LSMinimumSystemVersion</key>
-	<string>10.10</string>
+	<string>10.12</string>
 	<key>CFBundleName</key>
 	<string>AMVtool</string>
 	<key>NSHumanReadableCopyright</key>
@@ -19,6 +19,6 @@
 	<key>CFBundleShortVersionString</key>
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
-	<string>1.0.1.4</string>
+	<string>1.0.1.5</string>
 </dict>
 </plist>

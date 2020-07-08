@@ -353,7 +353,8 @@ void AMVtool::ProcessFile(int pos)
                 }
                 else
                 {
-                    updateQueue(pos,"Skipped");
+					if (ui->ifExists->currentIndex() == 2)
+                    	updateQueue(pos,"Skipped");
                 }
             }
         }

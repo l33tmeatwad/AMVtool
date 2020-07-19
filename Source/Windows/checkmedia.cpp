@@ -10,32 +10,30 @@ QString AVScolorspace(int colornum);
 QList<QStringList> checkAVS(QString inputScript);
 
 typedef struct AVSDLLVideoInfo {
-    int mt_import;
-
     // Video
     int width;
     int height;
     int raten;
     int rated;
+    int aspectn;
+    int aspectd;
+    int interlaced_frame;
+    int top_field_first;
     int num_frames;
-    int field_based;
-    int first_field;
-    int pixel_type_orig;
     int pixel_type;
 
     // Audio
     int audio_samples_per_second;
-    int sample_type_orig;
+    int num_audio_samples;
     int sample_type;
     int nchannels;
-    int64_t num_audio_samples;
 } AVSDLLVideoInfo;
 
-AVSDLLVideoInfo *vi;
+AVSDLLVideoInfo *vinfo = new AVSDLLVideoInfo();
 
 extern "C" {
-__declspec(dllimport) int __stdcall dimzon_avs_init(void* avs, char *func, char *arg, AVSDLLVideoInfo *vi);
-__declspec(dllexport) int __stdcall dimzon_avs_destroy(void* avs);
+__declspec(dllexport) int __stdcall dimzon_avs_init(intptr_t* ppstr, char *func, char *arg, AVSDLLVideoInfo *vi, int* originalPixelType, int* originalSampleType, char *cs);
+__declspec(dllexport) int __stdcall dimzon_avs_destroy(intptr_t* avs);
 }
 
 using namespace MediaInfoNameSpace;
@@ -66,19 +64,23 @@ QString checkmedia::checkFormats(bool vpyfail)
     {
         mediaformats.replace(" *.vpy", "");
     }
-
-    QString funcstr = "";
-    QByteArray func = funcstr.toLocal8Bit();
-    void* avs = new intptr_t(0);
-    int avisynth = dimzon_avs_init(avs,func.data(), func.data(), vi);
+    intptr_t* avs = new intptr_t(0);
+    QByteArray funcstr("IsString");
+    char *func = funcstr.data();
+    QByteArray argstr("");
+    char *arg = argstr.data();
+    int* opt = new int(0);
+    int* ost = new int(0);
+    QByteArray csstr("");
+    char *cs = csstr.data();
+    int avisynth = dimzon_avs_init(avs,func, arg, vinfo, opt, ost, cs);
     dimzon_avs_destroy(avs);
-    delete avs;
 
-    if (avisynth != 0)
+    if (avisynth == 1)
     {
             mediaformats.replace(" *.avs", "");
     }
-
+]
     return mediaformats;
 }
 
@@ -334,20 +336,19 @@ QList<QStringList> checkAVS(QString inputScript)
     QStringList inputVideoHeight;
     QStringList inputFPS;
     QStringList inputAudioCodecs;
-
-
     QStringList inputMediaDetails;
-    QString funcstr = "Import";
-    QByteArray func = funcstr.toLocal8Bit();
 
-    QByteArray file = inputScript.toLocal8Bit();
-
-    void* avs = new intptr_t(0);
-
-    AVSDLLVideoInfo *vinfo = new AVSDLLVideoInfo();
-    int avisynth = dimzon_avs_init(avs,func.data(), file.data(), vinfo);
+    intptr_t* avs = new intptr_t(0);
+    QByteArray funcstr("Import");
+    char *func = funcstr.data();
+    QByteArray filestr = inputScript.toLocal8Bit();
+    char *file = filestr.data();
+    int* opt = new int(0);
+    int* ost = new int(0);
+    QByteArray csstr("");
+    char *cs = csstr.data();
+    int avisynth = dimzon_avs_init(avs,func, file, vinfo, opt, ost, cs);
     dimzon_avs_destroy(avs);
-    delete avs;
 
     if (0 == avisynth)
     {
@@ -382,7 +383,6 @@ QList<QStringList> checkAVS(QString inputScript)
     {
         inputMediaDetails.append({ "0", "0", "Error", "0" });
     }
-    delete vinfo;
 
     QList<QStringList> inputMediaInfo = { inputMediaDetails, {"0"}, {"8bit"}, inputVideoCodecs, inputColorSpaces, inputColorMatrix, inputVideoWidth, inputVideoHeight, inputFPS, {"1"}, inputAudioCodecs };
     return inputMediaInfo;

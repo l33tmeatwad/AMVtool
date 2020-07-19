@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0.1.6
+Name=AMVtool
+Comment=GUI for FFmpeg designed for AMV editors.
+Exec=AMVtool
+Icon=AMVtool
+Terminal=false
+Type=Application
+Categories=AudioVideo;Qt;
+Name[en_US]=AMVtool

@@ -32,17 +32,16 @@ HEADERS  += Source/amvtool.h \
 FORMS    += Source/amvtool.ui \
             Source/configure.ui
 
-LIBPATH += $$PWD/Resources
-INCLUDEPATH += $$PWD/Resources
+INCLUDEPATH += $$PWD/Resources/Include
 
 linux{
     SOURCES += Source/checkmedia.cpp
     LIBS += -lmediainfo
     CONFIG += c++11
     icon.path = /usr/share/pixmaps
-    icon.files = Resources/AMVtool.png
+    icon.files = Resources/Linux/AMVtool.png
     shortcut.path = /usr/share/applications
-    shortcut.files = Resources/AMVtool.desktop
+    shortcut.files = Resources/Linux/AMVtool.desktop
     target.path = /usr/local/bin
     INSTALLS += target icon shortcut
 }
@@ -51,17 +50,20 @@ macx{
     SOURCES += Source/checkmedia.cpp
 	LIBPATH += $$PWD/Resources/MacOS
     LIBS += -lmediainfo -lzen -lz
-    QMAKE_INFO_PLIST = Resources/Info.plist
-    QMAKE_APP_OR_DLL = Resources/
-    ICON = Resources/icon.icns
-    QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.10
+    QMAKE_INFO_PLIST = Resources/MacOS/Info.plist
+    ICON = Resources/MacOS/icon.icns
+    QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.12
 }
 
 win32{
     SOURCES += Source/Windows/checkmedia.cpp
+    contains(QMAKE_TARGET.arch, x86_64) {
+            LIBPATH += $$PWD/Resources/Windows/x64 }
+        else {
+            LIBPATH += $$PWD/Resources/Windows/x86 }
     LIBS +=  -lmediainfo -lavisynthwrapper
-    RC_ICONS = Resources/icon.ico
-    VERSION = 1.0.1.5
+    RC_ICONS = Resources/Windows/icon.ico
+    VERSION = 1.0.1.6
     QMAKE_TARGET_PRODUCT = "AMVtool"
     QMAKE_TARGET_DESCRIPTION = "GUI for FFmpeg designed for AMV editors."
     QMAKE_TARGET_COPYRIGHT = "\\251 2020 by l33tmeatwad"

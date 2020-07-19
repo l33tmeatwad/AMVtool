@@ -31,6 +31,13 @@ AMVtool::~AMVtool()
     delete ui;
 }
 
+void AMVtool::closeEvent (QCloseEvent *event)
+{
+    if (QMessageBox::question( this, "Exiting AMVtool",tr("Are you sure you want to exit?\n"),QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes) == QMessageBox::Yes)
+        event->accept();
+    else
+        event->ignore();
+}
 
 QString AMVtool::checkDependencies()
 {

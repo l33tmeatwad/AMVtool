@@ -1,11 +1,9 @@
 #include "checkmedia.h"
 #include <MediaInfoDLL/MediaInfoDLL_Static.h>
-#include "ZenLib/Ztring.h"
 
 QString checkColorMatrix(QString matrix, QString videoWidth, QString videoHeight);
 
 using namespace MediaInfoDLL;
-using namespace ZenLib;
 
 checkmedia::checkmedia(QObject *parent) : QObject(parent)
 {

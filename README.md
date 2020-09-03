@@ -1,8 +1,9 @@
-AMVtool is a GUI for FFMpeg that is geared towards the needs of AMV editors.  In addition to handling almost all the formats that editors will use, it also helps out by automatically adjusting certain encode settings that are often incorrectly selected by many editors.  Here are some of the features:
+AMVtool is a GUI created with Qt for FFMpeg that is geared towards the needs of AMV editors.  In addition to handling almost all the formats that editors will use, it also helps out by automatically adjusting certain encode settings that are often incorrectly selected by many editors.  Here are some of the features:
 
 
 - Available on Linux, macOS, and Windows.
 - Automatically chooses the color matrix based on the existing file or guesses based on resolution.
+- Automatically detects compatibile containers for copying video.
 - Easy button for setting up file(s) to be recontainered.
 - Queue for batch encoding.
 - Shows bit depth of the currently selected video stream.

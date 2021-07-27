@@ -30,6 +30,7 @@ private:
     QString getCodecName(QString codecname);
     QString getColorSpace(QString colorspace, QString bitdepth);
     QString getColorMatrix(QString colormatrix);
+    QString getProfile(QString codec, QString bitdepth, QString profile);
     QString getAudioCodecName(QString codecname);
 
     QString outputfile;

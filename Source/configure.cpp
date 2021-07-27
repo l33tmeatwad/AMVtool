@@ -60,7 +60,6 @@ void configure::setData(const int &selFile, QList<QStringList> inputMediaInfo, c
     outputAudioCodec = configurationList[13];
     audioEncMode = configurationList[14];
     audioEncBitrate = configurationList[15].toInt();
-    maxMux = configurationList[17];
 
     ui->copyAudio->setChecked(configurationList[16].toInt());
     if (outputAudioCodec != "Copy")
@@ -96,6 +95,8 @@ void configure::setData(const int &selFile, QList<QStringList> inputMediaInfo, c
 
     ui->bitrateBox->setValue(videoEncBitrate);
     ui->bitrateBoxAudio->setValue(audioEncBitrate);
+    ui->maxMuxing->setValue(configurationList[17].toInt());
+    ui->experimentalFeatures->setChecked(configurationList[18].toInt());
 }
 
 // SHOW OR HIDE OPTIONS
@@ -125,12 +126,13 @@ void configure::setVideoVisibility()
     bool presetoptions;
     bool tuneoptions;
     bool colorspace;
+    QStringList noBitrate = {"Copy", "DNxHD", "ProRes","UT Video"};
 
-    if (ui->selectCodec->currentText() == "UT Video" || ui->selectCodec->currentText() == "Copy")
+    if (noBitrate.contains(ui->selectCodec->currentText()))
     {
         bitrateoptions = false;
-        presetoptions = false;
         tuneoptions = false;
+        presetoptions = false;
     }
     else
     {
@@ -170,6 +172,8 @@ void configure::setVideoVisibility()
     {
         matrixoptions = false;
     }
+    if (ui->selectCodec->currentText() == "DNxHD" || ui->selectCodec->currentText() == "ProRes")
+        matrixoptions = true;
 
     ui->bitrateBox->setVisible(bitrateoptions);
     ui->labelBitrate->setVisible(bitratetype);
@@ -314,7 +318,7 @@ void configure::setVideoCodec()
         {
             codecs.append("Copy");
         }
-        codecs.append({"UT Video","x264", "x265"});
+        codecs.append({"DNxHD","ProRes","UT Video","x264", "x265"});
     }
     if (ui->selectContainer->currentText() == "MP4")
     {
@@ -352,7 +356,19 @@ void configure::setBitDepth()
 
     ui->selectBitDepth->clear();
 
-    ui->selectBitDepth->addItem("8");
+    QStringList losslessMOV = {"DNxHD","ProRes"};
+
+    if (!losslessMOV.contains(ui->selectCodec->currentText()))
+        ui->selectBitDepth->addItem("8");
+
+    if (ui->selectCodec->currentText() == "ProRes")
+        ui->selectBitDepth->addItem("10");
+
+    if (ui->selectCodec->currentText() == "DNxHD" && ui->selectColorSpace->currentText() == "YUV422")
+        ui->selectBitDepth->addItem("8");
+    if (ui->selectCodec->currentText() == "DNxHD" && ui->selectColorSpace->currentText() == "YUV444")
+        ui->selectBitDepth->addItem("10");
+
 
     if (ui->selectCodec->currentText() == "x264")
         bitdepth = x264bitdepth;
@@ -380,6 +396,7 @@ void configure::setColorSpace()
         colorspace = "RGB24";
     }
     QStringList colorspaceoptions;
+
     colorspaceoptions.append("YUV420");
 
     if (colorspace.contains("RGB") || colorspace.contains("422") || colorspace.contains("444") || colorspace.contains("BGR"))
@@ -409,9 +426,23 @@ void configure::setColorSpace()
                 colorspaceoptions.append({"YUV422", "RGB24","RGBA"});
         }
     }
+    if (codec == "DNxHD")
+    {
+        colorspaceoptions.clear();
+        colorspaceoptions.append({"YUV422", "YUV444"});
+    }
+    if (codec == "ProRes")
+    {
+        colorspaceoptions.clear();
+        colorspaceoptions.append({"YUV422", "YUVA444"});
+    }
+
+
     ui->selectColorSpace->clear();
     ui->selectColorSpace->addItems(colorspaceoptions);
     int index = ui->selectColorSpace->findText(colorspace);
+    if (ui->selectCodec->currentText() == "x264" || ui->selectCodec->currentText() == "x265")
+        index = ui->selectColorSpace->findText("YUV420");
     if(index != -1) { ui->selectColorSpace->setCurrentIndex(index); }
     else { ui->selectColorSpace->setCurrentIndex(0); }
 
@@ -419,15 +450,47 @@ void configure::setColorSpace()
 
 void configure::setColorMatrix()
 {
+    QString colormatrix = inputColorMatrix[ui->selectVideoStream->currentIndex()];
+    QStringList needMatrix = {"x264", "x265","UT Video"};
     ui->selectMatrix->clear();
-    ui->selectMatrix->addItems({"BT.601", "BT.709"});
+    if (needMatrix.contains(ui->selectCodec->currentText()))
+    {
+        ui->labelMatrix->setText("Matrix:");
+        ui->selectMatrix->addItems({"BT.601", "BT.709"});
 
-    if (ui->selectCodec->currentText() != "UT Video")
-        ui->selectMatrix->addItems({"BT.2020NC","BT.2020C"});
+        if (ui->selectCodec->currentText() != "UT Video")
+            ui->selectMatrix->addItems({"BT.2020NC","BT.2020C"});
 
-    int index = ui->selectMatrix->findText(outputColorMatrix);
-    if(index != -1) { ui->selectMatrix->setCurrentIndex(index); }
-    else { ui->selectMatrix->setCurrentIndex(0); }
+        int index = ui->selectMatrix->findText(outputColorMatrix);
+        if(index != -1){ ui->selectMatrix->setCurrentIndex(index); }
+        else
+        {
+            index = ui->selectMatrix->findText(colormatrix);
+            if(index != -1){ ui->selectMatrix->setCurrentIndex(index); }
+            else { ui->selectMatrix->setCurrentIndex(0); }
+        }
+    }
+    else
+    {
+
+        ui->labelMatrix->setText("Profile:");
+        if (ui->selectCodec->currentText() == "DNxHD" && ui->selectBitDepth->currentText() == "8")
+            ui->selectMatrix->addItems({"Low Bandwidth","Standard Quality","High Quality"});
+        if (ui->selectCodec->currentText() == "DNxHD" && ui->selectBitDepth->currentText() == "10")
+            ui->selectMatrix->addItems({"High Quality","Finishing Quality"});
+        if (ui->selectCodec->currentText() == "ProRes" && ui->selectColorSpace->currentText() == "YUV422")
+            ui->selectMatrix->addItems({"Auto","Proxy","LT","Standard","High Quality"});
+        if (ui->selectCodec->currentText() == "ProRes" && ui->selectColorSpace->currentText() == "YUVA444")
+            ui->selectMatrix->addItems({"High Quality","Highest Quality"});
+
+        int index = ui->selectMatrix->findText(outputColorMatrix);
+        if(index != -1){ ui->selectMatrix->setCurrentIndex(index); }
+        else
+        {
+            index = ui->selectMatrix->findText("High Quality");
+            ui->selectMatrix->setCurrentIndex(index);
+        }
+    }
 
 }
 
@@ -708,10 +771,9 @@ void configure::on_buttonBox_accepted()
         outputAudioSource = "Original Audio";
     }
 
-
     QStringList configurationList = { outputLocation, outputContainer, QString::number(outputVideoStream), outputColorSpace, outputBitDepth, outputColorMatrix, outputVideoCodec,
                                       videoEncMode, videoEncPreset, videoEncTune, QString::number(videoEncBitrate), outputAudioSource, outputAudioStream, outputAudioCodec,
-                                    audioEncMode, QString::number(audioEncBitrate),QString::number(copyaudio),maxMux};
+                                    audioEncMode, QString::number(audioEncBitrate),QString::number(copyaudio),QString::number(ui->maxMuxing->value()),QString::number(ui->experimentalFeatures->isChecked())};
 
 
     fs.changeSettings(selectedFile, inputVideoBitDepths[ui->selectVideoStream->currentIndex()], configurationList);
@@ -813,6 +875,12 @@ void configure::on_selectCodec_currentIndexChanged()
 void configure::on_selectColorSpace_currentIndexChanged()
 {
     setVideoVisibility();
+    QStringList losslessMOV = {"DNxHD","ProRes"};
+    if (losslessMOV.contains(ui->selectCodec->currentText()))
+    {
+        setBitDepth();
+        setColorMatrix();
+    }
 }
 
 void configure::on_selectMode_currentIndexChanged()

@@ -117,11 +117,13 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
             if (VideoCodec == "YUV" || VideoCodec == "RGBA" || VideoCodec == "RGB")
                 VideoCodec = QString::fromStdString(MI.Get(Stream_Video, i, __T("CodecID"), Info_Text, Info_Name));
 
+            if (VideoCodec.contains("DNxH"))
+                VideoCodec = "DNxHD";
+
             QString bitdepth;
             QString colorspace;
             QString colormatrix;
             QStringList UTcodec = { "ULRG", "UMRG", "ULRA", "UMRA", "UQRG", "UQRA", "ULY0", "ULY2", "UMY2", "ULY4", "UMY4", "ULH0", "ULH2", "UMH2", "ULH4", "UMH4", "UQY2" };
-
 
             if (UTcodec.contains(VideoCodec))
             {
@@ -163,6 +165,8 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
                 colorspace = QString::fromStdString(MI.Get(Stream_Video, i, __T("ColorSpace"), Info_Text, Info_Name));
                 if (colorspace.toLower() == "yuv")
                     colorspace.append(QString::fromStdString(MI.Get(Stream_Video, i, __T("ChromaSubsampling"), Info_Text, Info_Name))).replace(":","");
+                if (VideoCodec == "ProRes")
+                    bitdepth = "10";
                 colormatrix = QString::fromStdString(MI.Get(Stream_Video, i, __T("matrix_coefficients"), Info_Text, Info_Name));
             }
             inputVideoCodecs.append(VideoCodec);

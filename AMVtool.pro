@@ -52,7 +52,7 @@ macx{
     LIBS += -lmediainfo -lzen -lz
     QMAKE_INFO_PLIST = Resources/MacOS/Info.plist
     ICON = Resources/MacOS/icon.icns
-    QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.12
+    QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.13
 }
 
 win32{
@@ -63,8 +63,8 @@ win32{
             LIBPATH += $$PWD/Resources/Windows/x86 }
     LIBS +=  -lmediainfo -lavisynthwrapper
     RC_ICONS = Resources/Windows/icon.ico
-    VERSION = 1.0.1.6
+    VERSION = 1.0.9.9
     QMAKE_TARGET_PRODUCT = "AMVtool"
     QMAKE_TARGET_DESCRIPTION = "GUI for FFmpeg designed for AMV editors."
-    QMAKE_TARGET_COPYRIGHT = "\\251 2020 by l33tmeatwad"
+    QMAKE_TARGET_COPYRIGHT = "\\251 2021 by l33tmeatwad"
 }

@@ -11,9 +11,14 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
     QString outputdir = configList[0];
     QString container = configList[1];
     int vstream = configList[2].toInt();
-    QString colorspace = getColorSpace(configList[3],configList[4]);
-    QString colormatrix = getColorMatrix(configList[5]);
     QString codecname = getCodecName(configList[6]);
+    QString colormatrix = configList[5];
+    QString colorspace = getColorSpace(configList[3],configList[4]);
+    if (codecname == "prores" || codecname == "dnxhd")
+        colormatrix = getProfile(codecname,colorspace,colormatrix);
+    else
+        colormatrix = getColorMatrix(colormatrix);
+
     QString vmode = configList[7];
     QString preset = configList[8];
     QString tune = configList[9];
@@ -24,8 +29,11 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
     QString amode = configList[14];
     QString abitrate = configList[15];
     bool acopy = configList[16].toInt();
-    QString MaxMuxing = configList[17];
+    int MaxMuxing = configList[17].toInt();
+    int Experimental = configList[18].toInt();
     QStringList containerCompatibility;
+
+
 
     QStringList ffmpegcommand;
     outputfile = OutputFile(fileInfo[1], container.toLower());
@@ -103,9 +111,13 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
             }
         }
     }
-    if (MaxMuxing != "")
+    if (MaxMuxing > 0)
     {
-        ffmpegcommand.append({"-max_muxing_queue_size",MaxMuxing});
+        ffmpegcommand.append({"-max_muxing_queue_size",QString::number(MaxMuxing)});
+    }
+    if (Experimental > 0)
+    {
+        ffmpegcommand.append({"-strict","-2"});
     }
 
     ffmpegcommand.append("-f");
@@ -148,7 +160,10 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
         ffmpegcommand.append({"-pix_fmt", colorspace });
         if (colorspace.contains("yuv"))
         {
-            ffmpegcommand.append({"-colorspace", colormatrix });
+            if (codecname == "prores" || codecname == "dnxhd")
+                ffmpegcommand.append({"-profile:v", colormatrix });
+            else
+                ffmpegcommand.append({"-colorspace", colormatrix });
         }
     }
 
@@ -288,6 +303,44 @@ QString setupencode::getColorMatrix(QString colormatrix)
     }
     return colormatrix;
 }
+
+QString setupencode::getProfile(QString codec, QString colorspace, QString profile)
+{
+    if (codec == "dnxhd")
+    {
+        if (profile == "Low Bandwidth")
+            profile = "dnxhr_lb";
+        if (profile == "Standard Quality")
+            profile = "dnxhr_sq";
+        if (profile == "High Quality" && !colorspace.contains("10"))
+            profile = "dnxhr_hq";
+        if (profile == "High Quality" && colorspace.contains("10"))
+            profile = "dnxhr_hqx";
+        if (profile == "Finishing Quality")
+            profile = "dnxhr_444";
+    }
+    if (codec == "prores")
+    {
+        if (profile == "Auto")
+            profile = "-1";
+        if (profile == "Proxy")
+            profile = "0";
+        if (profile == "LT")
+            profile = "1";
+        if (profile == "Standard")
+            profile = "2";
+        if (profile == "High Quality" && colorspace.contains("422"))
+            profile = "3";
+        if (profile == "High Quality" && colorspace.contains("444"))
+            profile = "4";
+        if (profile == "Highest Quality")
+            profile = "5";
+
+    }
+
+    return profile;
+}
+
 
 QString setupencode::getAudioCodecName(QString codecname)
 {

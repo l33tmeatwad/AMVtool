@@ -185,6 +185,10 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
             QString VideoCodec = QString::fromStdWString(MI.Get(Stream_Video, i, __T("Format_Commercial"), Info_Text, Info_Name).c_str());
             if (VideoCodec == "YUV" || VideoCodec == "RGBA" || VideoCodec == "RGB")
                 VideoCodec = QString::fromStdWString(MI.Get(Stream_Video, i, __T("CodecID"), Info_Text, Info_Name).c_str());
+
+            if (VideoCodec.contains("DNxH"))
+                VideoCodec = "DNxHD";
+
             QString bitdepth;
             QString colorspace;
             QString colormatrix;
@@ -231,6 +235,8 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
                 colorspace = QString::fromStdWString(MI.Get(Stream_Video, i, __T("ColorSpace"), Info_Text, Info_Name).c_str());
                 if (colorspace.toLower() == "yuv")
                     colorspace.append(QString::fromStdWString(MI.Get(Stream_Video, i, __T("ChromaSubsampling"), Info_Text, Info_Name).c_str())).replace(":","");
+                if (VideoCodec == "ProRes")
+                    bitdepth = "10";
                 colormatrix = QString::fromStdWString(MI.Get(Stream_Video, i, __T("matrix_coefficients"), Info_Text, Info_Name).c_str());
             }
             inputVideoCodecs.append(VideoCodec);

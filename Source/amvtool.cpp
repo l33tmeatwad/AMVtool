@@ -253,7 +253,7 @@ void AMVtool::updateQueue(int pos, QString status)
     if (status == "Complete")
     {
         ui->fileList->item(pos)->setText("COMPLETE | " + ui->fileList->item(pos)->text());
-        ui->fileList->item(pos)->setBackgroundColor(Qt::green);
+        ui->fileList->item(pos)->setBackground(Qt::green);
         mainQueueInfo[pos][3] = "Complete";
     }
     if (status == "Error")
@@ -266,21 +266,21 @@ void AMVtool::updateQueue(int pos, QString status)
         {
             packetbuffererror = false;
             ui->fileList->item(pos)->setText("ERROR | " + ui->fileList->item(pos)->text());
-            ui->fileList->item(pos)->setBackgroundColor(Qt::red);
+            ui->fileList->item(pos)->setBackground(Qt::red);
             mainQueueInfo[pos][3] = "Error";
         }
     }
     if (status == "Pending")
     {
         ui->fileList->item(pos)->setText(mainQueueInfo[pos][2] + " | " + mainQueueInfo[pos][1]);
-        ui->fileList->item(pos)->setBackgroundColor(Qt::white);
+        ui->fileList->item(pos)->setBackground(Qt::NoBrush);
         mainQueueInfo[pos][3] = "Pending";
         mainQueueInfo[pos][4] = "1";
     }
     if (status == "Skipped")
     {
         ui->fileList->item(pos)->setText("SKIPPED | " + ui->fileList->item(pos)->text());
-        ui->fileList->item(pos)->setBackgroundColor(Qt::yellow);
+        ui->fileList->item(pos)->setBackground(Qt::yellow);
         mainQueueInfo[pos][3] = "Skipped";
     }
 

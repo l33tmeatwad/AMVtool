@@ -166,7 +166,14 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
                 if (colorspace.toLower() == "yuv")
                     colorspace.append(QString::fromStdString(MI.Get(Stream_Video, i, __T("ChromaSubsampling"), Info_Text, Info_Name))).replace(":","");
                 if (VideoCodec == "ProRes")
+                {
+                    if (colorspace == "")
+                    {
+                        colorspace = "YUV";
+                        colorspace.append(QString::fromStdString(MI.Get(Stream_Video, i, __T("ChromaSubsampling"), Info_Text, Info_Name))).replace(":","");
+                    }
                     bitdepth = "10";
+                }
                 colormatrix = QString::fromStdString(MI.Get(Stream_Video, i, __T("matrix_coefficients"), Info_Text, Info_Name));
             }
             inputVideoCodecs.append(VideoCodec);

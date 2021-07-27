@@ -17,7 +17,7 @@
 	<key>CFBundleExecutable</key>
 	<string>AMVtool</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0</string>
+        <string>1.1</string>
 	<key>CFBundleVersion</key>
         <string>1.0.9.9</string>
 </dict>

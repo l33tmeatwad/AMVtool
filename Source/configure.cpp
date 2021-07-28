@@ -83,9 +83,7 @@ void configure::setData(const int &selFile, QList<QStringList> inputMediaInfo, c
 
     setContainer();
     setVideoCodec();
-//    setBitDepth();
     setPreset();
-//    setMode();
     setTune();
 
     setAudioCodec();
@@ -125,14 +123,14 @@ void configure::setVideoVisibility()
     bool presetoptions;
     bool tuneoptions;
     bool colorspace;
-    QStringList lossless = {"Copy", "DNxHD","ProRes","UT Video"};
+    QStringList lossless = {"Copy", "DNxHR","ProRes","UT Video"};
 
     if (lossless.contains(ui->selectCodec->currentText()))
     {
         bitrateoptions = false;
         presetoptions = false;
         tuneoptions = false;
-        if (ui->selectCodec->currentText() == "DNxHD" || ui->selectCodec->currentText() == "ProRes")
+        if (ui->selectCodec->currentText() == "DNxHR" || ui->selectCodec->currentText() == "ProRes")
             modeoptions = true;
         else
             modeoptions = false;
@@ -154,7 +152,7 @@ void configure::setVideoVisibility()
         bitratetype = false;
     }
 
-    QStringList noMatrix = {"Copy","DNxHD","ProRes"};
+    QStringList noMatrix = {"Copy","DNxHR"};
     if (noMatrix.contains(ui->selectCodec->currentText()) || ui->selectColorSpace->currentText().contains("RGB"))
     {
         matrixoptions = false;
@@ -164,7 +162,7 @@ void configure::setVideoVisibility()
         matrixoptions = true;
     }
 
-    if (ui->selectCodec->currentText() == "Copy" || ui->selectCodec->currentText() == "DNxHD")
+    if (ui->selectCodec->currentText() == "Copy" || ui->selectCodec->currentText() == "DNxHR")
     {
         colorspace = false;
     }
@@ -321,7 +319,7 @@ void configure::setVideoCodec()
         {
             codecs.append("Copy");
         }
-        codecs.append({"DNxHD","ProRes","x264", "x265"});
+        codecs.append({"DNxHR","ProRes","x264", "x265"});
     }
     if (ui->selectContainer->currentText() == "MP4")
     {
@@ -366,8 +364,8 @@ void configure::setBitDepth()
     if (ui->selectCodec->currentText() == "ProRes")
         ui->selectBitDepth->addItem("10");
 
-    QStringList DNxHD10 = {"","High Quality","Finishing Quality"};
-    if (ui->selectCodec->currentText() == "DNxHD" && DNxHD10.contains(ui->selectMode->currentText()))
+    QStringList DNxHR10 = {"","High Quality","Finishing Quality"};
+    if (ui->selectCodec->currentText() == "DNxHR" && DNxHR10.contains(ui->selectMode->currentText()))
         ui->selectBitDepth->addItem("10");
 
 
@@ -457,7 +455,7 @@ void configure::setColorMatrix()
     ui->selectMatrix->addItems({"BT.601", "BT.709"});
 
     if (ui->selectCodec->currentText() != "UT Video")
-        ui->selectMatrix->addItems({"BT.2020NC","BT.2020C"});
+        ui->selectMatrix->addItem("BT.2020NC");
 
     int index = ui->selectMatrix->findText(outputColorMatrix);
     if(index != -1) { ui->selectMatrix->setCurrentIndex(index); }
@@ -469,13 +467,13 @@ void configure::setMode()
 {
     int encModeIndex = ui->selectMode->findText(videoEncMode);
     ui->selectMode->clear();
-    QStringList losslessMOV = {"DNxHD","ProRes"};
+    QStringList losslessMOV = {"DNxHR","ProRes"};
     if (losslessMOV.contains(ui->selectCodec->currentText()))
     {
         ui->labelMode->setText("Profile:");
-        if (ui->selectCodec->currentText() == "DNxHD" && ui->selectBitDepth->currentText() == "8")
+        if (ui->selectCodec->currentText() == "DNxHR" && ui->selectBitDepth->currentText() == "8")
             ui->selectMode->addItems({"Low Bandwidth","Standard Quality","High Quality"});
-        if (ui->selectCodec->currentText() == "DNxHD" && ui->selectBitDepth->currentText() == "10")
+        if (ui->selectCodec->currentText() == "DNxHR" && ui->selectBitDepth->currentText() == "10")
             ui->selectMode->addItems({"High Quality","Finishing Quality"});
         if (ui->selectCodec->currentText() == "ProRes" && ui->selectColorSpace->currentText() == "YUV422")
             ui->selectMode->addItems({"Auto","Proxy","LT","Standard","High Quality"});
@@ -742,7 +740,7 @@ void configure::on_buttonBox_accepted()
     outputBitDepth = ui->selectBitDepth->currentText();
     videoEncMode = ui->selectMode->currentText();
     outputColorMatrix = ui->selectMatrix->currentText();
-    if (outputVideoCodec == "DNxHD")
+    if (outputVideoCodec == "DNxHR")
     {
         if (videoEncMode == "Finishing Quality")
             outputColorSpace = "YUV444";
@@ -867,7 +865,7 @@ void configure::on_selectBitDepth_currentIndexChanged()
     {
         outputBitDepth = ui->selectBitDepth->currentText();
     }
-    if (ui->selectCodec->currentText() == "DNxHD")
+    if (ui->selectCodec->currentText() == "DNxHR")
         setMode();
 }
 
@@ -899,7 +897,7 @@ void configure::on_selectCodec_currentIndexChanged()
 void configure::on_selectColorSpace_currentIndexChanged()
 {
     setVideoVisibility();
-    QStringList losslessMOV = {"DNxHD","ProRes"};
+    QStringList losslessMOV = {"DNxHR","ProRes"};
     if (losslessMOV.contains(ui->selectCodec->currentText()))
     {
         setBitDepth();

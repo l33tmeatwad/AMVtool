@@ -159,7 +159,13 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
         ffmpegcommand.append({"-pix_fmt", colorspace });
         if (colorspace.contains("yuv") && vmode != "Finishing Quality")
         {
-            ffmpegcommand.append({"-colorspace", colormatrix });
+            if (codecname == "prores")
+            {
+                QString colorprimaries = colormatrix;
+                ffmpegcommand.append({"-bsf:v","prores_metadata=color_primaries="+colorprimaries.replace("nc","")+":colorspace="+colormatrix});
+            }
+            else
+                ffmpegcommand.append({"-colorspace", colormatrix });
         }
     }
 
@@ -259,6 +265,10 @@ QString setupencode::OutputFile(QString originalfile, QString newtype)
 QString setupencode::getCodecName(QString codecname)
 {
     codecname = codecname.toLower().replace(" ","");
+    if (codecname == "dnxhr")
+    {
+        codecname = "dnxhd";
+    }
     if (codecname == "x264")
     {
         codecname = "lib" + codecname;

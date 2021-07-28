@@ -118,7 +118,7 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
                 VideoCodec = QString::fromStdString(MI.Get(Stream_Video, i, __T("CodecID"), Info_Text, Info_Name));
 
             if (VideoCodec.contains("DNxH"))
-                VideoCodec = "DNxHD";
+                VideoCodec = "DNxHR";
 
             QString bitdepth;
             QString colorspace;

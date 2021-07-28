@@ -11,14 +11,9 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
     QString outputdir = configList[0];
     QString container = configList[1];
     int vstream = configList[2].toInt();
-    QString codecname = getCodecName(configList[6]);
-    QString colormatrix = configList[5];
     QString colorspace = getColorSpace(configList[3],configList[4]);
-    if (codecname == "prores" || codecname == "dnxhd")
-        colormatrix = getProfile(codecname,colorspace,colormatrix);
-    else
-        colormatrix = getColorMatrix(colormatrix);
-
+    QString colormatrix = getColorMatrix(configList[5]);
+    QString codecname = getCodecName(configList[6]);
     QString vmode = configList[7];
     QString preset = configList[8];
     QString tune = configList[9];
@@ -32,8 +27,6 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
     int MaxMuxing = configList[17].toInt();
     int Experimental = configList[18].toInt();
     QStringList containerCompatibility;
-
-
 
     QStringList ffmpegcommand;
     outputfile = OutputFile(fileInfo[1], container.toLower());
@@ -155,15 +148,18 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
     if (tune != "(None)")
         ffmpegcommand.append({ "-tune", tune.toLower().replace(" ","") });
     }
+    if (codecname == "dnxhd" || codecname == "prores")
+    {
+
+        ffmpegcommand.append({"-profile:v",getProfile(codecname,colorspace,vmode)});
+    }
+
     if (codecname != "copy")
     {
         ffmpegcommand.append({"-pix_fmt", colorspace });
-        if (colorspace.contains("yuv"))
+        if (colorspace.contains("yuv") && vmode != "Finishing Quality")
         {
-            if (codecname == "prores" || codecname == "dnxhd")
-                ffmpegcommand.append({"-profile:v", colormatrix });
-            else
-                ffmpegcommand.append({"-colorspace", colormatrix });
+            ffmpegcommand.append({"-colorspace", colormatrix });
         }
     }
 
@@ -340,7 +336,6 @@ QString setupencode::getProfile(QString codec, QString colorspace, QString profi
 
     return profile;
 }
-
 
 QString setupencode::getAudioCodecName(QString codecname)
 {

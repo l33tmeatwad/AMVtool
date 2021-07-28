@@ -51,6 +51,8 @@ private slots:
 
     void on_copyVideo_toggled(bool checked);
 
+    void on_selectBitDepth_currentIndexChanged();
+
 private:
     Ui::configure *ui;    
     filesettings fs;
@@ -60,6 +62,7 @@ private:
 
     QList<bool> x264bitdepth;
     QList<bool> x265bitdepth;
+    QString selectedDepth;
 
     int inputVideoStreams;
     int inputAudioStreams;

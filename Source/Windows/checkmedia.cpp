@@ -80,7 +80,6 @@ QString checkmedia::checkFormats(bool vpyfail)
     {
             mediaformats.replace(" *.avs", "");
     }
-]
     return mediaformats;
 }
 
@@ -187,7 +186,7 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
                 VideoCodec = QString::fromStdWString(MI.Get(Stream_Video, i, __T("CodecID"), Info_Text, Info_Name).c_str());
 
             if (VideoCodec.contains("DNxH"))
-                VideoCodec = "DNxHD";
+                VideoCodec = "DNxHR";
 
             QString bitdepth;
             QString colorspace;

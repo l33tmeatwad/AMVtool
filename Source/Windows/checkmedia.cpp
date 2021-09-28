@@ -378,7 +378,7 @@ QList<QStringList> checkAVS(QString inputScript)
         inputVideoHeight.append(avsHeight);
         inputFPS.append(QString::number(vinfo->raten) + "/" + QString::number(vinfo->rated));
 
-        if (vinfo->nchannels > 0)
+        if (vinfo->audio_samples_per_second > 0)
         {
             inputAudioCodecs.append("AviSynth");
             inputAudioStreams = 1;

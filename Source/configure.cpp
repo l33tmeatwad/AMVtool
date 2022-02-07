@@ -694,7 +694,7 @@ void configure::setAudioBitrate()
         {
             min = 1;
             max = 5;
-            value = 4;
+            value = 5;
             valueinfo = "5 (Best) to 1 (Worst)";
         }
         if (codec == "MP3")

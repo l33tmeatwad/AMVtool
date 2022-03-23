@@ -327,6 +327,7 @@ QString setupencode::getProfile(QString codec, QString colorspace, QString profi
     }
     if (codec == "prores")
     {
+        codec = "prores_ks";
         if (profile == "Auto")
             profile = "-1";
         if (profile == "Proxy")

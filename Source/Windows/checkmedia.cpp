@@ -92,10 +92,7 @@ QString checkColorMatrix(QString colormatrix, QString videoWidth, QString videoH
     {
         if (videoWidth.toInt() > 940 || videoHeight.toInt() > 580)
         {
-            if (videoWidth.toInt() > 2048 || videoHeight.toInt() > 1080)
-                colormatrix = "BT.2020NC";
-            else
-                colormatrix = "BT.709";
+            colormatrix = "BT.709";
         }
         else
         {

@@ -57,14 +57,11 @@ macx{
 
 win32{
     SOURCES += Source/Windows/checkmedia.cpp
-    contains(QMAKE_TARGET.arch, x86_64) {
-            LIBPATH += $$PWD/Resources/Windows/x64 }
-        else {
-            LIBPATH += $$PWD/Resources/Windows/x86 }
+    LIBPATH += $$PWD/Resources/Windows
     LIBS +=  -lmediainfo -lavisynthwrapper
     RC_ICONS = Resources/Windows/icon.ico
-    VERSION = 1.0.9.9
+    VERSION = 1.1.0.1
     QMAKE_TARGET_PRODUCT = "AMVtool"
     QMAKE_TARGET_DESCRIPTION = "GUI for FFmpeg designed for AMV editors."
-    QMAKE_TARGET_COPYRIGHT = "\\251 2021 by l33tmeatwad"
+    QMAKE_TARGET_COPYRIGHT = "\\251 2022 by l33tmeatwad"
 }

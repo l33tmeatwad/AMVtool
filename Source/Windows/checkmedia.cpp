@@ -150,7 +150,7 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
         {
             inputContainer = QString::fromStdWString(MI.Get(Stream_General, 0, __T("Format"), Info_Text, Info_Name).c_str());
         }
-        inputDuration = QString::fromStdWString(MI.Get(Stream_General, 0, __T("Duration"), Info_Text, Info_Name).c_str()).toInt();
+        inputDuration = QString::fromStdWString(MI.Get(Stream_General, 0, __T("Duration"), Info_Text, Info_Name).c_str()).toFloat();
         inputVideoStreams = QString::fromStdWString(MI.Get(Stream_General,0, __T("VideoCount"), Info_Text, Info_Name).c_str()).toInt();
         inputAudioStreams = QString::fromStdWString(MI.Get(Stream_General,0, __T("AudioCount"), Info_Text, Info_Name).c_str()).toInt();
 

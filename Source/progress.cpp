@@ -1,27 +1,24 @@
 #include "progress.h"
 #include <cmath>
-#include <QRegExp>
+#include <QRegularExpression>
 
 QList<QString> progress::currentProcess(QString currentstatus, float duration)
 {
     int currentpercent = 0;
     float progress = 0;
 
-    QRegExp findtime(timecode);
-    int length = findtime.indexIn(currentstatus);
-    QStringList findstatus;
-    if (length != -1)
+    QRegularExpression findtime(timecode);
+    QRegularExpressionMatch findstatus = findtime.match(currentstatus);
+    if (findstatus.captured(0).length() != -1)
     {
-        findstatus = findtime.capturedTexts();
-        progress = parseTimecode(findstatus[0].right(11));
+        progress = parseTimecode(findstatus.captured(0).right(11));
     }
 
-    QRegExp findspeed("speed=");
-    int speedspot = findspeed.indexIn(currentstatus);
     float encspeed = 0.01f;
     QString encodespeed;
     if (currentstatus.contains("speed="))
     {
+        int speedspot = currentstatus.indexOf("speed=");
         encodespeed = currentstatus.replace(currentstatus.left(speedspot+6), "").replace("x","").replace(" ", "");
         encodespeed = encodespeed.left(encodespeed.length()-1);
         encspeed = encodespeed.toFloat();

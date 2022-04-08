@@ -510,8 +510,7 @@ void checkmedia::readOutput()
             vpyColorSpace = vsline.simplified().replace("Format Name: ", "");
             if (vpyColorSpace.contains("P") && !vpyColorSpace.contains("COMPAT"))
             {
-                QRegExp findbitdpeth("P");
-                vpyColorSpace = vpyColorSpace.left(findbitdpeth.indexIn(vpyColorSpace));
+                vpyColorSpace = vpyColorSpace.left(vpyColorSpace.indexOf("P"));
             }
         }
         if (vsline.contains("Bits: ") )

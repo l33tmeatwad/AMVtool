@@ -455,7 +455,10 @@ void configure::setColorMatrix()
     ui->selectMatrix->addItems({"BT.601", "BT.709"});
 
     if (ui->selectCodec->currentText() != "UT Video")
-        ui->selectMatrix->addItem("BT.2020NC");
+    {
+        if (inputColorMatrix[vsIndex] == "BT.2020NC")
+            ui->selectMatrix->addItem("BT.2020NC");
+    }
 
     int index = ui->selectMatrix->findText(outputColorMatrix);
     if(index != -1) { ui->selectMatrix->setCurrentIndex(index); }

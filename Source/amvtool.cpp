@@ -59,7 +59,7 @@ QString AMVtool::checkDependencies()
     }
     vspipeexec = depStatus[1];
     ffmpegexec = depStatus[2];
-    hibitdepth = { depStatus[3].toInt(), depStatus[4].toInt(), depStatus[5].toInt(), depStatus[6].toInt() };
+    hibitdepth = { depStatus[3].toInt(), depStatus[4].toInt(), depStatus[5].toInt(), depStatus[6].toInt(), depStatus[7].toInt(), depStatus[8].toInt() };
 
     return depStatus[0];
 
@@ -258,9 +258,9 @@ void AMVtool::updateQueue(int pos, QString status)
     }
     if (status == "Error")
     {
-        if (packetbuffererror == true && outputConfig[pos][17] == "")
+        if (packetbuffererror == true && outputConfig[pos][23] == "")
         {
-            outputConfig[pos][17] = "9999";
+            outputConfig[pos][23] = "9999";
         }
         else
         {
@@ -348,7 +348,12 @@ void AMVtool::ProcessFile(int pos)
         }
         if (mainQueueInfo[pos][3] != "Skipped" && packetbuffererror != true)
         {
-            QFileInfo file_exists(outputConfig[pos][0] + mainQueueInfo[pos][1].left(mainQueueInfo[pos][1].length()-4) + "-AMVtool." + outputConfig[pos][1].toLower());
+            int extension = 4;
+            if (inputDetails[0][2].contains("BDAV") || inputDetails[0][2].contains("WebM"))
+                extension = 5;
+            if (inputDetails[0][2].contains("MPEG-TS"))
+                extension = 3;
+            QFileInfo file_exists(outputConfig[pos][0] + mainQueueInfo[pos][1].left(mainQueueInfo[pos][1].length()-extension) + "-AMVtool." + outputConfig[pos][1].toLower());
             if (file_exists.exists() && mainQueueInfo[pos][4] != "2")
             {
                 if (ui->ifExists->currentIndex() == 0)
@@ -435,7 +440,7 @@ void AMVtool::Encode(int pos, QList<QStringList> inputDetails, QStringList confi
     {
         debugbox += EncodeOptions[i] + " ";
     }
-//    QMessageBox::information(this,"Encode Options", debugbox);
+    QMessageBox::information(this,"Encode Options", debugbox);
     pipe = new QProcess(this);
     if (inputDetails[0][2] == "VapourSynth")
     {

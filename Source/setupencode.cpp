@@ -13,23 +13,37 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
     int vstream = configList[2].toInt();
     QString colorspace = getColorSpace(configList[3],configList[4]);
     QString colormatrix = getColorMatrix(configList[5]);
-    QString codecname = getCodecName(configList[6]);
-    QString vmode = configList[7];
-    QString preset = configList[8];
-    QString tune = configList[9];
-    QString bitrate = configList[10];
-    QString asource = configList[11];
-    QString astream = configList[12];
-    QString acodec = getAudioCodecName(configList[13]);
-    QString amode = configList[14];
-    QString abitrate = configList[15];
-    bool acopy = configList[16].toInt();
-    int MaxMuxing = configList[17].toInt();
-    int Experimental = configList[18].toInt();
+    int convertHDR = configList[6].toInt();
+    QString codecname = getCodecName(configList[7]);
+    QString vmode = configList[8];
+    QString preset = configList[9];
+    QString tune = configList[10];
+    QString bitrate = configList[11];
+    QString asource = configList[12];
+    QString astream = configList[13];
+    QString acodec = getAudioCodecName(configList[14]);
+    QString amode = configList[15];
+    QString abitrate = configList[16];
+    int acopy = configList[17].toInt();
+    QString deinterlace = configList[18];
+    int cthresh = configList[19].toInt();
+    QString fieldorder = configList[20];
+    QString resize = configList[21];
+    QString aspectratio = configList[22];
+    int MaxMuxing = configList[23].toInt();
+    int Experimental = configList[24].toInt();
     QStringList containerCompatibility;
+    QStringList tilesThreads = getTilesAndThreads(inputDetails[8][vstream].toInt());
+
+    QString vfilters = "";
+    if (codecname != "copy")
+        vfilters = SetupFilters(fileInfo[2].contains("HDR"), convertHDR, colorspace, colormatrix, deinterlace, cthresh, fieldorder, resize, aspectratio);
 
     QStringList ffmpegcommand;
-    outputfile = OutputFile(fileInfo[1], container.toLower());
+    outputfile = OutputFile(fileInfo[1], inputDetails[0][2], container.toLower());
+
+    if (vmode.contains("2 Pass") && mainQueueInfo[queue][4] =="1")
+        astream = "None";
 
     QString mapID;
 
@@ -37,7 +51,7 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
     {
         if (inputDetails[4][vstream].contains("RGB"))
         {
-            ffmpegcommand.append({ "-f", "rawvideo", "-pix_fmt", "gbrp", "-s", inputDetails[6][vstream] + "x" + inputDetails[7][vstream], "-r", inputDetails[8][vstream]});
+            ffmpegcommand.append({ "-f", "rawvideo", "-pix_fmt", "gbrp", "-s", inputDetails[7][vstream] + "x" + inputDetails[8][vstream], "-r", inputDetails[9][vstream]});
         }
         ffmpegcommand.append({ "-i", "pipe:" });
     }
@@ -76,31 +90,41 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
                 for (int i = 0; i < inputDetails[0][1].toInt(); i++)
                 {
                     bool usestream = true;
-                    if (acodec == "copy" && container != "MKV")
+                    if (acopy == 1 && container != "MKV")
                     {
-                        usestream = canCopyAudio(container, inputDetails[10][i]);
+                        usestream = canCopyAudio(container, inputDetails[11][i]);
                     }
                     if (usestream)
                     {
-                        if (inputDetails[9][i].contains("x"))
+                        if (inputDetails[10][i].contains("x"))
                             mapID = source + ":i";
                         else
                             mapID = source;
 
-                        ffmpegcommand.append({"-map", mapID + ":" + inputDetails[9][i]});
+                        ffmpegcommand.append({"-map", mapID + ":" + inputDetails[10][i]});
                     }
 
                 }
             }
             if (astream.toLower() != "all" && astream.toLower() != "none")
             {
-                int stream = astream.toInt()-1;
-                if (inputDetails[9][stream].contains("x"))
-                    mapID = source + ":i";
-                else
-                    mapID = source;
+                bool usestream = true;
+                if (acopy == 1 && container != "MKV")
+                {
+                    int stream = astream.toInt()-1;
+                    usestream = canCopyAudio(container, inputDetails[11][stream]);
 
-                ffmpegcommand.append({"-map", mapID + ":" + inputDetails[9][stream]});
+                }
+                if (usestream)
+                {
+                    int stream = astream.toInt()-1;
+                    if (inputDetails[10][stream].contains("x"))
+                        mapID = source + ":i";
+                    else
+                        mapID = source;
+
+                    ffmpegcommand.append({"-map", mapID + ":" + inputDetails[10][stream]});
+                }
             }
         }
     }
@@ -127,26 +151,43 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
     ffmpegcommand.append({ "-c:v", codecname });
 
 
-    if (codecname == "libx264" || codecname == "hevc")
+    if (codecname == "libx264" || codecname == "hevc" || codecname == "libvpx-vp9")
     {
 
-        if (vmode == "Constant Rate Factor")
+        if (vmode.contains("Constant Rate"))
         {
             ffmpegcommand.append({ "-crf",bitrate });
+            if (codecname == "libvpx-vp9")
+                ffmpegcommand.append({"-qcomp","0.7"});
+            if (vmode.contains("2 Pass"))
+            {
+                ffmpegcommand.append({ "-pass",mainQueueInfo[queue][4] });
+            }
         }
 
         if (vmode.contains("Bitrate"))
         {
             ffmpegcommand.append({ "-b:v",bitrate + "k" });
+            if (codecname == "libvpx-vp9")
+                ffmpegcommand.append({"-qcomp","0.3"});
 
             if (vmode.contains("2 Pass"))
             {
                 ffmpegcommand.append({ "-pass",mainQueueInfo[queue][4] });
             }
         }
-    ffmpegcommand.append({ "-preset", preset.toLower().replace(" ","") });
-    if (tune != "(None)")
-        ffmpegcommand.append({ "-tune", tune.toLower().replace(" ","") });
+        if (vmode.contains("Lossless"))
+            ffmpegcommand.append({ "-x265-params","lossless=1" });
+        if (codecname == "libvpx-vp9")
+        {
+            ffmpegcommand.append({ "-tile-columns",tilesThreads[0],"-threads",tilesThreads[1],"-auto-alt-ref", "1", "-row-mt", "1", "-lag-in-frames", "25" });
+        }
+        else
+        {
+            ffmpegcommand.append({ "-preset", preset.toLower().replace(" ","") });
+            if (tune != "(None)" && !vmode.contains("Lossless"))
+                ffmpegcommand.append({ "-tune", tune.toLower().replace(" ","") });
+        }
     }
     if (codecname == "dnxhd" || codecname == "prores")
     {
@@ -157,6 +198,10 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
     if (codecname != "copy")
     {
         ffmpegcommand.append({"-pix_fmt", colorspace });
+        if (vfilters != "")
+        {
+            ffmpegcommand.append({"-vf",vfilters});
+        }
         if (colorspace.contains("yuv") && vmode != "Finishing Quality")
         {
             if (codecname == "prores")
@@ -168,26 +213,63 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
                 ffmpegcommand.append({"-colorspace", colormatrix });
         }
     }
+    else
+    {
+        if (aspectratio != "No")
+            ffmpegcommand.append({"-aspect",aspectratio.replace(":","/").replace("/1","")});
+    }
 
     if (astream != "None")
     {
-        if (astream == "All" || acodec != "copy")
+        if (astream == "All")
         {
+            int skipped = 0;
             for (int i = 0; i < inputDetails[0][1].toInt(); i++)
             {
-                bool copystream = canCopyAudio(container, inputDetails[10][i]);
+                bool skip = false;
+
+                bool copystream = canCopyAudio(container, inputDetails[11][i]);
                 QString audiocodec;
-                if (copystream && acopy)
+                if (copystream && acopy > 0)
                 {
                     audiocodec = "copy";
                 }
                 else
                 {
                     audiocodec = acodec;
+                    if (acopy == 1 && audiocodec != "copy")
+                    {
+                        skip = true;
+                        skipped++;
+                    }
                 }
+                if (!skip)
+                {
+                    ffmpegcommand.append({"-c:a:" + QString::number(i-skipped), audiocodec });
+                    if (audiocodec == "aac" || audiocodec == "libmp3lame" || audiocodec == "opus")
+                    {
+                        if (amode == "Quality")
+                            ffmpegcommand.append({"-q:a", abitrate });
+                        else
+                            ffmpegcommand.append({"-b:a", abitrate + "k" });
+                    }
+                }
+            }
+        }
+        else
+        {
+            if (acopy > 0 && canCopyAudio(container,inputDetails[11][astream.toInt()-1]))
+            {
+                acodec = "copy";
+            }
+            bool skip = false;
 
-                ffmpegcommand.append({"-c:a:" + QString::number(i), audiocodec });
-                if (audiocodec == "aac" || audiocodec == "libmp3lame")
+            if (acopy == 1 && acodec != "copy")
+                skip = true;
+            if (!skip)
+            {
+                ffmpegcommand.append({"-c:a", acodec });
+                if (acodec == "aac" || acodec == "libmp3lame" || acodec == "opus")
                 {
                     if (amode == "Quality")
                     {
@@ -197,25 +279,6 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
                     {
                         ffmpegcommand.append({"-b:a", abitrate + "k" });
                     }
-                }
-            }
-        }
-        else
-        {
-            if (acopy && canCopyAudio(container,inputDetails[10][astream.toInt()-1]))
-            {
-                acodec = "copy";
-            }
-            ffmpegcommand.append({"-c:a", acodec });
-            if (acodec == "aac" || acodec == "libmp3lame")
-            {
-                if (amode == "Quality")
-                {
-                    ffmpegcommand.append({"-q:a", abitrate });
-                }
-                else
-                {
-                    ffmpegcommand.append({"-b:a", abitrate + "k" });
                 }
             }
         }
@@ -256,9 +319,14 @@ QStringList setupencode::SetupPipe(QString inputFile, QString colorspace)
 }
 
 
-QString setupencode::OutputFile(QString originalfile, QString newtype)
+QString setupencode::OutputFile(QString originalfile, QString originalType, QString newtype)
 {
-    originalfile = originalfile.left(originalfile.length()-4) + "-AMVtool." + newtype;
+    int extension = 4;
+    if (originalType.contains("BDAV") || originalType.contains("WebM"))
+        extension = 5;
+    if (originalType.contains("MPEG-TS"))
+        extension = 3;
+    originalfile = originalfile.left(originalfile.length()-extension) + "-AMVtool." + newtype;
     return originalfile;
 }
 
@@ -276,6 +344,10 @@ QString setupencode::getCodecName(QString codecname)
     if (codecname == "x265")
     {
         codecname = "hevc";
+    }
+    if (codecname == "vp9")
+    {
+        codecname = "libvpx-vp9";
     }
     return codecname;
 }
@@ -357,9 +429,101 @@ QString setupencode::getAudioCodecName(QString codecname)
     }
     if (codecname == "pcm")
     {
-        codecname = codecname + "_s16le";
+        codecname = codecname + "_s24le";
     }
     return codecname;
+}
+
+QStringList setupencode::getTilesAndThreads(int height)
+{
+    int tiles = 0;
+    int threads = 2;
+    if (height >= 360 && height < 720)
+    {
+        tiles = 1;
+        threads = 4;
+    }
+    if (height >= 720 && height < 1080)
+    {
+        tiles = 2;
+        threads = 8;
+    }
+    if (height >= 1080 && height < 1440)
+    {
+        tiles = 3;
+        threads = 16;
+    }
+    return {QString::number(tiles),QString::number(threads)};
+}
+
+QString setupencode::SetupFilters(bool isHDR, bool convertHDR, QString colorspace, QString colormatrix, QString deinterlace, int cthresh, QString fieldorder, QString resize, QString aspectratio)
+{
+    QString outputfilters = "";
+    if (deinterlace != "None")
+    {
+        if (deinterlace == "Deinterlace")
+        {
+            outputfilters.append("yadif");
+            if (fieldorder == "Top")
+                outputfilters.append("=parity=tff");
+            if (fieldorder == "Bottom")
+                outputfilters.append("=parity=bff");
+        }
+        else
+        {
+            outputfilters.append("fieldmatch=cthresh="+QString::number(cthresh));
+            if (fieldorder == "Top")
+                outputfilters.append(":order=tff");
+            if (fieldorder == "Bottom")
+                outputfilters.append(":order=bff");
+            if (deinterlace == "Both")
+                outputfilters.append(",yadif");
+            if (fieldorder == "Top")
+                outputfilters.append("=parity=tff");
+            if (fieldorder == "Bottom")
+                outputfilters.append("=parity=bff");
+            outputfilters.append(",decimate");
+        }
+    }
+
+
+    if (isHDR && convertHDR)
+    {
+        if (outputfilters != "")
+            outputfilters.append(",");
+        outputfilters.append("zscale=t=linear:npl=100,format=gbrpf32le,zscale=p="+colormatrix+",tonemap=tonemap=hable:desat=0,zscale=t="+colormatrix+":m="+colormatrix+":r=tv,format="+colorspace);
+    }
+    if (resize != "No")
+    {
+        if (outputfilters != "")
+            outputfilters.append(",");
+        if (resize.contains("x"))
+        {
+            resize = "w="+resize;
+            resize.replace("x",":h=");
+        }
+        else
+        {
+            if (WidthResolutions.contains(resize))
+                resize = "w="+resize+":h=-2";
+            if (HeightResolutions.contains(resize))
+                resize = "w=-2:h="+resize;
+        }
+
+
+        outputfilters.append("zscale="+resize);
+    }
+    if (aspectratio != "No")
+    {
+        if (outputfilters != "")
+            outputfilters.append(",");
+        outputfilters.append("setdar=dar="+aspectratio.replace(":","/").replace("/1",""));
+    }
+    else
+        outputfilters.append("setsar=sar=1:1");
+
+
+    return outputfilters;
 }
 
 bool setupencode::canCopyAudio(QString container, QString format)
@@ -370,9 +534,11 @@ bool setupencode::canCopyAudio(QString container, QString format)
     if (container == "AVI")
         containerlist.append( {"MPEG Audio", "PCM"} );
     if (container == "MOV")
-        containerlist.append( {"AAC", "AC-3", "PCM"} );
+        containerlist.append( {"AAC", "AC-3", "ALAC", "PCM"} );
     if (container == "MP4")
         containerlist.append( {"AAC", "AC-3", "MPEG Audio"} );
+    if (container == "WEBM")
+        containerlist.append( {"Opus", "Vorbis"} );
 
     if (containerlist.contains(format) || container == "MKV")
     {

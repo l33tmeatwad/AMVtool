@@ -26,15 +26,20 @@ public slots:
 
 private:
     bool canCopyAudio(QString container, QString format);
-    QString OutputFile(QString originalfile, QString newtype);
+    QString OutputFile(QString originalfile, QString originalType, QString newtype);
     QString getCodecName(QString codecname);
     QString getColorSpace(QString colorspace, QString bitdepth);
     QString getColorMatrix(QString colormatrix);
     QString getProfile(QString codec, QString bitdepth, QString profile);
+    QStringList getTilesAndThreads(int height);
+    QString SetupFilters(bool isHDR, bool convertHDR, QString colorspace, QString colormatrix, QString deinterlace, int cthresh, QString fieldorder, QString resize, QString aspectratio);
     QString getAudioCodecName(QString codecname);
 
     QString outputfile;
     filesettings fs;
+
+    QStringList WidthResolutions = {"640", "854", "960", "1440", "1920", "2880", "3840", "5760", "7680"};
+    QStringList HeightResolutions = {"480", "720", "1080", "2160", "4320"};
 };
 
 #endif // SETUPENCODE_H

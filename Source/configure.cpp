@@ -11,7 +11,6 @@ configure::configure(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->copyVideo->setVisible(false);
-    ui->autoContainer->setVisible(false);
 }
 
 configure::~configure()
@@ -26,8 +25,7 @@ void configure::setData(const int &selFile, QList<QStringList> inputMediaInfo, c
     if (selFile == -1)
     {
         ui->copyVideo->setVisible(true);
-        ui->copyVideo->setChecked(RecontainerSettings[0]);
-        ui->autoContainer->setChecked(RecontainerSettings[1]);
+        ui->copyVideo->setChecked(RecontainerSettings);
     }
 
 
@@ -38,11 +36,12 @@ void configure::setData(const int &selFile, QList<QStringList> inputMediaInfo, c
     inputContainer = inputMediaInfo[0][2];
 
     inputVideoBitDepths = inputMediaInfo[2];
-    inputVideoCodecs = inputMediaInfo[3];
-    inputColorSpaces = inputMediaInfo[4];
-    inputColorMatrix = inputMediaInfo[5];
-    inputVideoHeight = inputMediaInfo[7];
-    inputAudioCodecs = inputMediaInfo[10];
+    inputLumaRange = inputMediaInfo[3];
+    inputVideoCodecs = inputMediaInfo[4];
+    inputColorSpaces = inputMediaInfo[5];
+    inputColorMatrix = inputMediaInfo[6];
+    inputVideoHeight = inputMediaInfo[8];
+    inputAudioCodecs = inputMediaInfo[11];
 
     outputLocation = configurationList[0];
     outputContainer = configurationList[1];
@@ -50,22 +49,45 @@ void configure::setData(const int &selFile, QList<QStringList> inputMediaInfo, c
     outputColorSpace = configurationList[3];
     outputBitDepth = configurationList[4];
     outputColorMatrix = configurationList[5];
-    outputVideoCodec = configurationList[6];
-    videoEncMode = configurationList[7];
-    videoEncPreset = configurationList[8];
-    videoEncTune = configurationList[9];
-    videoEncBitrate = configurationList[10].toInt();
-    outputAudioSource = configurationList[11];
-    outputAudioStream = configurationList[12];
-    outputAudioCodec = configurationList[13];
-    audioEncMode = configurationList[14];
-    audioEncBitrate = configurationList[15].toInt();
+    convertHDR2SDR = configurationList[6].toInt();
+    outputVideoCodec = configurationList[7];
+    videoEncMode = configurationList[8];
+    videoEncPreset = configurationList[9];
+    videoEncTune = configurationList[10];
+    videoEncBitrate = configurationList[11].toInt();
+    outputAudioSource = configurationList[12];
+    outputAudioStream = configurationList[13];
+    outputAudioCodec = configurationList[14];
+    audioEncMode = configurationList[15];
+    audioEncBitrate = configurationList[16].toInt();
+    deinterlaceType = configurationList[18];
+    cthreshValue = configurationList[19].toInt();
+    outputFieldOrder = configurationList[20];
+    outputResize = configurationList[21];
+    outputAR = configurationList[22];
 
-    ui->copyAudio->setChecked(configurationList[16].toInt());
-    if (outputAudioCodec != "Copy")
+    if (configurationList[17].toInt() > 1)
     {
         ui->encodeIncompatible->setChecked(true);
+        ui->copyAudio->setChecked(true);
     }
+    else
+        ui->copyAudio->setChecked(configurationList[17].toInt());
+
+    int interlaceIndex = ui->interlaceOptions->findText(deinterlaceType);
+    ui->interlaceOptions->setCurrentIndex(interlaceIndex);
+    setInterlaceVisibility(interlaceIndex);
+
+    ui->cthresh->setValue(cthreshValue);
+    ui->fieldOrder->setCurrentIndex(ui->fieldOrder->findText(outputFieldOrder));
+
+    if (outputResize != "No")
+        ui->resizeVideo->setChecked(true);
+
+    if (outputAR != "No")
+        ui->changeDAR->setChecked(true);
+    else
+        ui->changeDARSel->setVisible(false);
 
     ui->outputFolder->setText(outputLocation);
 
@@ -81,30 +103,28 @@ void configure::setData(const int &selFile, QList<QStringList> inputMediaInfo, c
     }
 
 
+
     setContainer();
     setVideoCodec();
+    setLumaConversion();
     setPreset();
     setTune();
 
     setAudioCodec();
     setAudioMode();
 
+    setResizeOptions();
+
     ui->bitrateBox->setValue(videoEncBitrate);
     ui->bitrateBoxAudio->setValue(audioEncBitrate);
-    ui->maxMuxing->setValue(configurationList[17].toInt());
-    ui->experimentalFeatures->setChecked(configurationList[18].toInt());
+    ui->maxMuxing->setValue(configurationList[23].toInt());
+    ui->experimentalFeatures->setChecked(configurationList[24].toInt());
 }
 
 // SHOW OR HIDE OPTIONS
 
 void configure::enableBitDepth(QList<int> hibitdepth)
 {
-    if (!hibitdepth.contains(1))
-    {
-        ui->selectBitDepth->setVisible(false);
-        ui->labelBitDepth->setVisible(false);
-    }
-
     bool x264hi10 = hibitdepth[0];
     bool x264hi12 = hibitdepth[1];
     x264bitdepth = {x264hi10,x264hi12};
@@ -112,6 +132,10 @@ void configure::enableBitDepth(QList<int> hibitdepth)
     bool x265hi10 = hibitdepth[2];
     bool x265hi12 = hibitdepth[3];
     x265bitdepth = {x265hi10,x265hi12};
+
+    bool vp9hi10 = hibitdepth[4];
+    bool vp9hi12 = hibitdepth[5];
+    vp9bitdepth = {vp9hi10,vp9hi12};
 }
 
 void configure::setVideoVisibility()
@@ -123,9 +147,11 @@ void configure::setVideoVisibility()
     bool presetoptions;
     bool tuneoptions;
     bool colorspace;
-    QStringList lossless = {"Copy", "DNxHR","ProRes","UT Video"};
+    bool codecsettings;
+    bool changedar;
+    QStringList productionCodecs = {"Copy", "DNxHR","ProRes","UT Video"};
 
-    if (lossless.contains(ui->selectCodec->currentText()))
+    if (productionCodecs.contains(ui->selectCodec->currentText()))
     {
         bitrateoptions = false;
         presetoptions = false;
@@ -139,8 +165,16 @@ void configure::setVideoVisibility()
     {
         bitrateoptions = true;
         modeoptions = true;
-        presetoptions = true;
-        tuneoptions = true;
+        if (ui->selectCodec->currentText() == "VP9")
+        {
+            presetoptions = false;
+            tuneoptions = false;
+        }
+        else
+        {
+            presetoptions = true;
+            tuneoptions = true;
+        }
     }
 
     if (ui->selectMode->currentText().contains("Bitrate") && bitrateoptions == true)
@@ -171,9 +205,35 @@ void configure::setVideoVisibility()
         colorspace = true;
     }
 
+    if (ui->selectCodec->currentText() == "Copy" || ui->selectCodec->currentText() == "UT Video")
+    {
+        codecsettings = false;
+    }
+    else
+    {
+        codecsettings = true;
+    }
+
     if (selectedFile < 0)
     {
         matrixoptions = false;
+    }
+
+    if (ui->selectMode->currentText().contains("Lossless"))
+    {
+        bitrateoptions = false;
+        tuneoptions = false;
+    }
+
+    if (ui->selectContainer->currentText() == "AVI")
+    {
+        changedar = false;
+        ui->changeDARSel->setVisible(changedar);
+    }
+    else
+    {
+        changedar = true;
+        ui->changeDARSel->setVisible(ui->changeDAR->isChecked());
     }
 
     ui->bitrateBox->setVisible(bitrateoptions);
@@ -189,6 +249,8 @@ void configure::setVideoVisibility()
     ui->labelPreset->setVisible(presetoptions);
     ui->selectTune->setVisible(tuneoptions);
     ui->labelTune->setVisible(tuneoptions);
+    ui->codecSettings->setVisible(codecsettings);
+    ui->changeDAR->setVisible(changedar);
 
 }
 
@@ -231,7 +293,7 @@ void configure::setAudioVisibility()
 
     }
 
-    if (ui->copyAudio->isChecked() && ui->encodeIncompatible->checkState() == Qt::Unchecked)
+    if (ui->copyAudio->isChecked() && ui->encodeIncompatible->checkState() == Qt::Unchecked && cancopyaudio)
     {
         bitrateoptions = false;
         audiocodec = false;
@@ -249,7 +311,7 @@ void configure::setAudioVisibility()
     if (selectedFile == -1)
     {
         ui->externalAudio->setVisible(false);
-        ui->internalAudio->setVisible(false);
+        //ui->internalAudio->setVisible(false);
     }
     ui->externalAudioSource->setVisible(externalaudio);
     ui->browseAudio->setVisible(externalaudio);
@@ -277,9 +339,29 @@ void configure::setVideoStream()
 
 void configure::setContainer()
 {
-    ui->selectContainer->addItems({"AVI","MKV", "MOV", "MP4"});
+    ui->selectContainer->addItems({"AVI","MKV", "MOV", "MP4","WEBM"});
     int containerindex = ui->selectContainer->findText(outputContainer);
     ui->selectContainer->setCurrentIndex(containerindex);
+}
+
+void configure::setLumaConversion()
+{
+    ui->convertHDR->setChecked(convertHDR2SDR);
+    if (ui->selectCodec->currentText() == "DNxHR" || ui->selectCodec->currentText() == "UT Video")
+    {
+        ui->convertHDR->setChecked(true);
+        ui->convertHDR->setEnabled(false);
+    }
+    else
+    {
+        ui->convertHDR->setChecked(convertHDR2SDR);
+        ui->convertHDR->setEnabled(true);
+    }
+    if (inputLumaRange[ui->selectVideoStream->currentIndex()].contains("HDR"))
+        ui->convertHDR->setVisible(true);
+    else
+        ui->convertHDR->setVisible(false);
+
 }
 
 void configure::setVideoCodec()
@@ -311,7 +393,7 @@ void configure::setVideoCodec()
         {
             codecs.append("Copy");
         }
-        codecs.append({"x264", "x265"});
+        codecs.append({"x264", "x265", "VP9"});
     }
     if (ui->selectContainer->currentText() == "MOV")
     {
@@ -328,6 +410,14 @@ void configure::setVideoCodec()
             codecs.append("Copy");
         }
         codecs.append({"x264", "x265"});
+    }
+    if (ui->selectContainer->currentText() == "WEBM")
+    {
+        if (WEBM.contains(inputVideoCodecs[vsIndex]))
+        {
+            codecs.append("Copy");
+        }
+        codecs.append("VP9");
     }
 
     ui->selectCodec->addItems(codecs);
@@ -357,14 +447,13 @@ void configure::setBitDepth()
 
     ui->selectBitDepth->clear();
 
-    QStringList losslessMOV = {"ProRes"};
-    if (!losslessMOV.contains(ui->selectCodec->currentText()))
+    if (!ui->selectCodec->currentText().contains("ProRes"))
         ui->selectBitDepth->addItem("8");
 
     if (ui->selectCodec->currentText() == "ProRes")
         ui->selectBitDepth->addItem("10");
 
-    QStringList DNxHR10 = {"","High Quality","Finishing Quality"};
+    QStringList DNxHR10 = {"High Quality","Finishing Quality"};
     if (ui->selectCodec->currentText() == "DNxHR" && DNxHR10.contains(ui->selectMode->currentText()))
         ui->selectBitDepth->addItem("10");
 
@@ -382,6 +471,14 @@ void configure::setBitDepth()
         if (x265bitdepth[0])
             ui->selectBitDepth->addItem("10");
         if (x265bitdepth[1])
+            ui->selectBitDepth->addItem("12");
+    }
+
+    if (ui->selectCodec->currentText() == "VP9")
+    {
+        if (vp9bitdepth[0])
+            ui->selectBitDepth->addItem("10");
+        if (vp9bitdepth[1])
             ui->selectBitDepth->addItem("12");
     }
 
@@ -414,21 +511,10 @@ void configure::setColorSpace()
         if (codec == "UT Video")
         {
             colorspaceoptions.clear();
-            int cvs = ui->selectVideoStream->currentIndex();
             if (ui->selectBitDepth->currentText() == "8")
-            {
-                if (inputColorMatrix[cvs].contains("BT.2020") && !inputColorSpaces[cvs].contains("RGB"))
-                    colorspaceoptions.append({"RGB24","RGBA"});
-                else
-                    colorspaceoptions.append({"YUV420", "YUV422", "RGB24","RGBA"});
-            }
+                colorspaceoptions.append({"YUV420", "YUV422", "RGB24","RGBA"});
             else
-            {
-                if (inputColorMatrix[cvs].contains("BT.2020"))
-                    colorspaceoptions.append({"RGB24","RGBA"});
-                else
-                    colorspaceoptions.append({"YUV422", "RGB24","RGBA"});
-            }
+                colorspaceoptions.append({"YUV422", "RGB24","RGBA"});
         }
         if (codec == "ProRes")
         {
@@ -439,11 +525,7 @@ void configure::setColorSpace()
 
         ui->selectColorSpace->clear();
         ui->selectColorSpace->addItems(colorspaceoptions);
-        int index;
-        if (ui->selectCodec->currentText() == "x264" || ui->selectCodec->currentText() == "x265" || ui->selectCodec->currentText() == "ProRes")
-            index = ui->selectColorSpace->findText(outputColorSpace);
-        else
-            index = ui->selectColorSpace->findText(colorspace);
+        int index = ui->selectColorSpace->findText(outputColorSpace);
         if(index != -1) { ui->selectColorSpace->setCurrentIndex(index); }
         else { ui->selectColorSpace->setCurrentIndex(0); }
 
@@ -454,10 +536,28 @@ void configure::setColorMatrix()
     ui->selectMatrix->clear();
     ui->selectMatrix->addItems({"BT.601", "BT.709"});
 
-    if (ui->selectCodec->currentText() != "UT Video")
+    if (ui->convertHDR->isChecked() && inputLumaRange[ui->selectVideoStream->currentIndex()].contains("HDR") && outputColorMatrix == "BT.2020NC")
     {
-        if (inputColorMatrix[vsIndex] == "BT.2020NC")
-            ui->selectMatrix->addItem("BT.2020NC");
+        outputColorMatrix = "BT.709";
+    }
+    else
+    {
+        if (ui->selectCodec->currentText() != "")
+        {
+            if (ui->selectCodec->currentText() != "UT Video")
+            {
+                if (ui->selectCodec->currentText() != "DNxHR")
+                {
+                    if (inputColorMatrix[vsIndex].contains("BT.2020") && !ui->convertHDR->isChecked())
+                    {
+                        ui->selectMatrix->clear();
+                        ui->selectMatrix->addItem("BT.2020");
+                    }
+                }
+
+            }
+        }
+
     }
 
     int index = ui->selectMatrix->findText(outputColorMatrix);
@@ -468,10 +568,9 @@ void configure::setColorMatrix()
 
 void configure::setMode()
 {
-    int encModeIndex = ui->selectMode->findText(videoEncMode);
     ui->selectMode->clear();
-    QStringList losslessMOV = {"DNxHR","ProRes"};
-    if (losslessMOV.contains(ui->selectCodec->currentText()))
+    QStringList mezzanineMOV = {"DNxHR","ProRes"};
+    if (mezzanineMOV.contains(ui->selectCodec->currentText()))
     {
         ui->labelMode->setText("Profile:");
         if (ui->selectCodec->currentText() == "DNxHR" && ui->selectBitDepth->currentText() == "8")
@@ -496,7 +595,13 @@ void configure::setMode()
     else
     {
         ui->labelMode->setText("Mode:");
-        ui->selectMode->addItems({"Constant Rate Factor","Bitrate 1 Pass","Bitrate 2 Pass"});
+        if(ui->selectCodec->currentText() == "VP9")
+            ui->selectMode->addItems({"Constant Rate 1 Pass","Constant Rate 2 Pass"});
+        else
+            ui->selectMode->addItem("Constant Rate Factor");
+        ui->selectMode->addItems({"Bitrate 1 Pass","Bitrate 2 Pass"});
+        if (ui->selectCodec->currentText().contains("x265"))
+            ui->selectMode->addItem("Lossless");
         int index = ui->selectMode->findText(videoEncMode);
         if(index != -1){ ui->selectMode->setCurrentIndex(index); }
         else { ui->selectMode->setCurrentIndex(0); }
@@ -563,7 +668,7 @@ void configure::setAudioStream()
 
     if (newExtAudio && ui->externalAudio->isChecked())
         index = 0;
-    if (outputAudioSource != "Original Audio" && ui->internalAudio->isChecked())
+    if (outputAudioSource != "Original Audio" && !ui->externalAudio->isChecked())
         index = 0;
 
     if(index != -1)
@@ -598,7 +703,7 @@ void configure::setAudioCodec()
     if (ui->selectContainer->currentText() == "MKV")
     {
         cancopyaudio = true;
-        codecs.append({ "AAC", "ALAC", "FLAC", "MP3", "PCM" });
+        codecs.append({ "AAC", "ALAC", "FLAC", "MP3", "Opus", "PCM" });
     }
     if (ui->selectContainer->currentText() == "MOV")
     {
@@ -610,7 +715,12 @@ void configure::setAudioCodec()
         canCopyAudio(MP4);
         codecs.append("AAC");
     }
-    ui->selectAudioCodec->addItems(codecs);
+    if (ui->selectContainer->currentText() == "WEBM")
+    {
+        canCopyAudio(WEBM);
+        codecs.append("Opus");
+    }
+   ui->selectAudioCodec->addItems(codecs);
     int index = ui->selectAudioCodec->findText(outputcodec);
 
     if (index == -1)
@@ -657,8 +767,22 @@ void configure::canCopyAudio(QStringList containerinfo)
 
 void configure::setAudioMode()
 {
+
+    if (ui->selectAudioCodec->currentText() == "Opus")
+    {
+        ui->selectAudioMode->clear();
+        ui->selectAudioMode->addItem("Bitrate");
+    }
+    else
+    {
+       ui->selectAudioMode->clear();
+       ui->selectAudioMode->addItems({"Bitrate","Quality"});
+    }
     int encModeIndex = ui->selectAudioMode->findText(audioEncMode);
-    ui->selectAudioMode->setCurrentIndex(encModeIndex);
+    if (encModeIndex != -1)
+        ui->selectAudioMode->setCurrentIndex(encModeIndex);
+    else
+        ui->selectAudioMode->setCurrentIndex(0);
 }
 
 void configure::getAltAudioCodecs(QString newAudio)
@@ -669,7 +793,7 @@ void configure::getAltAudioCodecs(QString newAudio)
     if (streamcount > 0)
     {
         altAudioStreams = streamcount;
-        altAudioCodecs = newAudioInfo[10];
+        altAudioCodecs = newAudioInfo[11];
         ui->externalAudioSource->setText(newAudio);
         setAudioStream();
     }
@@ -678,17 +802,17 @@ void configure::getAltAudioCodecs(QString newAudio)
         QMessageBox::information(this,"Error","External audio file contains no audio streams, switching back to internal audio.");
         outputAudioSource = "OriginalAudio";
         ui->externalAudioSource->setText("");
-        ui->internalAudio->setChecked(true);
+        ui->externalAudio->setChecked(false);
     }
 
 }
 
 void configure::setAudioBitrate()
 {
-    int min;
-    int max;
-    int value;
-    QString valueinfo;
+    int min = 0;
+    int max = 0;
+    int value = 0;
+    QString valueinfo = "";
 
     if (ui->selectAudioMode->currentText() == "Quality")
     {
@@ -707,20 +831,12 @@ void configure::setAudioBitrate()
             value = 5;
             valueinfo = "0 (Best) to 9 (Worst)";
         }
-        if (codec == "ALAC" || codec == "FLAC" || codec == "PCM" || codec == "Copy")
-        {
-            min = 0;
-            max = 0;
-            value = 0;
-            valueinfo = "";
-        }
-
     }
     else
     {
         min = 45;
         max = 320;
-        value = 128;
+        value = 192;
         valueinfo = "Kbps";
     }
     ui->bitrateBoxAudio->setMinimum(min);
@@ -729,6 +845,98 @@ void configure::setAudioBitrate()
 
     ui->labelAudioBitrate->setText(valueinfo);
 }
+
+//SET ADVANCED OPTIONS
+
+void configure::setInterlaceVisibility(int index)
+{
+    if (index == 0 || index == 2 || ui->selectCodec->currentText() == "Copy")
+    {
+        ui->labelcthresh->setVisible(false);
+        ui->cthresh->setVisible(false);
+        if (index == 2)
+        {
+            ui->labelFieldOrder->setVisible(true);
+            ui->fieldOrder->setVisible(true);
+        }
+        else
+        {
+            ui->labelFieldOrder->setVisible(false);
+            ui->fieldOrder->setVisible(false);
+        }
+    }
+    else
+    {
+        ui->labelcthresh->setVisible(true);
+        ui->cthresh->setVisible(true);
+        ui->labelFieldOrder->setVisible(true);
+        ui->fieldOrder->setVisible(true);
+    }
+    if (ui->selectCodec->currentText() == "Copy")
+        ui->interlaceOptions->setVisible(false);
+    else
+        ui->interlaceOptions->setVisible(true);
+}
+
+void configure::setResizeOptions ()
+{
+    bool visible = false;
+    if (!ui->resizeResolution->isChecked() && !ui->resizeWidth->isChecked() && !ui->resizeHeight->isChecked())
+    {
+        if (outputResize != "No" && ui->resizeVideo->isChecked())
+        {
+            if (FullResolutions.contains(outputResize))
+                ui->resizeResolution->setChecked(true);
+            if (WidthResolutions.contains(outputResize))
+                ui->resizeWidth->setChecked(true);
+            if (HeightResolutions.contains(outputResize))
+                ui->resizeHeight->setChecked(true);
+            visible = true;
+        }
+        else
+        {
+            if (ui->resizeVideo->isChecked() && outputResize == "No")
+            {
+                ui->resizeResolution->setChecked(true);
+                visible = true;
+            }
+        }
+    }
+    else
+    {
+        if (ui->resizeVideo->isChecked())
+            visible = true;
+    }
+    if (ui->selectCodec->currentText() == "Copy")
+    {
+        ui->resizeVideo->setVisible(false);
+        visible = false;
+    }
+    else
+        ui->resizeVideo->setVisible(true);
+
+    ui->resizeVideoSel->setVisible(visible);
+    ui->resizeResolution->setVisible(visible);
+    ui->resizeWidth->setVisible(visible);
+    ui->resizeHeight->setVisible(visible);
+
+    if (visible)
+    {
+        ui->resizeVideoSel->clear();
+        if (ui->resizeResolution->isChecked())
+            ui->resizeVideoSel->addItems(FullResolutions);
+        if (ui->resizeWidth->isChecked())
+            ui->resizeVideoSel->addItems(WidthResolutions);
+        if (ui->resizeHeight->isChecked())
+            ui->resizeVideoSel->addItems(HeightResolutions);
+
+        int index = ui->resizeVideoSel->findText(outputResize);
+        if(index != -1) { ui->resizeVideoSel->setCurrentIndex(index); }
+        else { ui->resizeVideoSel->setCurrentIndex(0); }
+        outputResize = ui->resizeVideoSel->currentText();
+    }
+}
+
 
 
 // BUTTON ACTIONS
@@ -743,6 +951,8 @@ void configure::on_buttonBox_accepted()
     outputBitDepth = ui->selectBitDepth->currentText();
     videoEncMode = ui->selectMode->currentText();
     outputColorMatrix = ui->selectMatrix->currentText();
+    if (outputColorMatrix == "BT.2020")
+        outputColorMatrix = "BT.2020NC";
     if (outputVideoCodec == "DNxHR")
     {
         if (videoEncMode == "Finishing Quality")
@@ -752,27 +962,27 @@ void configure::on_buttonBox_accepted()
     }
     else
         outputColorSpace = ui->selectColorSpace->currentText();
+
     videoEncPreset = ui->selectPreset->currentText();
     if (ui->selectTune->currentIndex() != -1)
         videoEncTune = ui->selectTune->currentText();
     videoEncBitrate = ui->bitrateBox->value();
     outputAudioStream = ui->selectAudioStream->currentText();
-    bool copyaudio = false;
 
-    if (ui->copyAudio->isChecked() && ui->encodeIncompatible->checkState() == Qt::Unchecked && cancopyaudio == true)
+    int copyaudio = 0;
+
+    if (ui->copyAudio->isChecked() && ui->encodeIncompatible->checkState() == Qt::Unchecked)
     {
-        outputAudioCodec = "Copy";
-        copyaudio = true;
+        copyaudio = 1;
     }
     else
     {
         if (ui->copyAudio->isChecked() && ui->encodeIncompatible->isChecked())
         {
-            copyaudio = true;
+            copyaudio = 2;
         }
-        outputAudioCodec = ui->selectAudioCodec->currentText();
     }
-
+    outputAudioCodec = ui->selectAudioCodec->currentText();
     audioEncMode = ui->selectAudioMode->currentText();
     audioEncBitrate = ui->bitrateBoxAudio->value();
 
@@ -785,79 +995,43 @@ void configure::on_buttonBox_accepted()
         outputAudioSource = "Original Audio";
     }
 
+    deinterlaceType = ui->interlaceOptions->currentText();
 
-    QStringList configurationList = { outputLocation, outputContainer, QString::number(outputVideoStream), outputColorSpace, outputBitDepth, outputColorMatrix, outputVideoCodec,
+    if (deinterlaceType != "None" && deinterlaceType != "Blend" && outputVideoCodec != "Copy")
+    {
+        cthreshValue = ui->cthresh->value();
+        outputFieldOrder = ui->fieldOrder->currentText();
+    }
+    else
+        if (outputVideoCodec == "Copy")
+            deinterlaceType = "None";
+
+    if (ui->resizeVideo->isChecked() && outputVideoCodec != "Copy")
+        outputResize = ui->resizeVideoSel->currentText();
+    else
+        outputResize = "No";
+
+    if (ui->changeDAR->isChecked() && outputContainer != "AVI")
+        outputAR = ui->changeDARSel->currentText();
+    else
+        outputAR = "No";
+
+
+    QStringList configurationList = { outputLocation, outputContainer, QString::number(outputVideoStream), outputColorSpace, outputBitDepth, outputColorMatrix, QString::number(ui->convertHDR->isChecked()), outputVideoCodec,
                                       videoEncMode, videoEncPreset, videoEncTune, QString::number(videoEncBitrate), outputAudioSource, outputAudioStream, outputAudioCodec,
-                                    audioEncMode, QString::number(audioEncBitrate),QString::number(copyaudio),QString::number(ui->maxMuxing->value()),QString::number(ui->experimentalFeatures->isChecked())};
+                                    audioEncMode, QString::number(audioEncBitrate), QString::number(copyaudio), deinterlaceType, QString::number(cthreshValue), outputFieldOrder, outputResize, outputAR, QString::number(ui->maxMuxing->value()),QString::number(ui->experimentalFeatures->isChecked())};
 
 
-    fs.changeSettings(selectedFile, inputVideoBitDepths[ui->selectVideoStream->currentIndex()], configurationList);
+    fs.changeSettings(selectedFile, inputVideoBitDepths[ui->selectVideoStream->currentIndex()] + " " + inputLumaRange[ui->selectVideoStream->currentIndex()], configurationList);
 
     if (selectedFile == -1 && ui->copyVideo->isChecked())
     {
         queue queue;
-        queue.setupRecontainer(ui->autoContainer->isChecked());
+        queue.setupRecontainer();
     }
 
 
     this->close();
-}
-
-void configure::on_recontainer_clicked()
-{
-    if (selectedFile < 0)
-    {
-        ui->copyVideo->setChecked(true);
-        if (QMessageBox::question(this,"Audio Option", "Would you like to only recontainer videos compatible with " + ui->selectContainer->currentText() + "?", QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes)
-        {
-            ui->autoContainer->setChecked(false);
-        }
-        else
-        {
-            ui->autoContainer->setChecked(true);
-        }
-
-    }
-    else
-    {
-        filesettings fs;
-        QStringList containers = fs.findContainers(inputVideoCodecs[ui->selectVideoStream->currentIndex()]);
-
-        if (containers[0] == inputContainer)
-        {
-            containers.removeFirst();
-        }
-
-        if (containers[0] != "None")
-        {
-            int containerindex = ui->selectContainer->findText(containers[0]);
-            ui->selectContainer->setCurrentIndex(containerindex);
-            int index = ui->selectCodec->findText("Copy");
-            if (index == -1)
-            {
-                index = 0;
-            }
-            ui->selectCodec->setCurrentIndex(index);
-            ui->copyAudio->setChecked(true);
-        }
-    }
-    if (QMessageBox::question(this,"Audio Option", "Would you like to include the audio?", QMessageBox::Yes|QMessageBox::No) == QMessageBox::No)
-    {
-        int index = ui->selectAudioStream->findText("None");
-        if (index < 0)
-        {
-            index = 0;
-        }
-        ui->selectAudioStream->setCurrentIndex(index);
-    }
-    else
-    {
-        if (ui->selectAudioStream->currentText() == "None")
-        {
-            ui->selectAudioStream->setCurrentIndex(0);
-        }
-    }
-
 }
 
 // CHANGED VALUE EVENTS
@@ -889,19 +1063,22 @@ void configure::on_selectContainer_currentIndexChanged()
 
 void configure::on_selectCodec_currentIndexChanged()
 {
+    setLumaConversion();
     setBitDepth();
     setColorSpace();
     setColorMatrix();
     setMode();
     setTune();
     setVideoVisibility();
+    setInterlaceVisibility(ui->interlaceOptions->currentIndex());
+    setResizeOptions();
 }
 
 void configure::on_selectColorSpace_currentIndexChanged()
 {
     setVideoVisibility();
-    QStringList losslessMOV = {"DNxHR","ProRes"};
-    if (losslessMOV.contains(ui->selectCodec->currentText()))
+    QStringList mezzanineMOV = {"DNxHR","ProRes"};
+    if (mezzanineMOV.contains(ui->selectCodec->currentText()))
     {
         setBitDepth();
         setMode();
@@ -910,18 +1087,24 @@ void configure::on_selectColorSpace_currentIndexChanged()
 
 void configure::on_selectMode_currentIndexChanged()
 {
-    if (ui->selectCodec->currentText().contains("x26"))
+    QStringList lossyCodecs = {"x264","x265","VP9"};
+    if (lossyCodecs.contains(ui->selectCodec->currentText()))
     {
-        if (ui->selectMode->currentText() == "Constant Rate Factor")
+        if (ui->selectMode->currentText().contains("Constant Rate"))
         {
             ui->bitrateBox->setMaximum(51);
             ui->bitrateBox->setValue(18);
+            ui->bitrateBox->setMinimum(1);
         }
         else
         {
-            ui->bitrateBox->setMinimum(5);
-            ui->bitrateBox->setMaximum(50000);
-            ui->bitrateBox->setValue(2500);
+            if (!ui->selectMode->currentText().contains("Lossless"))
+            {
+                ui->bitrateBox->setMinimum(5);
+                ui->bitrateBox->setMaximum(50000);
+                ui->bitrateBox->setValue(2500);
+            }
+
         }
         setVideoVisibility();
     }
@@ -957,6 +1140,7 @@ void configure::on_selectVideoStream_currentIndexChanged(int index)
     if (ui->selectMatrix->currentIndex() != -1)
     {
         outputColorMatrix = inputColorMatrix[index];
+        setVideoCodec();
         setBitDepth();
         setColorSpace();
         setColorMatrix();
@@ -986,6 +1170,7 @@ void configure::on_selectAudioMode_currentIndexChanged()
 
 void configure::on_selectAudioCodec_currentIndexChanged()
 {
+    setAudioMode();
     setAudioBitrate();
     setAudioVisibility();
 }
@@ -1029,8 +1214,56 @@ void configure::on_encodeIncompatible_toggled()
     setAudioVisibility();
 }
 
-void configure::on_copyVideo_toggled(bool checked)
+void configure::on_convertHDR_toggled()
 {
-    ui->autoContainer->setVisible(checked);
+    setColorMatrix();
+    setVideoVisibility();
 }
+
+void configure::on_convertHDR_clicked(bool checked)
+{
+    convertHDR2SDR = checked;
+}
+
+void configure::on_interlaceOptions_currentIndexChanged(int index)
+{
+    setInterlaceVisibility(index);
+}
+
+void configure::on_resizeVideo_toggled()
+{
+    setResizeOptions();
+}
+
+void configure::on_resizeResolution_toggled()
+{
+    setResizeOptions();
+}
+
+
+void configure::on_resizeHeight_toggled()
+{
+    setResizeOptions();
+}
+
+
+void configure::on_resizeWidth_toggled()
+{
+    setResizeOptions();
+}
+
+void configure::on_changeDAR_toggled(bool checked)
+{
+    ui->changeDARSel->setVisible(checked);
+    if (outputAR != "No")
+    {
+        int index = ui->changeDARSel->findText(outputAR);
+        if(index != -1) { ui->changeDARSel->setCurrentIndex(index); }
+        else { ui->changeDARSel->setCurrentIndex(0); }
+        outputAR = ui->changeDARSel->currentText();
+    }
+}
+
+
+
 

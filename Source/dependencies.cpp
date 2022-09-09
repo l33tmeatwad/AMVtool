@@ -12,6 +12,7 @@ QStringList dependencies::checkDependencies()
     QString ffmpegLoc = findDir("ffmpeg","-version");
     QList<bool> x264;
     QList<bool> x265;
+    QList<bool> vp9;
     bool ffmpegFail;
     if (!ffmpegLoc.contains("Not Found"))
     {
@@ -20,16 +21,20 @@ QStringList dependencies::checkDependencies()
 
         ffmpegFail = checkEXEC(ffmpegLoc, {"-h", "encoder=libx265"});
         x265 = {hibit10, hibit12};
+
+        ffmpegFail = checkEXEC(ffmpegLoc, {"-h", "encoder=libvpx-vp9"});
+        vp9 = {hibit10, hibit12};
     }
     else
     {
         x264 = {false,false};
         x265 = {false,false};
+        vp9 = {false,false};
     }
     QString vspipeLoc = findDir("vspipe","--version");
 
     checkmedia cm;
-    QStringList depStatus = { cm.checkFormats(vspipeLoc.contains("Not Found")), vspipeLoc, ffmpegLoc, QString::number(x264[0]), QString::number(x264[1]), QString::number(x265[0]), QString::number(x265[1]) };
+    QStringList depStatus = { cm.checkFormats(vspipeLoc.contains("Not Found")), vspipeLoc, ffmpegLoc, QString::number(x264[0]), QString::number(x264[1]), QString::number(x265[0]), QString::number(x265[1]), QString::number(vp9[0]), QString::number(vp9[1]) };
     return depStatus;
 }
 

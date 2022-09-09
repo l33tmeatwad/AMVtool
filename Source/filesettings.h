@@ -12,16 +12,16 @@
 extern QList<QStringList> mainQueueInfo;
 extern QStringList defaultConfiguration;
 extern QList<QStringList> outputConfig;
-extern QList<bool> RecontainerSettings;
+extern bool RecontainerSettings;
 
 class filesettings
 {
 public:
     bool checkFolder(QString folder);
-    void addSettings(QString originalLocation, QString colormatrix, bool isVPY);
+    void addSettings(QString originalLocation, QString lumarange, QString colormatrix, bool isVPY);
     void changeSettings(int ql, QString bitdepth, QStringList configurationList);
     void removeSettings(int ql);
-    void recontainerSettings(QList<QStringList> mediaInfo, int vstream, int queue, bool autoCon);
+    void recontainerSettings(QList<QStringList> mediaInfo, int vstream, int queue);
     QStringList findContainers(QString codec);
 private:
     QStringList AVI = { "ULRG", "ULRA", "ULY0", "ULH0", "ULY2", "ULH2", "YQY2", "XviD"};

@@ -23,13 +23,13 @@ bool filesettings::checkFolder(QString folder)
     return validpath;
 }
 
-void filesettings::addSettings(QString originalLocation, QString colormatrix, bool isVPY)
+void filesettings::addSettings(QString originalLocation, QString lumarange, QString colormatrix, bool isVPY)
 {
     outputConfig.append(defaultConfiguration);
-    if (defaultConfiguration[6] == "Ut Video" && defaultConfiguration[3].contains("YUV") && colormatrix.contains("BT.2020"))
-        outputConfig[outputConfig.count()-1][3] = "RGB24";
-
-    outputConfig[outputConfig.count()-1][5] = colormatrix;
+    if (lumarange == "HDR" && defaultConfiguration[6] == "1")
+        outputConfig[outputConfig.count()-1][5] = "BT.709";
+    else
+        outputConfig[outputConfig.count()-1][5] = colormatrix;
 
     if (defaultConfiguration[0] == "Original File Location")
     {
@@ -37,7 +37,7 @@ void filesettings::addSettings(QString originalLocation, QString colormatrix, bo
     }
     if (isVPY)
     {
-        outputConfig[outputConfig.count()-1][12] = "None";
+        outputConfig[outputConfig.count()-1][13] = "None";
     }
 }
 
@@ -55,13 +55,11 @@ void filesettings::changeSettings(int ql, QString bitdepth, QStringList configur
 
         for (int i = 0; i < outputConfig.count(); i++)
         {
-            if (configurationList[6] == "Ut Video" && configurationList[3].contains("YUV") && outputConfig[i][5].contains("BT.2020"))
-                configurationList[3] = "RGB24";
             configurationList[2] = outputConfig[i][2];
             configurationList[5] = outputConfig[i][5];
-            configurationList[11] = outputConfig[i][11];
-            if (mainQueueInfo[i][1].right(3) == "vpy" && outputConfig[i][11] == "Original Audio")
-                configurationList[12] = "None";
+            configurationList[12] = outputConfig[i][12];
+            if (mainQueueInfo[i][1].right(3) == "vpy" && outputConfig[i][12] == "Original Audio")
+                configurationList[13] = "None";
 
             QString fileLoc = outputConfig[i][0];
             outputConfig[i] = configurationList;
@@ -81,29 +79,14 @@ void filesettings::removeSettings(int ql)
 }
 
 
-void filesettings::recontainerSettings(QList<QStringList> mediaInfo, int vstream, int queue, bool autoCon)
+void filesettings::recontainerSettings(QList<QStringList> mediaInfo, int vstream, int queue)
 {
     if (mediaInfo[0][2] != "Error" && mediaInfo[0][2] != "AviSynth" && mediaInfo[0][2] != "VapourSynth")
     {
-        QStringList containers = findContainers(mediaInfo[3][vstream]);
-
-        if (autoCon == true)
-        {
-            containers.removeAll(mediaInfo[0][2]);
-            outputConfig[queue][1] = containers[0];
-        }
+        QStringList containers = findContainers(mediaInfo[4][vstream]);
         if (containers.contains(outputConfig[queue][1]))
         {
-            outputConfig[queue][6] = "Copy";
-            outputConfig[queue][16] = "1";
-            if (outputConfig[queue][1] == "MP4")
-            {
-                outputConfig[queue][13] = "AAC";
-            }
-            else
-            {
-                outputConfig[queue][13] = "PCM";
-            }
+            outputConfig[queue][7] = "Copy";
         }
     }
 }

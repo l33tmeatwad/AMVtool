@@ -19,7 +19,7 @@ QList<QString> progress::currentProcess(QString currentstatus, float duration)
     if (currentstatus.contains("speed="))
     {
         int speedspot = currentstatus.indexOf("speed=");
-        encodespeed = currentstatus.replace(currentstatus.left(speedspot+6), "").replace("x","").replace(" ", "");
+        encodespeed = currentstatus.replace(currentstatus.left(speedspot+6), "").replace("x","").replace(" ", "").replace("\r","");
         encodespeed = encodespeed.left(encodespeed.length()-1);
         encspeed = encodespeed.toFloat();
     }
@@ -39,7 +39,9 @@ QString progress::generateTimeLeft(float spd, float dur, float prog)
     else
     {
         float milli = 1000;
-        float timeleft = ((dur-prog)/milli)/spd;
+        float timeleft = 0;
+        if (spd > 0)
+            timeleft = ((dur-prog)/milli)/spd;
         float time = 60;
         float hours = (timeleft/time)/time;
         hours = floor(hours);

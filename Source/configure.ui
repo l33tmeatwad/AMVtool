@@ -6,20 +6,26 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>434</width>
-    <height>335</height>
+    <width>448</width>
+    <height>394</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="minimumSize">
    <size>
-    <width>434</width>
-    <height>335</height>
+    <width>448</width>
+    <height>394</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>434</width>
-    <height>335</height>
+    <width>448</width>
+    <height>394</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -30,8 +36,8 @@
     <rect>
      <x>8</x>
      <y>91</y>
-     <width>417</width>
-     <height>201</height>
+     <width>431</width>
+     <height>261</height>
     </rect>
    </property>
    <property name="currentIndex">
@@ -45,45 +51,26 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>0</y>
-       <width>391</width>
-       <height>68</height>
+       <y>10</y>
+       <width>404</width>
+       <height>71</height>
       </rect>
      </property>
      <layout class="QGridLayout" name="vcodecLayout">
-      <item row="1" column="7" colspan="2">
-       <widget class="QComboBox" name="selectMatrix">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
+      <item row="0" column="4" colspan="3">
+       <spacer name="vcodecSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
-        <property name="maximumSize">
+        <property name="sizeHint" stdset="0">
          <size>
-          <width>110</width>
-          <height>16777215</height>
+          <width>5</width>
+          <height>20</height>
          </size>
         </property>
-       </widget>
+       </spacer>
       </item>
-      <item row="0" column="6" colspan="2">
-       <widget class="QLabel" name="labelVideoStream">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Use Stream:</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="8">
+      <item row="0" column="9">
        <widget class="QComboBox" name="selectVideoStream">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -112,65 +99,20 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="4">
+      <item row="1" column="5">
        <spacer name="colorSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>10</width>
+          <width>20</width>
           <height>17</height>
          </size>
         </property>
        </spacer>
       </item>
-      <item row="1" column="2" colspan="2">
-       <widget class="QComboBox" name="selectColorSpace">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>110</width>
-          <height>0</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="5">
-       <spacer name="matrixSpacer">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>6</width>
-          <height>17</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="0" column="1" colspan="2">
-       <widget class="QComboBox" name="selectCodec">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>95</width>
-          <height>0</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="6">
+      <item row="1" column="7">
        <widget class="QLabel" name="labelMatrix">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -183,6 +125,38 @@
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="8" colspan="2">
+       <widget class="QComboBox" name="selectMatrix">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>110</width>
+          <height>16777215</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" colspan="3">
+       <widget class="QComboBox" name="selectCodec">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>110</width>
+          <height>0</height>
+         </size>
         </property>
        </widget>
       </item>
@@ -199,195 +173,8 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="3" colspan="3">
-       <spacer name="vcodecSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>5</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-     </layout>
-    </widget>
-    <widget class="QWidget" name="vsettingsLayoutWidget">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>70</y>
-       <width>391</width>
-       <height>68</height>
-      </rect>
-     </property>
-     <layout class="QGridLayout" name="vsettingsLayout">
-      <item row="0" column="0">
-       <widget class="QLabel" name="labelMode">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Mode:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QComboBox" name="selectPreset">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>105</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>105</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <item>
-         <property name="text">
-          <string>Placebo</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Very Slow</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Slower</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Slow</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Medium</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Fast</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Faster</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Very Fast</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Super Fast</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Ultra Fast</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item row="0" column="4" colspan="2">
-       <widget class="QSpinBox" name="bitrateBox">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>65</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="maximum">
-         <number>51</number>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="7">
-       <spacer name="bitrateSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>13</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="0" column="6">
-       <widget class="QLabel" name="labelBitrate">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Kbps</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="labelPreset">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Preset:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="3">
-       <spacer name="presetSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>30</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="1" column="4">
-       <widget class="QLabel" name="labelTune">
+      <item row="0" column="7" colspan="2">
+       <widget class="QLabel" name="labelVideoStream">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -395,57 +182,41 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Tune:</string>
+         <string>Use Stream:</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
-      <item row="1" column="5" colspan="3">
-       <widget class="QComboBox" name="selectTune">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>110</width>
-          <height>16777215</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1" colspan="3">
-       <widget class="QComboBox" name="selectMode">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>180</width>
-          <height>16777215</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="2">
-       <spacer name="verticalSpacer">
+      <item row="1" column="6">
+       <spacer name="matrixSpacer">
         <property name="orientation">
          <enum>Qt::Vertical</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>8</width>
-          <height>40</height>
+          <width>6</width>
+          <height>17</height>
          </size>
         </property>
        </spacer>
+      </item>
+      <item row="1" column="2" colspan="3">
+       <widget class="QComboBox" name="selectColorSpace">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>110</width>
+          <height>0</height>
+         </size>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -453,16 +224,25 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>140</y>
-       <width>391</width>
-       <height>43</height>
+       <y>200</y>
+       <width>401</width>
+       <height>31</height>
       </rect>
      </property>
      <layout class="QGridLayout" name="copyGrid">
-      <item row="0" column="1">
-       <widget class="QCheckBox" name="autoContainer">
+      <item row="0" column="2">
+       <widget class="QCheckBox" name="copyVideo">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="layoutDirection">
+         <enum>Qt::LeftToRight</enum>
+        </property>
         <property name="text">
-         <string>Auto Select New Container</string>
+         <string>Copy Compatible (Recontainer)</string>
         </property>
         <property name="checked">
          <bool>false</bool>
@@ -470,13 +250,286 @@
        </widget>
       </item>
       <item row="0" column="0">
-       <widget class="QCheckBox" name="copyVideo">
+       <widget class="QCheckBox" name="convertHDR">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="text">
-         <string>Copy Compatible</string>
+         <string>Convert HDR to SDR</string>
         </property>
        </widget>
       </item>
+      <item row="0" column="1">
+       <spacer name="copyVideoSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>10</width>
+          <height>10</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
      </layout>
+    </widget>
+    <widget class="QGroupBox" name="codecSettings">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>80</y>
+       <width>401</width>
+       <height>111</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Codec Settings</string>
+     </property>
+     <widget class="QWidget" name="vsettingsLayoutWidget">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>381</width>
+        <height>71</height>
+       </rect>
+      </property>
+      <layout class="QGridLayout" name="vsettingsLayout">
+       <item row="0" column="0">
+        <widget class="QLabel" name="labelMode">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Mode:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QComboBox" name="selectPreset">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>105</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>105</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <item>
+          <property name="text">
+           <string>Placebo</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Very Slow</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Slower</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Slow</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Medium</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Fast</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Faster</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Very Fast</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Super Fast</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Ultra Fast</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="0" column="4" colspan="2">
+        <widget class="QSpinBox" name="bitrateBox">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>65</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="maximum">
+          <number>51</number>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="7">
+        <spacer name="bitrateSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>13</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="0" column="6">
+        <widget class="QLabel" name="labelBitrate">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Kbps</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="labelPreset">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Preset:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="3">
+        <spacer name="presetSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>30</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="1" column="4">
+        <widget class="QLabel" name="labelTune">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Tune:</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="5" colspan="3">
+        <widget class="QComboBox" name="selectTune">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>110</width>
+           <height>16777215</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1" colspan="3">
+        <widget class="QComboBox" name="selectMode">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>180</width>
+           <height>16777215</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>8</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </widget>
    <widget class="QWidget" name="AudioSettings">
@@ -487,9 +540,9 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>130</y>
-       <width>391</width>
-       <height>33</height>
+       <y>190</y>
+       <width>401</width>
+       <height>41</height>
       </rect>
      </property>
      <layout class="QGridLayout" name="externalAudioLayout">
@@ -515,62 +568,32 @@
       </item>
      </layout>
     </widget>
-    <widget class="QWidget" name="aoptionsLayoutWidget">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>74</y>
-       <width>391</width>
-       <height>51</height>
-      </rect>
-     </property>
-     <layout class="QGridLayout" name="aoptionsLayout">
-      <item row="0" column="0">
-       <widget class="QCheckBox" name="copyAudio">
-        <property name="text">
-         <string>Copy Compatible</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QCheckBox" name="encodeIncompatible">
-        <property name="text">
-         <string>Encode Incompatible</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QRadioButton" name="internalAudio">
-        <property name="text">
-         <string>Use Original Audio</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QRadioButton" name="externalAudio">
-        <property name="layoutDirection">
-         <enum>Qt::LeftToRight</enum>
-        </property>
-        <property name="text">
-         <string>Use Another Source</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
     <widget class="QWidget" name="acodecLayoutWidget">
      <property name="geometry">
       <rect>
        <x>10</x>
        <y>10</y>
-       <width>391</width>
+       <width>401</width>
        <height>68</height>
       </rect>
      </property>
      <layout class="QGridLayout" name="acodecLayout">
+      <item row="1" column="2">
+       <widget class="QSpinBox" name="bitrateBoxAudio">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>55</width>
+          <height>16777215</height>
+         </size>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="0">
        <widget class="QLabel" name="labelAudioCodec">
         <property name="sizePolicy">
@@ -587,22 +610,6 @@
         </property>
         <property name="text">
          <string>Codec:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QComboBox" name="selectAudioCodec">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>105</width>
-          <height>0</height>
-         </size>
         </property>
        </widget>
       </item>
@@ -625,23 +632,50 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="2">
-       <widget class="QSpinBox" name="bitrateBoxAudio">
+      <item row="0" column="5">
+       <widget class="QComboBox" name="selectAudioStream">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="minimumSize">
+         <size>
+          <width>80</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="maximumSize">
          <size>
-          <width>55</width>
+          <width>80</width>
           <height>16777215</height>
+         </size>
+        </property>
+        <item>
+         <property name="text">
+          <string>None</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="selectAudioCodec">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>105</width>
+          <height>0</height>
          </size>
         </property>
        </widget>
       </item>
-      <item row="0" column="3">
+      <item row="0" column="4">
        <widget class="QLabel" name="labelAudioStream">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -657,7 +691,7 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="3" colspan="2">
+      <item row="1" column="4" colspan="2">
        <widget class="QLabel" name="labelAudioBitrate">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
@@ -715,14 +749,349 @@
         </item>
        </widget>
       </item>
-      <item row="0" column="4">
-       <widget class="QComboBox" name="selectAudioStream">
+      <item row="1" column="3">
+       <spacer name="abitrateSpacer">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>1</width>
+          <height>17</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="horizontalLayoutWidget_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>80</y>
+       <width>401</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="copyAudioOptions">
+      <item>
+       <widget class="QCheckBox" name="copyAudio">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>17</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Copy Compatible</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="copySpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>13</width>
+          <height>17</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="encodeIncompatible">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Encode Incompatible</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QCheckBox" name="externalAudio">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>160</y>
+       <width>211</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="layoutDirection">
+      <enum>Qt::LeftToRight</enum>
+     </property>
+     <property name="text">
+      <string>Use Another Source</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="AdvSettings">
+    <attribute name="title">
+     <string>Advanced</string>
+    </attribute>
+    <widget class="QWidget" name="gridLayoutWidget_3">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>200</y>
+       <width>401</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <layout class="QGridLayout" name="extraFeatrues">
+      <item row="0" column="1">
+       <widget class="QSpinBox" name="maxMuxing">
+        <property name="maximum">
+         <number>9999</number>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="maxMuxLabel">
+        <property name="text">
+         <string>Max Muxing Queue Size:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QCheckBox" name="experimentalFeatures">
+        <property name="text">
+         <string>Experimental Features</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="verticalLayoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>260</x>
+       <y>70</y>
+       <width>151</width>
+       <height>76</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="ResizeStyle">
+      <item>
+       <widget class="QRadioButton" name="resizeResolution">
+        <property name="text">
+         <string>Resize to Resolution</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="resizeHeight">
+        <property name="text">
+         <string>Resize by Height</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="resizeWidth">
+        <property name="text">
+         <string>Resize by Width</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QGroupBox" name="interlaceRemoval">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>0</y>
+       <width>401</width>
+       <height>61</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Interlacing Removal</string>
+     </property>
+     <widget class="QWidget" name="gridLayoutWidget_2">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>20</y>
+        <width>381</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <layout class="QGridLayout" name="interlaceGroup">
+       <item row="0" column="1">
+        <widget class="QLabel" name="labelFieldOrder">
+         <property name="minimumSize">
+          <size>
+           <width>70</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Field Order</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="3">
+        <widget class="QLabel" name="labelcthresh">
+         <property name="minimumSize">
+          <size>
+           <width>50</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>cthresh</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="4">
+        <widget class="QSpinBox" name="cthresh">
+         <property name="minimumSize">
+          <size>
+           <width>50</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="minimum">
+          <number>-1</number>
+         </property>
+         <property name="maximum">
+          <number>255</number>
+         </property>
+         <property name="value">
+          <number>9</number>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QComboBox" name="interlaceOptions">
+         <property name="minimumSize">
+          <size>
+           <width>70</width>
+           <height>0</height>
+          </size>
+         </property>
+         <item>
+          <property name="text">
+           <string>None</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>IVTC</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Deinterlace</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Both</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="0" column="7">
+        <spacer name="interlaceSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>6</width>
+           <height>10</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="0" column="2">
+        <widget class="QComboBox" name="fieldOrder">
+         <property name="minimumSize">
+          <size>
+           <width>96</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>96</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <item>
+          <property name="text">
+           <string>Auto</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Top</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Bottom</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="horizontalLayoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>70</y>
+       <width>241</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QCheckBox" name="changeDAR">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>34</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Change Playback AR</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="changeDARSel">
         <property name="minimumSize">
          <size>
           <width>80</width>
@@ -732,61 +1101,87 @@
         <property name="maximumSize">
          <size>
           <width>80</width>
-          <height>16777215</height>
+          <height>32</height>
          </size>
         </property>
         <item>
          <property name="text">
-          <string>None</string>
+          <string>4:3</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>16:9</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>1.85:1</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>2.35:1</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>2.39:1</string>
          </property>
         </item>
        </widget>
       </item>
      </layout>
     </widget>
-   </widget>
-   <widget class="QWidget" name="OtherSettings">
-    <attribute name="title">
-     <string>Other</string>
-    </attribute>
-    <widget class="QCheckBox" name="experimentalFeatures">
+    <widget class="QWidget" name="horizontalLayoutWidget_3">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>30</y>
-       <width>371</width>
+       <x>10</x>
+       <y>110</y>
+       <width>241</width>
        <height>41</height>
       </rect>
      </property>
-     <property name="text">
-      <string>Use Experimental Features</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="maxMuxLabel">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>10</y>
-       <width>151</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Max Muxing Queue Size:</string>
-     </property>
-    </widget>
-    <widget class="QSpinBox" name="maxMuxing">
-     <property name="geometry">
-      <rect>
-       <x>180</x>
-       <y>10</y>
-       <width>61</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="maximum">
-      <number>9999</number>
-     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QCheckBox" name="resizeVideo">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>34</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Resize Video</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="resizeVideoSel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>132</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>132</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="layoutDirection">
+         <enum>Qt::LeftToRight</enum>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </widget>
   </widget>
@@ -794,37 +1189,12 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>290</y>
-     <width>415</width>
+     <y>350</y>
+     <width>431</width>
      <height>44</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" name="exitButtons">
-    <item>
-     <widget class="QPushButton" name="recontainer">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>Recontainer</string>
-      </property>
-      <property name="autoDefault">
-       <bool>false</bool>
-      </property>
-      <property name="default">
-       <bool>false</bool>
-      </property>
-      <property name="flat">
-       <bool>false</bool>
-      </property>
-     </widget>
-    </item>
     <item>
      <spacer name="buttonSpacer">
       <property name="orientation">
@@ -846,6 +1216,9 @@
       <property name="standardButtons">
        <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
       </property>
+      <property name="centerButtons">
+       <bool>false</bool>
+      </property>
      </widget>
     </item>
    </layout>
@@ -855,7 +1228,7 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>414</width>
+     <width>431</width>
      <height>33</height>
     </rect>
    </property>
@@ -912,7 +1285,7 @@
     <rect>
      <x>11</x>
      <y>50</y>
-     <width>411</width>
+     <width>431</width>
      <height>32</height>
     </rect>
    </property>

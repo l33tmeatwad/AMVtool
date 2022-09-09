@@ -109,6 +109,12 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
             }
 
 
+            QString lumaRange = QString::fromStdString(MI.Get(Stream_Video, i, __T("transfer_characteristics"), Info_Text, Info_Name));
+            if (lumaRange.contains("PQ") || lumaRange.contains("HLG"))
+                inputLumaRange.append("HDR");
+            else
+                inputLumaRange.append("SDR");
+
             inputVideoStreamIDs.append(videoID);
             QString VideoCodec = QString::fromStdString(MI.Get(Stream_Video, i, __T("Format_Commercial"), Info_Text, Info_Name));
             if (VideoCodec == "YUV" || VideoCodec == "RGBA" || VideoCodec == "RGB")
@@ -121,6 +127,12 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
             QString colorspace;
             QString colormatrix;
             QStringList UTcodec = { "ULRG", "UMRG", "ULRA", "UMRA", "UQRG", "UQRA", "ULY0", "ULY2", "UMY2", "ULY4", "UMY4", "ULH0", "ULH2", "UMH2", "ULH4", "UMH4", "UQY2" };
+
+            foreach(QString codec, UTcodec)
+            {
+                if (VideoCodec.contains(codec))
+                    VideoCodec = codec;
+            }
 
             if (UTcodec.contains(VideoCodec))
             {
@@ -188,7 +200,10 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
 
             if (bitdepth == "")
             {
-                bitdepth = "Bitdepth Unknown";
+                if (lumaRange.contains("PQ") || lumaRange.contains("HLG"))
+                    bitdepth = "10bit";
+                else
+                    bitdepth = "8bit";
             }
             else
             {
@@ -261,7 +276,7 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
     MI.Close();
 
     inputMediaDetails.append({ QString::number(inputVideoStreams),QString::number(inputAudioStreams),inputContainer, QString::number(inputDuration) });
-    inputMediaInfo = { inputMediaDetails, inputVideoStreamIDs, inputVideoBitDepths, inputVideoCodecs, inputColorSpaces, inputColorMatrix, inputVideoWidth, inputVideoHeight, inputFPS, inputAudioStreamIDs, inputAudioCodecs };
+    inputMediaInfo = { inputMediaDetails, inputVideoStreamIDs, inputVideoBitDepths, inputLumaRange, inputVideoCodecs, inputColorSpaces, inputColorMatrix, inputVideoWidth, inputVideoHeight, inputFPS, inputAudioStreamIDs, inputAudioCodecs };
 
     return inputMediaInfo;
 }
@@ -311,7 +326,7 @@ void checkmedia::setVPYDetails()
         inputMediaDetails.append({ "0", "0", "Error", "0" });
     }
 
-    inputMediaInfo = { inputMediaDetails, {"0"}, inputVideoBitDepths, inputVideoCodecs, inputColorSpaces, inputColorMatrix, inputVideoWidth, inputVideoHeight, inputFPS, {""}, inputAudioCodecs };
+    inputMediaInfo = { inputMediaDetails, {"0"}, inputVideoBitDepths, {"SDR"}, inputVideoCodecs, inputColorSpaces, inputColorMatrix, inputVideoWidth, inputVideoHeight, inputFPS, {""}, inputAudioCodecs };
 
 }
 

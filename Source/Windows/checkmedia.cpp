@@ -176,6 +176,12 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
                 }
             }
 
+            QString lumaRange = QString::fromStdWString(MI.Get(Stream_Video, i, __T("transfer_characteristics"), Info_Text, Info_Name).c_str());
+            if (lumaRange.contains("PQ") || lumaRange.contains("HLG"))
+                inputLumaRange.append("HDR");
+            else
+                inputLumaRange.append("SDR");
+
 
             inputVideoStreamIDs.append(videoID);
             QString VideoCodec = QString::fromStdWString(MI.Get(Stream_Video, i, __T("Format_Commercial"), Info_Text, Info_Name).c_str());
@@ -190,6 +196,11 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
             QString colormatrix;
             QStringList UTcodec = { "ULRG", "UMRG", "ULRA", "UMRA", "UQRG", "UQRA", "ULY0", "ULY2", "UMY2", "ULY4", "UMY4", "ULH0", "ULH2", "UMH2", "ULH4", "UMH4", "UQY2" };
 
+            foreach(QString codec, UTcodec)
+            {
+                if (VideoCodec.contains(codec))
+                    VideoCodec = codec;
+            }
 
             if (UTcodec.contains(VideoCodec))
             {
@@ -329,7 +340,7 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
     MI.Close();
 
     inputMediaDetails.append({ QString::number(inputVideoStreams),QString::number(inputAudioStreams),inputContainer, QString::number(inputDuration) });
-    inputMediaInfo = { inputMediaDetails, inputVideoStreamIDs, inputVideoBitDepths, inputVideoCodecs, inputColorSpaces, inputColorMatrix, inputVideoWidth, inputVideoHeight, inputFPS, inputAudioStreamIDs, inputAudioCodecs };
+    inputMediaInfo = { inputMediaDetails, inputVideoStreamIDs, inputVideoBitDepths, inputLumaRange, inputVideoCodecs, inputColorSpaces, inputColorMatrix, inputVideoWidth, inputVideoHeight, inputFPS, inputAudioStreamIDs, inputAudioCodecs };
 
     return inputMediaInfo;
 }
@@ -393,7 +404,7 @@ QList<QStringList> checkAVS(QString inputScript)
         inputMediaDetails.append({ "0", "0", "Error", "0" });
     }
 
-    QList<QStringList> inputMediaInfo = { inputMediaDetails, {"0"}, {"8bit"}, inputVideoCodecs, inputColorSpaces, inputColorMatrix, inputVideoWidth, inputVideoHeight, inputFPS, {"1"}, inputAudioCodecs };
+    QList<QStringList> inputMediaInfo = { inputMediaDetails, {"0"}, {"8bit"}, {"SDR"}, inputVideoCodecs, inputColorSpaces, inputColorMatrix, inputVideoWidth, inputVideoHeight, inputFPS, {"1"}, inputAudioCodecs };
     return inputMediaInfo;
 
 }
@@ -469,7 +480,7 @@ void checkmedia::setVPYDetails()
         inputMediaDetails.append({ "0", "0", "Error", "0" });
     }
 
-    inputMediaInfo = { inputMediaDetails, {"0"}, inputVideoBitDepths, inputVideoCodecs, inputColorSpaces, inputColorMatrix, inputVideoWidth, inputVideoHeight, inputFPS, {""}, inputAudioCodecs };
+    inputMediaInfo = { inputMediaDetails, {"0"}, inputVideoBitDepths, {"SDR"}, inputVideoCodecs, inputColorSpaces, inputColorMatrix, inputVideoWidth, inputVideoHeight, inputFPS, {""}, inputAudioCodecs };
 
 }
 

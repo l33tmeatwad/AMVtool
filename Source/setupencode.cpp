@@ -511,7 +511,7 @@ QString setupencode::SetupFilters(bool isHDR, bool convertHDR, QString colorspac
         }
 
 
-        outputfilters.append("zscale="+resize);
+        outputfilters.append("scale="+resize+":flags=spline");
     }
     if (aspectratio != "No")
     {
@@ -520,8 +520,12 @@ QString setupencode::SetupFilters(bool isHDR, bool convertHDR, QString colorspac
         outputfilters.append("setdar=dar="+aspectratio.replace(":","/").replace("/1",""));
     }
     else
-        outputfilters.append("setsar=sar=1:1");
-
+    {
+        if (resize != "No")
+        {
+            outputfilters.append(",setsar=sar=1:1");
+        }
+    }
 
     return outputfilters;
 }

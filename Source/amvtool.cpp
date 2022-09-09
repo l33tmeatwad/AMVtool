@@ -435,12 +435,12 @@ void AMVtool::Encode(int pos, QList<QStringList> inputDetails, QStringList confi
     encode->setProcessChannelMode(QProcess::MergedChannels);
     QStringList EncodeOptions = se.SetupEncode(pos, mainQueueInfo[pos], inputDetails, configList);
 
-    QString debugbox;
+    /*QString debugbox;
     for (int i = 0; i < EncodeOptions.count(); i++)
     {
         debugbox += EncodeOptions[i] + " ";
     }
-    QMessageBox::information(this,"Encode Options", debugbox);
+    QMessageBox::information(this,"Encode Options", debugbox);*/
     pipe = new QProcess(this);
     if (inputDetails[0][2] == "VapourSynth")
     {

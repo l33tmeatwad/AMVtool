@@ -32,7 +32,7 @@
    <bool>false</bool>
   </property>
   <property name="windowTitle">
-   <string>AMVtool 1.2 (Beta 1)</string>
+   <string>AMVtool 1.2 (Beta 2)</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QListWidget" name="fileList">
@@ -67,7 +67,7 @@
       <x>10</x>
       <y>252</y>
       <width>581</width>
-      <height>91</height>
+      <height>96</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout">

@@ -79,11 +79,11 @@ void filesettings::removeSettings(int ql)
 }
 
 
-void filesettings::recontainerSettings(QList<QStringList> mediaInfo, int vstream, int queue)
+void filesettings::recontainerSettings(QList<QStringList> inputMediaInfo, int vstream, int queue)
 {
-    if (mediaInfo[0][2] != "Error" && mediaInfo[0][2] != "AviSynth" && mediaInfo[0][2] != "VapourSynth")
+    if (inputMediaInfo[0][2] != "Error" && inputMediaInfo[0][2] != "AviSynth" && inputMediaInfo[0][2] != "VapourSynth")
     {
-        QStringList containers = findContainers(mediaInfo[4][vstream]);
+        QStringList containers = findContainers(inputMediaInfo[5][vstream]);
         if (containers.contains(outputConfig[queue][1]))
         {
             outputConfig[queue][7] = "Copy";

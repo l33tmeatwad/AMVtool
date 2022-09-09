@@ -321,7 +321,7 @@ void AMVtool::ProcessFile(int pos)
     ui->configEncSettings->setEnabled(false);
 
     queue queue;
-    QList<QStringList> inputDetails = queue.checkInput(pos);
+    QList<QStringList> inputMediaInfo = queue.checkInput(pos);
 
     if (mainQueueInfo[pos][3] != "Error")
     {
@@ -349,9 +349,9 @@ void AMVtool::ProcessFile(int pos)
         if (mainQueueInfo[pos][3] != "Skipped" && packetbuffererror != true)
         {
             int extension = 4;
-            if (inputDetails[0][2].contains("BDAV") || inputDetails[0][2].contains("WebM"))
+            if (!mainQueueInfo[pos][1].right(4).contains("."))
                 extension = 5;
-            if (inputDetails[0][2].contains("MPEG-TS"))
+            if (inputMediaInfo[0][2].contains("MPEG-TS"))
                 extension = 3;
             QFileInfo file_exists(outputConfig[pos][0] + mainQueueInfo[pos][1].left(mainQueueInfo[pos][1].length()-extension) + "-AMVtool." + outputConfig[pos][1].toLower());
             if (file_exists.exists() && mainQueueInfo[pos][4] != "2")
@@ -378,7 +378,7 @@ void AMVtool::ProcessFile(int pos)
 
     if (mainQueueInfo[pos][3] == "Pending")
     {
-        Encode(pos,inputDetails, outputConfig[pos]);
+        Encode(pos,inputMediaInfo, outputConfig[pos]);
     }
     else
     {
@@ -422,10 +422,10 @@ QString AMVtool::selectNewFolder()
 
 // SECTION FOR PROCESSING ENCODES
 
-void AMVtool::Encode(int pos, QList<QStringList> inputDetails, QStringList configList)
+void AMVtool::Encode(int pos, QList<QStringList> inputMediaInfo, QStringList configList)
 {
     ui->statusBar->showMessage("Starting Encode");
-    inputDuration = inputDetails[0][3].toFloat();
+    inputDuration = inputMediaInfo[0][3].toFloat();
     outputcreated = false;
     setupencode se;
     encode = new QProcess(this);
@@ -433,7 +433,7 @@ void AMVtool::Encode(int pos, QList<QStringList> inputDetails, QStringList confi
     connect(encode, SIGNAL(error(QProcess::ProcessError)), this, SLOT(readErrors()));
     connect(encode, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(encodeFinished(int,QProcess::ExitStatus)));
     encode->setProcessChannelMode(QProcess::MergedChannels);
-    QStringList EncodeOptions = se.SetupEncode(pos, mainQueueInfo[pos], inputDetails, configList);
+    QStringList EncodeOptions = se.SetupEncode(pos, mainQueueInfo[pos], inputMediaInfo, configList);
 
     /*QString debugbox;
     for (int i = 0; i < EncodeOptions.count(); i++)
@@ -442,11 +442,11 @@ void AMVtool::Encode(int pos, QList<QStringList> inputDetails, QStringList confi
     }
     QMessageBox::information(this,"Encode Options", debugbox);*/
     pipe = new QProcess(this);
-    if (inputDetails[0][2] == "VapourSynth")
+    if (inputMediaInfo[0][2] == "VapourSynth")
     {
         connect(pipe, SIGNAL(error(QProcess::ProcessError)), this, SLOT(readFromStdErr()));
         pipe->setStandardOutputProcess(encode);
-        pipe->start(vspipeexec, se.SetupPipe(mainQueueInfo[pos][0], inputDetails[4][0]));
+        pipe->start(vspipeexec, se.SetupPipe(mainQueueInfo[pos][0], inputMediaInfo[6][0]));
     }
     encode->setWorkingDirectory(outputConfig[pos][0]);
     encode->start(ffmpegexec, EncodeOptions);

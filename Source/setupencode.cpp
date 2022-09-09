@@ -5,8 +5,12 @@ setupencode::setupencode(QObject *parent) : QObject(parent)
 
 }
 
-QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStringList> inputDetails, QStringList configList)
+QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStringList> inputMediaInfo, QStringList configList)
 {
+
+
+
+
     QString mediafile = fileInfo[0];
     QString outputdir = configList[0];
     QString container = configList[1];
@@ -32,26 +36,35 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
     QString aspectratio = configList[22];
     int MaxMuxing = configList[23].toInt();
     int Experimental = configList[24].toInt();
+
+    QString inputVideoStreamID = inputMediaInfo[1][vstream];
+    QString inputColorSpace = inputMediaInfo[6][vstream];
+    QString inputWidth = inputMediaInfo[8][vstream];
+    QString inputHeight = inputMediaInfo[9][vstream];
+    QString inputFPS = inputMediaInfo[10][vstream];
+    QStringList inputAudioStreams = inputMediaInfo[11];
+    QStringList inputAudioCodecs = inputMediaInfo[12];
+
     QStringList containerCompatibility;
-    QStringList tilesThreads = getTilesAndThreads(inputDetails[8][vstream].toInt());
+    QStringList tilesThreads = getTilesAndThreads(inputHeight.toInt());
 
     QString vfilters = "";
     if (codecname != "copy")
         vfilters = SetupFilters(fileInfo[2].contains("HDR"), convertHDR, colorspace, colormatrix, deinterlace, cthresh, fieldorder, resize, aspectratio);
 
     QStringList ffmpegcommand;
-    outputfile = OutputFile(fileInfo[1], inputDetails[0][2], container.toLower());
+    outputfile = OutputFile(fileInfo[1], inputMediaInfo[0][2], container.toLower());
 
     if (vmode.contains("2 Pass") && mainQueueInfo[queue][4] =="1")
         astream = "None";
 
     QString mapID;
 
-    if (inputDetails[0][2] == "VapourSynth")
+    if (inputMediaInfo[0][2] == "VapourSynth")
     {
-        if (inputDetails[4][vstream].contains("RGB"))
+        if (inputColorSpace.contains("RGB"))
         {
-            ffmpegcommand.append({ "-f", "rawvideo", "-pix_fmt", "gbrp", "-s", inputDetails[7][vstream] + "x" + inputDetails[8][vstream], "-r", inputDetails[9][vstream]});
+            ffmpegcommand.append({ "-f", "rawvideo", "-pix_fmt", "gbrp", "-s", inputWidth + "x" + inputHeight, "-r", inputFPS});
         }
         ffmpegcommand.append({ "-i", "pipe:" });
     }
@@ -65,14 +78,14 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
         ffmpegcommand.append({"-i", asource});
     }
 
-    if (inputDetails[0][0].toInt() > 1 || inputDetails[0][1].toInt() > 0 || asource != "Original Audio")
+    if (inputMediaInfo[0][0].toInt() > 1 || inputMediaInfo[0][1].toInt() > 0 || asource != "Original Audio")
     {
-        if (inputDetails[1][vstream].contains("x"))
+        if (inputVideoStreamID.contains("x"))
             mapID = "i";
         else
             mapID = "0";
 
-        ffmpegcommand.append({"-map", mapID + ":" +  inputDetails[1][vstream]});
+        ffmpegcommand.append({"-map", mapID + ":" +  inputVideoStreamID});
         if (astream != "None")
         {
             QString source;
@@ -87,21 +100,21 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
 
             if (astream == "All")
             {
-                for (int i = 0; i < inputDetails[0][1].toInt(); i++)
+                for (int i = 0; i < inputMediaInfo[0][1].toInt(); i++)
                 {
                     bool usestream = true;
                     if (acopy == 1 && container != "MKV")
                     {
-                        usestream = canCopyAudio(container, inputDetails[11][i]);
+                        usestream = canCopyAudio(container, inputAudioCodecs[i]);
                     }
                     if (usestream)
                     {
-                        if (inputDetails[10][i].contains("x"))
+                        if (inputAudioStreams[i].contains("x"))
                             mapID = source + ":i";
                         else
                             mapID = source;
 
-                        ffmpegcommand.append({"-map", mapID + ":" + inputDetails[10][i]});
+                        ffmpegcommand.append({"-map", mapID + ":" + inputAudioStreams[i]});
                     }
 
                 }
@@ -112,18 +125,18 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
                 if (acopy == 1 && container != "MKV")
                 {
                     int stream = astream.toInt()-1;
-                    usestream = canCopyAudio(container, inputDetails[11][stream]);
+                    usestream = canCopyAudio(container, inputAudioCodecs[stream]);
 
                 }
                 if (usestream)
                 {
                     int stream = astream.toInt()-1;
-                    if (inputDetails[10][stream].contains("x"))
+                    if (inputAudioStreams[stream].contains("x"))
                         mapID = source + ":i";
                     else
                         mapID = source;
 
-                    ffmpegcommand.append({"-map", mapID + ":" + inputDetails[10][stream]});
+                    ffmpegcommand.append({"-map", mapID + ":" + inputAudioStreams[stream]});
                 }
             }
         }
@@ -224,11 +237,11 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
         if (astream == "All")
         {
             int skipped = 0;
-            for (int i = 0; i < inputDetails[0][1].toInt(); i++)
+            for (int i = 0; i < inputMediaInfo[0][1].toInt(); i++)
             {
                 bool skip = false;
 
-                bool copystream = canCopyAudio(container, inputDetails[11][i]);
+                bool copystream = canCopyAudio(container, inputAudioCodecs[i]);
                 QString audiocodec;
                 if (copystream && acopy > 0)
                 {
@@ -258,7 +271,7 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
         }
         else
         {
-            if (acopy > 0 && canCopyAudio(container,inputDetails[11][astream.toInt()-1]))
+            if (acopy > 0 && canCopyAudio(container, inputAudioCodecs[astream.toInt()-1]))
             {
                 acodec = "copy";
             }
@@ -322,7 +335,7 @@ QStringList setupencode::SetupPipe(QString inputFile, QString colorspace)
 QString setupencode::OutputFile(QString originalfile, QString originalType, QString newtype)
 {
     int extension = 4;
-    if (originalType.contains("BDAV") || originalType.contains("WebM"))
+    if (!originalfile.right(4).contains("."))
         extension = 5;
     if (originalType.contains("MPEG-TS"))
         extension = 3;

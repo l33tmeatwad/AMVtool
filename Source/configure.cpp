@@ -37,11 +37,12 @@ void configure::setData(const int &selFile, QList<QStringList> inputMediaInfo, c
 
     inputVideoBitDepths = inputMediaInfo[2];
     inputLumaRange = inputMediaInfo[3];
-    inputVideoCodecs = inputMediaInfo[4];
-    inputColorSpaces = inputMediaInfo[5];
-    inputColorMatrix = inputMediaInfo[6];
-    inputVideoHeight = inputMediaInfo[8];
-    inputAudioCodecs = inputMediaInfo[11];
+    inputScanType = inputMediaInfo[4];
+    inputVideoCodecs = inputMediaInfo[5];
+    inputColorSpaces = inputMediaInfo[6];
+    inputColorMatrix = inputMediaInfo[7];
+    inputVideoHeight = inputMediaInfo[9];
+    inputAudioCodecs = inputMediaInfo[12];
 
     outputLocation = configurationList[0];
     outputContainer = configurationList[1];
@@ -793,7 +794,7 @@ void configure::getAltAudioCodecs(QString newAudio)
     if (streamcount > 0)
     {
         altAudioStreams = streamcount;
-        altAudioCodecs = newAudioInfo[11];
+        altAudioCodecs = newAudioInfo[12];
         ui->externalAudioSource->setText(newAudio);
         setAudioStream();
     }
@@ -1021,8 +1022,11 @@ void configure::on_buttonBox_accepted()
                                       videoEncMode, videoEncPreset, videoEncTune, QString::number(videoEncBitrate), outputAudioSource, outputAudioStream, outputAudioCodec,
                                     audioEncMode, QString::number(audioEncBitrate), QString::number(copyaudio), deinterlaceType, QString::number(cthreshValue), outputFieldOrder, outputResize, outputAR, QString::number(ui->maxMuxing->value()),QString::number(ui->experimentalFeatures->isChecked())};
 
+    QString ifInterlaced = "";
+    if (inputScanType[ui->selectVideoStream->currentIndex()].contains("Interlaced"))
+            ifInterlaced = " Interlaced";
 
-    fs.changeSettings(selectedFile, inputVideoBitDepths[ui->selectVideoStream->currentIndex()] + " " + inputLumaRange[ui->selectVideoStream->currentIndex()], configurationList);
+    fs.changeSettings(selectedFile, inputVideoBitDepths[ui->selectVideoStream->currentIndex()] + " " + inputLumaRange[ui->selectVideoStream->currentIndex()] + ifInterlaced, configurationList);
 
     if (selectedFile == -1 && ui->copyVideo->isChecked())
     {

@@ -84,6 +84,7 @@ private:
 
     QStringList inputVideoBitDepths;
     QStringList inputLumaRange;
+    QStringList inputScanType;
     QStringList inputVideoCodecs;
     QStringList inputVideoHeight;
     QStringList inputColorSpaces;

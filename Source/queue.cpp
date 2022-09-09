@@ -9,28 +9,31 @@ QString queue::InputFiles(QString inputFile)
     filesettings fs;
 
     QString openedFileInfo = "Error";
-    QList<QStringList> mediainfo;
+    QList<QStringList> inputMediInfo;
     bool isVPY = false;
     if (inputFile.right(3) == "vpy")
     {
         isVPY = true;
     }
-    mediainfo = cm.checkMedia(inputFile);
+    inputMediInfo = cm.checkMedia(inputFile);
 
-    if (mediainfo[0][0].toInt() > 0)
+    if (inputMediInfo[0][0].toInt() > 0)
     {
+        QString ifInterlaced = "";
+        if (inputMediInfo[4][0].contains("Interlaced"))
+            ifInterlaced = " Interlaced";
         QFile f(inputFile);
         QFileInfo fileInfo(f);
         QString filename(fileInfo.fileName());
         QString Location = inputFile;
-        mainQueueInfo.append({inputFile, filename, mediainfo[2][0] + " " + mediainfo[3][0], "Pending", "1"});
-        fs.addSettings(Location.replace(filename,""), mediainfo[3][0], mediainfo[6][0], isVPY);
-        openedFileInfo = mediainfo[2][0] + " " + mediainfo[3][0] + " | " + filename;
+        mainQueueInfo.append({inputFile, filename, inputMediInfo[2][0] + " " + inputMediInfo[3][0] + ifInterlaced, "Pending", "1"});
+        fs.addSettings(Location.replace(filename,""), inputMediInfo[3][0], inputMediInfo[6][0], isVPY);
+        openedFileInfo = inputMediInfo[2][0] + " " + inputMediInfo[3][0] + ifInterlaced + " | " + filename;
     }
     if (RecontainerSettings && openedFileInfo != "Error")
     {
         filesettings fs;
-        fs.recontainerSettings(mediainfo,0,mainQueueInfo.count()-1);
+        fs.recontainerSettings(inputMediInfo,0,mainQueueInfo.count()-1);
     }
 
     return openedFileInfo;
@@ -46,8 +49,8 @@ QList<QStringList> queue::getInputDetails(QString mediafile)
     }
     else
     {
-        QList<QStringList> mediaDetails = { { "1", "1", "Real Media" }, {"0"}, {"8"},{"HDR"}, {"Real Video"}, {"YUV420"}, {"BT.709" }, {"1280"}, {"720"}, {"23.976"}, {"0"}, {"Real Audio"} };
-        return mediaDetails;
+        QList<QStringList> inputMediaInfo = { { "1", "1", "Real Media" }, {"0"}, {"8"}, {"HDR"}, {"Progressive"}, {"Real Video"}, {"YUV420"}, {"BT.709" }, {"1280"}, {"720"}, {"23.976"}, {"0"}, {"Real Audio"} };
+        return inputMediaInfo;
     }
 
 }
@@ -71,19 +74,19 @@ int queue::findPosition()
 QList<QStringList> queue::checkInput(int position)
 {
     checkmedia cm;
-    QList<QStringList> inputDetails = cm.checkMedia(mainQueueInfo[position][0]);
+    QList<QStringList> inputMediaInfo = cm.checkMedia(mainQueueInfo[position][0]);
     if (outputConfig[position][12] != "Original Audio")
     {
         QList<QStringList> audioDetails = cm.checkMedia(outputConfig[position][12]);
-        inputDetails[0][1] = audioDetails[0][1];
-        inputDetails[10] = audioDetails[10];
-        inputDetails[11] = audioDetails[11];
+        inputMediaInfo[0][1] = audioDetails[0][1];
+        inputMediaInfo[11] = audioDetails[11];
+        inputMediaInfo[12] = audioDetails[12];
     }
 
-    int vstreamcount = inputDetails[0][0].toInt();
-    int astreamcount = inputDetails[0][1].toInt();
+    int vstreamcount = inputMediaInfo[0][0].toInt();
+    int astreamcount = inputMediaInfo[0][1].toInt();
     QString audiosel = outputConfig[position][13];
-    audiosel = audiosel.replace("All", inputDetails[0][1]);
+    audiosel = audiosel.replace("All", inputMediaInfo[0][1]);
 
 
     if (vstreamcount > outputConfig[position][2].toInt())
@@ -100,7 +103,7 @@ QList<QStringList> queue::checkInput(int position)
     {
         mainQueueInfo[position][3] = "Error";
     }
-    return inputDetails;
+    return inputMediaInfo;
 }
 
 void queue::setupRecontainer()
@@ -110,7 +113,7 @@ void queue::setupRecontainer()
     {
         filesettings fs;
         int vstream = outputConfig[i][2].toInt();
-        QList<QStringList> mediaInfo = getInputDetails(mainQueueInfo[i][0]);
-        fs.recontainerSettings(mediaInfo, vstream, i);
+        QList<QStringList> inputMediaInfo = getInputDetails(mainQueueInfo[i][0]);
+        fs.recontainerSettings(inputMediaInfo, vstream, i);
     }
 }

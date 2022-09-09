@@ -49,7 +49,7 @@ private:
     void CheckQueue();
     void ProcessFile(int pos);
     QString selectNewFolder();
-    void Encode(int pos, QList<QStringList> inputDetails, QStringList configList);
+    void Encode(int pos, QList<QStringList> inputMediaInfo, QStringList configList);
 
     QString ffmpegexec;
     QString mediatypes;

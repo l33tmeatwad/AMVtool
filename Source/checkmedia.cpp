@@ -45,6 +45,8 @@ QList<QStringList> checkmedia::checkMedia(QString inputFile)
 {
     inputVideoStreamIDs.clear();
     inputVideoBitDepths.clear();
+    inputLumaRange.clear();
+    inputScanType.clear();
     inputVideoCodecs.clear();
     inputColorSpaces.clear();
     inputColorMatrix.clear();
@@ -114,6 +116,13 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
                 inputLumaRange.append("HDR");
             else
                 inputLumaRange.append("SDR");
+
+            QString scanType = QString::fromStdString(MI.Get(Stream_Video, i, __T("ScanType"), Info_Text, Info_Name));
+            if (scanType.contains("Interlaced"))
+                inputScanType.append(scanType);
+            else
+                inputScanType.append("");
+
 
             inputVideoStreamIDs.append(videoID);
             QString VideoCodec = QString::fromStdString(MI.Get(Stream_Video, i, __T("Format_Commercial"), Info_Text, Info_Name));
@@ -276,7 +285,7 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
     MI.Close();
 
     inputMediaDetails.append({ QString::number(inputVideoStreams),QString::number(inputAudioStreams),inputContainer, QString::number(inputDuration) });
-    inputMediaInfo = { inputMediaDetails, inputVideoStreamIDs, inputVideoBitDepths, inputLumaRange, inputVideoCodecs, inputColorSpaces, inputColorMatrix, inputVideoWidth, inputVideoHeight, inputFPS, inputAudioStreamIDs, inputAudioCodecs };
+    inputMediaInfo = { inputMediaDetails, inputVideoStreamIDs, inputVideoBitDepths, inputLumaRange, inputScanType, inputVideoCodecs, inputColorSpaces, inputColorMatrix, inputVideoWidth, inputVideoHeight, inputFPS, inputAudioStreamIDs, inputAudioCodecs };
 
     return inputMediaInfo;
 }
@@ -326,7 +335,7 @@ void checkmedia::setVPYDetails()
         inputMediaDetails.append({ "0", "0", "Error", "0" });
     }
 
-    inputMediaInfo = { inputMediaDetails, {"0"}, inputVideoBitDepths, {"SDR"}, inputVideoCodecs, inputColorSpaces, inputColorMatrix, inputVideoWidth, inputVideoHeight, inputFPS, {""}, inputAudioCodecs };
+    inputMediaInfo = { inputMediaDetails, {"0"}, inputVideoBitDepths, {"SDR"}, {"Progressive"}, inputVideoCodecs, inputColorSpaces, inputColorMatrix, inputVideoWidth, inputVideoHeight, inputFPS, {""}, inputAudioCodecs };
 
 }
 

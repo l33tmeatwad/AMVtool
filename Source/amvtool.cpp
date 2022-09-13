@@ -323,6 +323,9 @@ void AMVtool::ProcessFile(int pos)
     queue queue;
     QList<QStringList> inputMediaInfo = queue.checkInput(pos);
 
+    if (inputMediaInfo[0][2] == "Error")
+        updateQueue(pos,"Error");
+
     if (mainQueueInfo[pos][3] != "Error")
     {
         filesettings fs;
@@ -378,6 +381,10 @@ void AMVtool::ProcessFile(int pos)
 
     if (mainQueueInfo[pos][3] == "Pending")
     {
+        if (outputConfig[pos][7].contains("Copy"))
+            processType = "Recontainering: ";
+        else
+            processType = "Encoding: ";
         Encode(pos,inputMediaInfo, outputConfig[pos]);
     }
     else
@@ -424,23 +431,27 @@ QString AMVtool::selectNewFolder()
 
 void AMVtool::Encode(int pos, QList<QStringList> inputMediaInfo, QStringList configList)
 {
-    ui->statusBar->showMessage("Starting Encode");
+    ui->statusBar->showMessage("Starting Process");
     inputDuration = inputMediaInfo[0][3].toFloat();
     outputcreated = false;
     setupencode se;
     encode = new QProcess(this);
     connect(encode, SIGNAL(readyReadStandardOutput()),this,SLOT(readyReadStandardOutput()));
-    connect(encode, SIGNAL(error(QProcess::ProcessError)), this, SLOT(readErrors()));
+    connect(encode, SIGNAL(errorOccurred(QProcess::ProcessError)), this, SLOT(readErrors()));
     connect(encode, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(encodeFinished(int,QProcess::ExitStatus)));
     encode->setProcessChannelMode(QProcess::MergedChannels);
     QStringList EncodeOptions = se.SetupEncode(pos, mainQueueInfo[pos], inputMediaInfo, configList);
 
-    /*QString debugbox;
+    QString ffmpegCommand = "ffmpeg ";
     for (int i = 0; i < EncodeOptions.count(); i++)
     {
-        debugbox += EncodeOptions[i] + " ";
+        ffmpegCommand += EncodeOptions[i] + " ";
     }
-    QMessageBox::information(this,"Encode Options", debugbox);*/
+
+    mOutputString.append(ffmpegCommand+"\n"+"\n");
+    ui->textEdit->setText(mOutputString);
+    ui->textEdit->verticalScrollBar()->setSliderPosition(ui->textEdit->verticalScrollBar()->maximum());
+
     pipe = new QProcess(this);
     if (inputMediaInfo[0][2] == "VapourSynth")
     {
@@ -477,7 +488,7 @@ void AMVtool::encodeFinished(int exitcode, QProcess::ExitStatus)
         ui->progressBar->setValue(100);
         if (outputcreated == true)
         {
-            if (mainQueueInfo[position][4] == "1" && outputConfig[position][7].contains("2 Pass") )
+            if (mainQueueInfo[position][4] == "1" && outputConfig[position][8].contains("2 Pass") )
             {
                 mainQueueInfo[position][4] = "2";
             }
@@ -528,8 +539,9 @@ void AMVtool::readyReadStandardOutput()
     {
         progress cp;
         QList<QString> currentprogress = cp.currentProcess(readline, duration);
-        ui->statusBar->showMessage("Encoding: " + mainQueueInfo[position][1]);
-        timeRemaining->setText(currentprogress[1] + "  ");
+        ui->statusBar->showMessage(processType + mainQueueInfo[position][1]);
+        if (!currentprogress[1].contains("00:00:00.000"))
+               timeRemaining->setText(currentprogress[1] + "  ");
         ui->progressBar->setValue(currentprogress[0].toInt());
     }
     else

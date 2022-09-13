@@ -9,31 +9,34 @@ QString queue::InputFiles(QString inputFile)
     filesettings fs;
 
     QString openedFileInfo = "Error";
-    QList<QStringList> inputMediInfo;
+    QList<QStringList> inputMediaInfo;
     bool isVPY = false;
     if (inputFile.right(3) == "vpy")
     {
         isVPY = true;
     }
-    inputMediInfo = cm.checkMedia(inputFile);
+    inputMediaInfo = cm.checkMedia(inputFile);
 
-    if (inputMediInfo[0][0].toInt() > 0)
+    if (inputMediaInfo[0][0].toInt() > 0)
     {
         QString ifInterlaced = "";
-        if (inputMediInfo[4][0].contains("Interlaced"))
+        if (inputMediaInfo[4][0].contains("Interlaced"))
             ifInterlaced = " Interlaced";
         QFile f(inputFile);
         QFileInfo fileInfo(f);
         QString filename(fileInfo.fileName());
         QString Location = inputFile;
-        mainQueueInfo.append({inputFile, filename, inputMediInfo[2][0] + " " + inputMediInfo[3][0] + ifInterlaced, "Pending", "1"});
-        fs.addSettings(Location.replace(filename,""), inputMediInfo[3][0], inputMediInfo[6][0], isVPY);
-        openedFileInfo = inputMediInfo[2][0] + " " + inputMediInfo[3][0] + ifInterlaced + " | " + filename;
+        QString LumaRange = inputMediaInfo[3][0];
+        QString ColorMatrix = inputMediaInfo[7][0];
+
+        mainQueueInfo.append({inputFile, filename, inputMediaInfo[2][0] + " " + inputMediaInfo[3][0] + ifInterlaced, "Pending", "1"});
+        fs.addSettings(Location.replace(filename,""), LumaRange, ColorMatrix, isVPY);
+        openedFileInfo = inputMediaInfo[2][0] + " " + inputMediaInfo[3][0] + ifInterlaced + " | " + filename;
     }
     if (RecontainerSettings && openedFileInfo != "Error")
     {
         filesettings fs;
-        fs.recontainerSettings(inputMediInfo,0,mainQueueInfo.count()-1);
+        fs.recontainerSettings(inputMediaInfo,0,mainQueueInfo.count()-1);
     }
 
     return openedFileInfo;

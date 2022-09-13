@@ -53,6 +53,7 @@ private:
 
     QString ffmpegexec;
     QString mediatypes;
+    QString processType;
     QString mOutputString;
     QList<int> hibitdepth;
 

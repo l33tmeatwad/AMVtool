@@ -358,7 +358,12 @@ void AMVtool::ProcessFile(int pos)
         }
         if (mainQueueInfo[pos][3] != "Skipped" && packetbuffererror != true)
         {
-            QFileInfo file_exists(outputConfig[pos][0] + mainQueueInfo[pos][1].left(mainQueueInfo[pos][1].length()-4) + "-AMVtool." + outputConfig[pos][1].toLower());
+            int extension = 4;
+            if (!mainQueueInfo[pos][1].right(4).contains("."))
+                extension = 5;
+            if (inputDetails[0][2].contains("MPEG-TS"))
+                extension = 3;
+            QFileInfo file_exists(outputConfig[pos][0] + mainQueueInfo[pos][1].left(mainQueueInfo[pos][1].length()-extension) + "-AMVtool." + outputConfig[pos][1].toLower());
             if (file_exists.exists() && mainQueueInfo[pos][4] != "2")
             {
                 if (ui->ifExists->currentIndex() == 0)

@@ -29,7 +29,7 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
     QStringList containerCompatibility;
 
     QStringList ffmpegcommand;
-    outputfile = OutputFile(fileInfo[1], container.toLower());
+    outputfile = OutputFile(fileInfo[1], inputDetails[0][2], container.toLower());
 
     QString mapID;
 
@@ -282,9 +282,14 @@ QStringList setupencode::SetupPipe(QString inputFile, QString colorspace)
 }
 
 
-QString setupencode::OutputFile(QString originalfile, QString newtype)
+QString setupencode::OutputFile(QString originalfile, QString originalType, QString newtype)
 {
-    originalfile = originalfile.left(originalfile.length()-4) + "-AMVtool." + newtype;
+    int extension = 4;
+    if (!originalfile.right(4).contains("."))
+        extension = 5;
+    if (originalType.contains("MPEG-TS"))
+        extension = 3;
+    originalfile = originalfile.left(originalfile.length()-extension) + "-AMVtool." + newtype;
     return originalfile;
 }
 

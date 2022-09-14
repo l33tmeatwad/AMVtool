@@ -348,7 +348,7 @@ void configure::setContainer()
 void configure::setLumaConversion()
 {
     ui->convertHDR->setChecked(convertHDR2SDR);
-    if (ui->selectCodec->currentText() == "DNxHR" || ui->selectCodec->currentText() == "UT Video")
+    if (ui->selectCodec->currentText() == "UT Video")
     {
         ui->convertHDR->setChecked(true);
         ui->convertHDR->setEnabled(false);
@@ -537,7 +537,7 @@ void configure::setColorMatrix()
     ui->selectMatrix->clear();
     ui->selectMatrix->addItems({"BT.601", "BT.709"});
 
-    if (ui->convertHDR->isChecked() && inputLumaRange[ui->selectVideoStream->currentIndex()].contains("HDR") && outputColorMatrix == "BT.2020NC")
+    if (ui->convertHDR->isChecked() && inputLumaRange[ui->selectVideoStream->currentIndex()].contains("HDR") && outputColorMatrix.contains("BT.2020"))
     {
         outputColorMatrix = "BT.709";
     }
@@ -547,13 +547,10 @@ void configure::setColorMatrix()
         {
             if (ui->selectCodec->currentText() != "UT Video")
             {
-                if (ui->selectCodec->currentText() != "DNxHR")
+                if (inputColorMatrix[vsIndex].contains("BT.2020") && !ui->convertHDR->isChecked())
                 {
-                    if (inputColorMatrix[vsIndex].contains("BT.2020") && !ui->convertHDR->isChecked())
-                    {
-                        ui->selectMatrix->clear();
-                        ui->selectMatrix->addItem("BT.2020");
-                    }
+                    ui->selectMatrix->clear();
+                    ui->selectMatrix->addItem("BT.2020");
                 }
 
             }
@@ -953,7 +950,7 @@ void configure::on_buttonBox_accepted()
     videoEncMode = ui->selectMode->currentText();
     outputColorMatrix = ui->selectMatrix->currentText();
     if (outputColorMatrix == "BT.2020")
-        outputColorMatrix = "BT.2020NC";
+        outputColorMatrix = inputColorMatrix[outputVideoStream];
     if (outputVideoCodec == "DNxHR")
     {
         if (videoEncMode == "Finishing Quality")

@@ -455,7 +455,7 @@ void AMVtool::Encode(int pos, QList<QStringList> inputMediaInfo, QStringList con
     pipe = new QProcess(this);
     if (inputMediaInfo[0][2] == "VapourSynth")
     {
-        connect(pipe, SIGNAL(error(QProcess::ProcessError)), this, SLOT(readFromStdErr()));
+        connect(pipe, SIGNAL(errorOccurred(QProcess::ProcessError)), this, SLOT(readFromStdErr()));
         pipe->setStandardOutputProcess(encode);
         pipe->start(vspipeexec, se.SetupPipe(mainQueueInfo[pos][0], inputMediaInfo[6][0]));
     }

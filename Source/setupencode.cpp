@@ -23,7 +23,7 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
     QString acodec = getAudioCodecName(configList[13]);
     QString amode = configList[14];
     QString abitrate = configList[15];
-    bool acopy = configList[16].toInt();
+    int acopy = configList[16].toInt();
     int MaxMuxing = configList[17].toInt();
     int Experimental = configList[18].toInt();
     QStringList containerCompatibility;
@@ -76,7 +76,7 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
                 for (int i = 0; i < inputDetails[0][1].toInt(); i++)
                 {
                     bool usestream = true;
-                    if (acodec == "copy" && container != "MKV")
+                    if (acopy == 1 && container != "MKV")
                     {
                         usestream = canCopyAudio(container, inputDetails[10][i]);
                     }
@@ -92,15 +92,24 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
 
                 }
             }
-            if (astream.toLower() != "all" && astream.toLower() != "none")
+            if (astream != "All" && astream != "None")
             {
-                int stream = astream.toInt()-1;
-                if (inputDetails[9][stream].contains("x"))
-                    mapID = source + ":i";
-                else
-                    mapID = source;
+                bool usestream = true;
+                if (acopy == 1 && container != "MKV")
+                {
+                    int stream = astream.toInt()-1;
+                    usestream = canCopyAudio(container, inputDetails[10][stream]);
+                }
+                if (usestream)
+                {
+                    int stream = astream.toInt()-1;
+                    if (inputDetails[9][stream].contains("x"))
+                        mapID = source + ":i";
+                    else
+                        mapID = source;
 
-                ffmpegcommand.append({"-map", mapID + ":" + inputDetails[9][stream]});
+                    ffmpegcommand.append({"-map", mapID + ":" + inputDetails[9][stream]});
+                }
             }
         }
     }
@@ -171,23 +180,59 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
 
     if (astream != "None")
     {
-        if (astream == "All" || acodec != "copy")
+        if (astream == "All")
         {
+            int skipped = 0;
             for (int i = 0; i < inputDetails[0][1].toInt(); i++)
             {
+                bool skip = false;
+
                 bool copystream = canCopyAudio(container, inputDetails[10][i]);
                 QString audiocodec;
-                if (copystream && acopy)
+                if (copystream && acopy > 0)
                 {
                     audiocodec = "copy";
                 }
                 else
                 {
                     audiocodec = acodec;
+                    if (acopy == 1 && audiocodec != "copy")
+                    {
+                        skip = true;
+                        skipped++;
+                    }
+                }
+                if (!skip)
+                {
+                    ffmpegcommand.append({"-c:a:" + QString::number(i-skipped), audiocodec });
+                    if (audiocodec == "aac" || audiocodec == "libmp3lame")
+                    {
+                        if (amode == "Quality")
+                        {
+                            ffmpegcommand.append({"-q:a", abitrate });
+                        }
+                        else
+                        {
+                            ffmpegcommand.append({"-b:a", abitrate + "k" });
+                        }
+                    }
                 }
 
-                ffmpegcommand.append({"-c:a:" + QString::number(i), audiocodec });
-                if (audiocodec == "aac" || audiocodec == "libmp3lame")
+            }
+        }
+        else
+        {
+            if (acopy > 0 && canCopyAudio(container,inputDetails[10][astream.toInt()-1]))
+            {
+                acodec = "copy";
+            }
+            bool skip = false;
+            if (acopy == 1 && acodec != "copy")
+                skip = true;
+            if (!skip)
+            {
+                ffmpegcommand.append({"-c:a", acodec });
+                if (acodec == "aac" || acodec == "libmp3lame")
                 {
                     if (amode == "Quality")
                     {
@@ -197,25 +242,6 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
                     {
                         ffmpegcommand.append({"-b:a", abitrate + "k" });
                     }
-                }
-            }
-        }
-        else
-        {
-            if (acopy && canCopyAudio(container,inputDetails[10][astream.toInt()-1]))
-            {
-                acodec = "copy";
-            }
-            ffmpegcommand.append({"-c:a", acodec });
-            if (acodec == "aac" || acodec == "libmp3lame")
-            {
-                if (amode == "Quality")
-                {
-                    ffmpegcommand.append({"-q:a", abitrate });
-                }
-                else
-                {
-                    ffmpegcommand.append({"-b:a", abitrate + "k" });
                 }
             }
         }

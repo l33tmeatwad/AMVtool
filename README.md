@@ -3,7 +3,7 @@ AMVtool is a GUI created with Qt for FFMpeg that is geared towards the needs of 
 
 - Available on Linux, macOS, and Windows.
 - Automatically chooses the color matrix based on the existing file or guesses based on resolution.
-- Automatically detects compatibile containers for copying video.
+- Automatically detects compatible containers for copying video.
 - Easy button for setting up file(s) to be recontainered.
 - Queue for batch encoding.
 - Shows bit depth of the currently selected video stream.

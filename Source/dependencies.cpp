@@ -66,7 +66,7 @@ bool dependencies::checkEXEC(QString execDir, QStringList execCommand)
     execfail = false;
     exec = new QProcess(this);
     connect(exec, SIGNAL(readyReadStandardOutput()), this, SLOT(readOutput()));
-    connect(exec, SIGNAL(error(QProcess::ProcessError)), this, SLOT(readErrors()));
+    connect(exec, SIGNAL(errorOccurred(QProcess::ProcessError)), this, SLOT(readErrors()));
     exec->setProcessChannelMode(QProcess::MergedChannels);
     exec->start(execDir, execCommand);
     exec->waitForFinished();

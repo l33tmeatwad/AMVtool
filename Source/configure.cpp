@@ -61,11 +61,13 @@ void configure::setData(const int &selFile, QList<QStringList> inputMediaInfo, c
     audioEncMode = configurationList[14];
     audioEncBitrate = configurationList[15].toInt();
 
-    ui->copyAudio->setChecked(configurationList[16].toInt());
-    if (outputAudioCodec != "Copy")
+    if (configurationList[16].toInt() > 1)
     {
         ui->encodeIncompatible->setChecked(true);
+        ui->copyAudio->setChecked(true);
     }
+    else
+        ui->copyAudio->setChecked(configurationList[16].toInt());
 
     ui->outputFolder->setText(outputLocation);
 
@@ -277,7 +279,10 @@ void configure::setVideoStream()
 
 void configure::setContainer()
 {
-    ui->selectContainer->addItems({"AVI","MKV", "MOV", "MP4"});
+    ui->selectContainer->clear();
+    if (!outputColorMatrix.contains("BT.2020"))
+        ui->selectContainer->addItem("AVI");
+    ui->selectContainer->addItems({"MKV", "MOV", "MP4"});
     int containerindex = ui->selectContainer->findText(outputContainer);
     ui->selectContainer->setCurrentIndex(containerindex);
 }
@@ -415,20 +420,7 @@ void configure::setColorSpace()
         {
             colorspaceoptions.clear();
             int cvs = ui->selectVideoStream->currentIndex();
-            if (ui->selectBitDepth->currentText() == "8")
-            {
-                if (inputColorMatrix[cvs].contains("BT.2020") && !inputColorSpaces[cvs].contains("RGB"))
-                    colorspaceoptions.append({"RGB24","RGBA"});
-                else
-                    colorspaceoptions.append({"YUV420", "YUV422", "RGB24","RGBA"});
-            }
-            else
-            {
-                if (inputColorMatrix[cvs].contains("BT.2020"))
-                    colorspaceoptions.append({"RGB24","RGBA"});
-                else
-                    colorspaceoptions.append({"YUV422", "RGB24","RGBA"});
-            }
+            colorspaceoptions.append({"YUV420", "YUV422", "RGB24","RGBA"});
         }
         if (codec == "ProRes")
         {
@@ -454,10 +446,13 @@ void configure::setColorMatrix()
     ui->selectMatrix->clear();
     ui->selectMatrix->addItems({"BT.601", "BT.709"});
 
-    if (ui->selectCodec->currentText() != "UT Video")
+    if (ui->selectCodec->currentText() != "UT Vide")
     {
-        if (inputColorMatrix[vsIndex] == "BT.2020NC")
-            ui->selectMatrix->addItem("BT.2020NC");
+        if (inputColorMatrix[vsIndex].contains("BT.2020"))
+        {
+            ui->selectMatrix->clear();
+            ui->selectMatrix->addItem("BT.2020");
+        }
     }
 
     int index = ui->selectMatrix->findText(outputColorMatrix);
@@ -468,7 +463,6 @@ void configure::setColorMatrix()
 
 void configure::setMode()
 {
-    int encModeIndex = ui->selectMode->findText(videoEncMode);
     ui->selectMode->clear();
     QStringList losslessMOV = {"DNxHR","ProRes"};
     if (losslessMOV.contains(ui->selectCodec->currentText()))
@@ -743,6 +737,8 @@ void configure::on_buttonBox_accepted()
     outputBitDepth = ui->selectBitDepth->currentText();
     videoEncMode = ui->selectMode->currentText();
     outputColorMatrix = ui->selectMatrix->currentText();
+    if (outputColorMatrix == "BT.2020")
+            outputColorMatrix = inputColorMatrix[outputVideoStream];
     if (outputVideoCodec == "DNxHR")
     {
         if (videoEncMode == "Finishing Quality")
@@ -757,22 +753,21 @@ void configure::on_buttonBox_accepted()
         videoEncTune = ui->selectTune->currentText();
     videoEncBitrate = ui->bitrateBox->value();
     outputAudioStream = ui->selectAudioStream->currentText();
-    bool copyaudio = false;
 
-    if (ui->copyAudio->isChecked() && ui->encodeIncompatible->checkState() == Qt::Unchecked && cancopyaudio == true)
+    int copyaudio = 0;
+
+    if (ui->copyAudio->isChecked() && ui->encodeIncompatible->checkState() == Qt::Unchecked)
     {
-        outputAudioCodec = "Copy";
-        copyaudio = true;
+        copyaudio = 1;
     }
     else
     {
         if (ui->copyAudio->isChecked() && ui->encodeIncompatible->isChecked())
         {
-            copyaudio = true;
+            copyaudio = 2;
         }
-        outputAudioCodec = ui->selectAudioCodec->currentText();
     }
-
+    outputAudioCodec = ui->selectAudioCodec->currentText();
     audioEncMode = ui->selectAudioMode->currentText();
     audioEncBitrate = ui->bitrateBoxAudio->value();
 
@@ -957,6 +952,8 @@ void configure::on_selectVideoStream_currentIndexChanged(int index)
     if (ui->selectMatrix->currentIndex() != -1)
     {
         outputColorMatrix = inputColorMatrix[index];
+        setContainer();
+        setVideoCodec();
         setBitDepth();
         setColorSpace();
         setColorMatrix();

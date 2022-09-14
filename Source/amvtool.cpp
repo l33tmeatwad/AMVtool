@@ -323,6 +323,16 @@ void AMVtool::ProcessFile(int pos)
     queue queue;
     QList<QStringList> inputDetails = queue.checkInput(pos);
 
+    if (outputConfig[pos][5].contains("BT.2020") && outputConfig[pos][6].contains("UT Video"))
+    {
+        updateQueue(pos,"Error");
+        mOutputString.append("UT Video not compatible with BT.2020");
+        ui->textEdit->setText(mOutputString);
+        ui->textEdit->verticalScrollBar()->setSliderPosition(ui->textEdit->verticalScrollBar()->maximum());
+    }
+    if (inputDetails[0][2] == "Error")
+        updateQueue(pos,"Error");
+
     if (mainQueueInfo[pos][3] != "Error")
     {
         filesettings fs;
@@ -425,21 +435,25 @@ void AMVtool::Encode(int pos, QList<QStringList> inputDetails, QStringList confi
     setupencode se;
     encode = new QProcess(this);
     connect(encode, SIGNAL(readyReadStandardOutput()),this,SLOT(readyReadStandardOutput()));
-    connect(encode, SIGNAL(error(QProcess::ProcessError)), this, SLOT(readErrors()));
+    connect(encode, SIGNAL(errorOccurred(QProcess::ProcessError)), this, SLOT(readErrors()));
     connect(encode, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(encodeFinished(int,QProcess::ExitStatus)));
     encode->setProcessChannelMode(QProcess::MergedChannels);
     QStringList EncodeOptions = se.SetupEncode(pos, mainQueueInfo[pos], inputDetails, configList);
 
-    QString debugbox;
-    for (int i = 0; i < EncodeOptions.count(); i++)
-    {
-        debugbox += EncodeOptions[i] + " ";
-    }
-//    QMessageBox::information(this,"Encode Options", debugbox);
+    QString ffmpegCommand = "ffmpeg ";
+       for (int i = 0; i < EncodeOptions.count(); i++)
+       {
+           ffmpegCommand += EncodeOptions[i] + " ";
+       }
+
+       mOutputString.append(ffmpegCommand+"\n"+"\n");
+       ui->textEdit->setText(mOutputString);
+       ui->textEdit->verticalScrollBar()->setSliderPosition(ui->textEdit->verticalScrollBar()->maximum());
+
     pipe = new QProcess(this);
     if (inputDetails[0][2] == "VapourSynth")
     {
-        connect(pipe, SIGNAL(error(QProcess::ProcessError)), this, SLOT(readFromStdErr()));
+        connect(pipe, SIGNAL(errorOccurred(QProcess::ProcessError)), this, SLOT(readFromStdErr()));
         pipe->setStandardOutputProcess(encode);
         pipe->start(vspipeexec, se.SetupPipe(mainQueueInfo[pos][0], inputDetails[4][0]));
     }

@@ -446,7 +446,7 @@ void configure::setColorMatrix()
     ui->selectMatrix->clear();
     ui->selectMatrix->addItems({"BT.601", "BT.709"});
 
-    if (ui->selectCodec->currentText() != "UT Vide")
+    if (ui->selectCodec->currentText() != "UT Video")
     {
         if (inputColorMatrix[vsIndex].contains("BT.2020"))
         {

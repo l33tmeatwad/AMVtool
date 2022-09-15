@@ -166,8 +166,8 @@ void AMVtool::on_configEncSettings_clicked()
     foreach (QListWidgetItem * item, ui->fileList->selectedItems())
     {
         int queue = ui->fileList->row(item);
+        updateQueue(queue,"Pending");
         openConfigBox(queue);
-        ui->fileList->item(queue)->setText(mainQueueInfo[queue][2] + " | " + mainQueueInfo[queue][1]);
     }
 
 }
@@ -326,7 +326,7 @@ void AMVtool::ProcessFile(int pos)
     if (outputConfig[pos][5].contains("BT.2020") && outputConfig[pos][6].contains("UT Video"))
     {
         updateQueue(pos,"Error");
-        mOutputString.append("UT Video not compatible with BT.2020");
+        mOutputString.append("UT Video not compatible with BT.2020 \n");
         ui->textEdit->setText(mOutputString);
         ui->textEdit->verticalScrollBar()->setSliderPosition(ui->textEdit->verticalScrollBar()->maximum());
     }

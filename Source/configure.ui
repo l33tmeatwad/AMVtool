@@ -29,9 +29,9 @@
    <property name="geometry">
     <rect>
      <x>8</x>
-     <y>91</y>
+     <y>81</y>
      <width>417</width>
-     <height>201</height>
+     <height>211</height>
     </rect>
    </property>
    <property name="currentIndex">
@@ -455,7 +455,7 @@
        <x>10</x>
        <y>153</y>
        <width>391</width>
-       <height>21</height>
+       <height>22</height>
       </rect>
      </property>
      <layout class="QGridLayout" name="copyGrid">
@@ -487,7 +487,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>130</y>
+       <y>150</y>
        <width>391</width>
        <height>33</height>
       </rect>
@@ -510,52 +510,6 @@
        <widget class="QPushButton" name="browseAudio">
         <property name="text">
          <string>Browse</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-    <widget class="QWidget" name="aoptionsLayoutWidget">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>74</y>
-       <width>391</width>
-       <height>51</height>
-      </rect>
-     </property>
-     <layout class="QGridLayout" name="aoptionsLayout">
-      <item row="0" column="0">
-       <widget class="QCheckBox" name="copyAudio">
-        <property name="text">
-         <string>Copy Compatible</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QCheckBox" name="encodeIncompatible">
-        <property name="text">
-         <string>Encode Incompatible</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QRadioButton" name="internalAudio">
-        <property name="text">
-         <string>Use Original Audio</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QRadioButton" name="externalAudio">
-        <property name="layoutDirection">
-         <enum>Qt::LeftToRight</enum>
-        </property>
-        <property name="text">
-         <string>Use Another Source</string>
         </property>
        </widget>
       </item>
@@ -754,6 +708,90 @@
          </size>
         </property>
        </spacer>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="horizontalLayoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>11</x>
+       <y>119</y>
+       <width>391</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="selextAudioLayout">
+      <item>
+       <widget class="QRadioButton" name="internalAudio">
+        <property name="text">
+         <string>Use Original Audio</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="extAudioSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="externalAudio">
+        <property name="layoutDirection">
+         <enum>Qt::LeftToRight</enum>
+        </property>
+        <property name="text">
+         <string>Use Another Source</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="horizontalLayoutWidget_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>80</y>
+       <width>391</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="copyAudioLayout">
+      <item>
+       <widget class="QCheckBox" name="copyAudio">
+        <property name="text">
+         <string>Copy Compatible</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="copySpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="encodeIncompatible">
+        <property name="text">
+         <string>Encode Incompatible</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

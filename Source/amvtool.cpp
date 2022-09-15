@@ -166,8 +166,8 @@ void AMVtool::on_configEncSettings_clicked()
     foreach (QListWidgetItem * item, ui->fileList->selectedItems())
     {
         int queue = ui->fileList->row(item);
+	updateQueue(queue,"Pending");
         openConfigBox(queue);
-        ui->fileList->item(queue)->setText(mainQueueInfo[queue][2] + " | " + mainQueueInfo[queue][1]);
     }
 
 }

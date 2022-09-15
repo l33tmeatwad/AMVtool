@@ -284,7 +284,10 @@ void configure::setContainer()
         ui->selectContainer->addItem("AVI");
     ui->selectContainer->addItems({"MKV", "MOV", "MP4"});
     int containerindex = ui->selectContainer->findText(outputContainer);
-    ui->selectContainer->setCurrentIndex(containerindex);
+    if (containerindex == -1)
+        ui->selectContainer->setCurrentIndex(ui->selectContainer->findText("MP4"));
+    else
+         ui->selectContainer->setCurrentIndex(containerindex);
 }
 
 void configure::setVideoCodec()

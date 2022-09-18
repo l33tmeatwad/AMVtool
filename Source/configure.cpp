@@ -358,7 +358,7 @@ void configure::setLumaConversion()
         ui->convertHDR->setChecked(convertHDR2SDR);
         ui->convertHDR->setEnabled(true);
     }
-    if (inputLumaRange[ui->selectVideoStream->currentIndex()].contains("HDR"))
+    if (inputLumaRange[ui->selectVideoStream->currentIndex()].contains("HDR") && ui->selectCodec->currentText() != "Copy")
         ui->convertHDR->setVisible(true);
     else
         ui->convertHDR->setVisible(false);

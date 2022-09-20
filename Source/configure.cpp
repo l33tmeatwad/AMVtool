@@ -538,7 +538,7 @@ void configure::setTune()
 void configure::setAudioStream()
 {
     int audioStreams;
-    if (externalaudio || ui->externalAudioSource->text() != "")
+    if (externalaudio && ui->externalAudioSource->text() != "")
         audioStreams = altAudioStreams;
     else
         audioStreams = inputAudioStreams;

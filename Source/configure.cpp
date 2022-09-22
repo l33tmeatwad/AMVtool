@@ -251,7 +251,6 @@ void configure::setAudioVisibility()
     if (selectedFile == -1)
     {
         ui->externalAudio->setVisible(false);
-        ui->internalAudio->setVisible(false);
     }
     ui->externalAudioSource->setVisible(externalaudio);
     ui->browseAudio->setVisible(externalaudio);
@@ -560,7 +559,7 @@ void configure::setAudioStream()
 
     if (newExtAudio && ui->externalAudio->isChecked())
         index = 0;
-    if (outputAudioSource != "Original Audio" && ui->internalAudio->isChecked())
+    if (outputAudioSource != "Original Audio" && !ui->externalAudio->isChecked())
         index = 0;
 
     if(index != -1)
@@ -675,7 +674,7 @@ void configure::getAltAudioCodecs(QString newAudio)
         QMessageBox::information(this,"Error","External audio file contains no audio streams, switching back to internal audio.");
         outputAudioSource = "OriginalAudio";
         ui->externalAudioSource->setText("");
-        ui->internalAudio->setChecked(true);
+        ui->externalAudio->setChecked(false);
     }
 
 }

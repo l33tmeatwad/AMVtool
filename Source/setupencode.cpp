@@ -17,7 +17,7 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
     int vstream = configList[2].toInt();
     QString colorspace = getColorSpace(configList[3],configList[4]);
     QString colormatrix = getColorMatrix(configList[5]);
-    int convertHDR = configList[6].toInt();
+    bool convertHDR = configList[6].toInt();
     QString codecname = getCodecName(configList[7]);
     QString vmode = configList[8];
     QString preset = configList[9];
@@ -35,7 +35,9 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
     QString resize = configList[21];
     QString aspectratio = configList[22];
     int MaxMuxing = configList[23].toInt();
-    int Experimental = configList[24].toInt();
+    bool FastStart = configList[24].toInt();
+    bool DisableBFrames = configList[25].toInt();
+    bool Experimental = configList[26].toInt();
 
     QString inputVideoStreamID = inputMediaInfo[1][vstream];
     QString inputColorSpace = inputMediaInfo[6][vstream];
@@ -50,7 +52,7 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
 
     QString vfilters = "";
     if (codecname != "copy")
-        vfilters = SetupFilters(fileInfo[2].contains("HDR"), convertHDR, colorspace, colormatrix, deinterlace, cthresh, fieldorder, resize, aspectratio);
+        vfilters = SetupFilters(fileInfo[2].contains("HDR"), convertHDR, inputColorSpace, colorspace, colormatrix, deinterlace, cthresh, fieldorder, resize, aspectratio);
 
     QStringList ffmpegcommand;
     outputfile = OutputFile(fileInfo[1], inputMediaInfo[0][2], container.toLower());
@@ -145,7 +147,7 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
     {
         ffmpegcommand.append({"-max_muxing_queue_size",QString::number(MaxMuxing)});
     }
-    if (Experimental > 0)
+    if (Experimental)
     {
         ffmpegcommand.append({"-strict","-2"});
     }
@@ -159,6 +161,12 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
     else
     {
         ffmpegcommand.append(container);
+    }
+
+    if (container == "MOV" || container == "MP4")
+    {
+        if (FastStart)
+            ffmpegcommand.append({"-movflags","+faststart"});
     }
 
     ffmpegcommand.append({ "-c:v", codecname });
@@ -201,6 +209,8 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
             if (tune != "(None)" && !vmode.contains("Lossless"))
                 ffmpegcommand.append({ "-tune", tune.toLower().replace(" ","") });
         }
+        if (codecname != "libvpx-vp9" && DisableBFrames)
+            ffmpegcommand.append({ "-bf", "0" });
     }
     if (codecname == "dnxhd" || codecname == "prores")
     {
@@ -302,7 +312,7 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
     }
     ffmpegcommand.append("-y");
 
-    if (mainQueueInfo[queue][4] == "1" && vmode.contains("Bitrate"))
+    if (mainQueueInfo[queue][4] == "1" && vmode.contains("2 Pass"))
     {
         ffmpegcommand.append( pass1null );
 
@@ -469,8 +479,11 @@ QStringList setupencode::getTilesAndThreads(int height)
     return {QString::number(tiles),QString::number(threads)};
 }
 
-QString setupencode::SetupFilters(bool isHDR, bool convertHDR, QString colorspace, QString colormatrix, QString deinterlace, int cthresh, QString fieldorder, QString resize, QString aspectratio)
+QString setupencode::SetupFilters(bool isHDR, bool convertHDR, QString inputcolorspace, QString colorspace, QString colormatrix, QString deinterlace, int cthresh, QString fieldorder, QString resize, QString aspectratio)
 {
+
+    if (!isHDR)
+        convertHDR = false;
     QString outputfilters = "";
     if (deinterlace != "None")
     {
@@ -500,7 +513,7 @@ QString setupencode::SetupFilters(bool isHDR, bool convertHDR, QString colorspac
     }
 
 
-    if (isHDR && convertHDR)
+    if (convertHDR)
     {
         if (outputfilters != "")
             outputfilters.append(",");
@@ -510,21 +523,23 @@ QString setupencode::SetupFilters(bool isHDR, bool convertHDR, QString colorspac
     {
         if (outputfilters != "")
             outputfilters.append(",");
+        if (inputcolorspace.contains("RGB") && colorspace.contains("yuv"))
+            outputfilters.append("colorspace=iall="+colormatrix+":all="+colormatrix+":format="+colorspace+",");
         if (resize.contains("x"))
         {
-            resize = "w="+resize;
-            resize.replace("x",":h=");
+            resize = resize;
+            resize.replace("x",":");
         }
         else
         {
             if (WidthResolutions.contains(resize))
-                resize = "w="+resize+":h=-2";
+                resize = resize+":-2";
             if (HeightResolutions.contains(resize))
-                resize = "w=-2:h="+resize;
+                resize = "-2:"+resize;
         }
 
 
-        outputfilters.append("scale="+resize+":flags=spline");
+        outputfilters.append("zscale="+resize+":filter=spline36");
     }
     if (aspectratio != "No")
     {

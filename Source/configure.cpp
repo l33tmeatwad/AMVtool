@@ -119,7 +119,9 @@ void configure::setData(const int &selFile, QList<QStringList> inputMediaInfo, c
     ui->bitrateBox->setValue(videoEncBitrate);
     ui->bitrateBoxAudio->setValue(audioEncBitrate);
     ui->maxMuxing->setValue(configurationList[23].toInt());
-    ui->experimentalFeatures->setChecked(configurationList[24].toInt());
+    ui->faststart->setChecked(configurationList[24].toInt());
+    ui->disableBframes->setChecked(configurationList[25].toInt());
+    ui->experimentalFeatures->setChecked(configurationList[26].toInt());
 }
 
 // SHOW OR HIDE OPTIONS
@@ -150,6 +152,8 @@ void configure::setVideoVisibility()
     bool colorspace;
     bool codecsettings;
     bool changedar;
+    bool faststart;
+    bool bframes;
     QStringList productionCodecs = {"Copy", "DNxHR","ProRes","UT Video"};
 
     if (productionCodecs.contains(ui->selectCodec->currentText()))
@@ -237,6 +241,16 @@ void configure::setVideoVisibility()
         ui->changeDARSel->setVisible(ui->changeDAR->isChecked());
     }
 
+    if (ui->selectContainer->currentText() == "MOV" || ui->selectContainer->currentText() == "MP4")
+        faststart = true;
+    else
+        faststart = false;
+
+    if (ui->selectCodec->currentText() == "x264" || ui->selectCodec->currentText() == "x265")
+        bframes = true;
+    else
+        bframes = false;
+
     ui->bitrateBox->setVisible(bitrateoptions);
     ui->labelBitrate->setVisible(bitratetype);
     ui->selectMode->setVisible(modeoptions);
@@ -252,6 +266,8 @@ void configure::setVideoVisibility()
     ui->labelTune->setVisible(tuneoptions);
     ui->codecSettings->setVisible(codecsettings);
     ui->changeDAR->setVisible(changedar);
+    ui->faststart->setVisible(faststart);
+    ui->disableBframes->setVisible(bframes);
 
 }
 
@@ -947,7 +963,10 @@ void configure::on_buttonBox_accepted()
     outputVideoStream = ui->selectVideoStream->currentIndex();
     outputVideoCodec = ui->selectCodec->currentText();
     outputBitDepth = ui->selectBitDepth->currentText();
-    videoEncMode = ui->selectMode->currentText();
+    if (outputVideoCodec == "UT Video")
+        videoEncMode = "";
+    else
+        videoEncMode = ui->selectMode->currentText();
     outputColorMatrix = ui->selectMatrix->currentText();
     if (outputColorMatrix == "BT.2020")
         outputColorMatrix = inputColorMatrix[outputVideoStream];
@@ -1014,10 +1033,18 @@ void configure::on_buttonBox_accepted()
     else
         outputAR = "No";
 
+    bool faststart = false;
+    if (ui->selectContainer->currentText() == "MOV" || ui->selectContainer->currentText() == "MP4")
+        faststart = ui->faststart->isChecked();
+
+    bool bframes = false;
+    if (ui->selectCodec->currentText() == "x264" || ui->selectCodec->currentText() == "x265")
+        bframes = ui->disableBframes->isChecked();
 
     QStringList configurationList = { outputLocation, outputContainer, QString::number(outputVideoStream), outputColorSpace, outputBitDepth, outputColorMatrix, QString::number(ui->convertHDR->isChecked()), outputVideoCodec,
                                       videoEncMode, videoEncPreset, videoEncTune, QString::number(videoEncBitrate), outputAudioSource, outputAudioStream, outputAudioCodec,
-                                    audioEncMode, QString::number(audioEncBitrate), QString::number(copyaudio), deinterlaceType, QString::number(cthreshValue), outputFieldOrder, outputResize, outputAR, QString::number(ui->maxMuxing->value()),QString::number(ui->experimentalFeatures->isChecked())};
+                                    audioEncMode, QString::number(audioEncBitrate), QString::number(copyaudio), deinterlaceType, QString::number(cthreshValue), outputFieldOrder, outputResize, outputAR,
+                                      QString::number(ui->maxMuxing->value()), QString::number(faststart), QString::number(bframes),QString::number(ui->experimentalFeatures->isChecked())};
 
     QString ifInterlaced = "";
     if (inputScanType[ui->selectVideoStream->currentIndex()].contains("Interlaced"))

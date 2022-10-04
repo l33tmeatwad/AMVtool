@@ -32,7 +32,7 @@ private:
     QString getColorMatrix(QString colormatrix);
     QString getProfile(QString codec, QString bitdepth, QString profile);
     QStringList getTilesAndThreads(int height);
-    QString SetupFilters(bool isHDR, bool convertHDR, QString colorspace, QString colormatrix, QString deinterlace, int cthresh, QString fieldorder, QString resize, QString aspectratio);
+    QString SetupFilters(bool isHDR, bool convertHDR, QString inputcolorspace, QString colorspace, QString colormatrix, QString deinterlace, int cthresh, QString fieldorder, QString resize, QString aspectratio);
     QString getAudioCodecName(QString codecname);
 
     QString outputfile;

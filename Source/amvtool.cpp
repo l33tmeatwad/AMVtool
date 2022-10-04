@@ -475,6 +475,10 @@ void AMVtool::changeEnabled(bool status, QString button)
 
 void AMVtool::encodeFinished(int exitcode, QProcess::ExitStatus)
 {
+    mOutputString.append("\n");
+    ui->textEdit->setText(mOutputString);
+    ui->textEdit->verticalScrollBar()->setSliderPosition(ui->textEdit->verticalScrollBar()->maximum());
+
     inputDuration = 0;
     if (pipe->state() > 0)
     {

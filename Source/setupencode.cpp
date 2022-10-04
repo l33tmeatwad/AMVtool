@@ -252,7 +252,7 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
     }
     ffmpegcommand.append("-y");
 
-    if (mainQueueInfo[queue][4] == "1" && vmode.contains("Bitrate"))
+    if (mainQueueInfo[queue][4] == "1" && vmode.contains("2 Pass"))
     {
         ffmpegcommand.append( pass1null );
 

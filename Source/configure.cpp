@@ -737,7 +737,10 @@ void configure::on_buttonBox_accepted()
     outputVideoStream = ui->selectVideoStream->currentIndex();
     outputVideoCodec = ui->selectCodec->currentText();
     outputBitDepth = ui->selectBitDepth->currentText();
-    videoEncMode = ui->selectMode->currentText();
+    if (outputVideoCodec == "UT Video")
+        videoEncMode = "";
+    else
+        videoEncMode = ui->selectMode->currentText();
     outputColorMatrix = ui->selectMatrix->currentText();
     if (outputColorMatrix == "BT.2020")
             outputColorMatrix = inputColorMatrix[outputVideoStream];

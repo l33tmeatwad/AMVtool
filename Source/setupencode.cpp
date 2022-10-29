@@ -269,7 +269,7 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
                 if (!skip)
                 {
                     ffmpegcommand.append({"-c:a:" + QString::number(i-skipped), audiocodec });
-                    if (audiocodec == "aac" || audiocodec == "libmp3lame" || audiocodec == "opus")
+                    if (audiocodec == "aac" || audiocodec == "libmp3lame" || audiocodec == "libopus")
                     {
                         if (amode == "Quality")
                             ffmpegcommand.append({"-q:a", abitrate });
@@ -292,7 +292,7 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
             if (!skip)
             {
                 ffmpegcommand.append({"-c:a", acodec });
-                if (acodec == "aac" || acodec == "libmp3lame" || acodec == "opus")
+                if (acodec == "aac" || acodec == "libmp3lame" || acodec == "libopus")
                 {
                     if (amode == "Quality")
                     {
@@ -449,6 +449,10 @@ QString setupencode::getAudioCodecName(QString codecname)
     if (codecname == "mp3")
     {
         codecname = "lib" + codecname + "lame";
+    }
+    if (codecname == "opus")
+    {
+        codecname = "lib" + codecname;
     }
     if (codecname == "pcm")
     {

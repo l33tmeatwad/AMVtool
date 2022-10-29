@@ -166,8 +166,8 @@ void AMVtool::on_configEncSettings_clicked()
     foreach (QListWidgetItem * item, ui->fileList->selectedItems())
     {
         int queue = ui->fileList->row(item);
-        updateQueue(queue,"Pending");
         openConfigBox(queue);
+        updateQueue(queue,"Pending");
     }
 
 }
@@ -433,6 +433,9 @@ void AMVtool::Encode(int pos, QList<QStringList> inputMediaInfo, QStringList con
 {
     ui->statusBar->showMessage("Starting Process");
     inputDuration = inputMediaInfo[0][3].toFloat();
+    inputFrameRate = inputMediaInfo[10][outputConfig[pos][2].toInt()].toFloat();
+    if (outputConfig[pos][18] == "IVTC" || outputConfig[pos][18] == "Both")
+        inputFrameRate = inputFrameRate*0.8;
     outputcreated = false;
     setupencode se;
     encode = new QProcess(this);
@@ -480,6 +483,7 @@ void AMVtool::encodeFinished(int exitcode, QProcess::ExitStatus)
     ui->textEdit->verticalScrollBar()->setSliderPosition(ui->textEdit->verticalScrollBar()->maximum());
 
     inputDuration = 0;
+    inputFrameRate = 0;
     if (pipe->state() > 0)
     {
         pipe->kill();
@@ -535,6 +539,7 @@ void AMVtool::readErrors()
 void AMVtool::readyReadStandardOutput()
 {
     float duration = inputDuration;
+    float framerate = inputFrameRate;
     QString readline = encode->readAllStandardOutput();
     if (readline.contains("Too many packets buffered for output stream"))
         packetbuffererror = true;
@@ -542,7 +547,7 @@ void AMVtool::readyReadStandardOutput()
     if (readline.contains("time="))
     {
         progress cp;
-        QList<QString> currentprogress = cp.currentProcess(readline, duration);
+        QList<QString> currentprogress = cp.currentProcess(readline, duration, framerate);
         ui->statusBar->showMessage(processType + mainQueueInfo[position][1]);
         if (!currentprogress[1].contains("00:00:00.000"))
                timeRemaining->setText(currentprogress[1] + "  ");

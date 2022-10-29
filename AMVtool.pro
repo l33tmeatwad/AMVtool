@@ -12,7 +12,7 @@ TARGET = AMVtool
 TEMPLATE = app
 
 SOURCES += Source/main.cpp\
-        Source/amvtool.cpp \
+    Source/amvtool.cpp \
     Source/configure.cpp \
     Source/filesettings.cpp \
     Source/setupencode.cpp \
@@ -48,7 +48,7 @@ linux{
 
 macx{
     SOURCES += Source/checkmedia.cpp
-	LIBPATH += $$PWD/Resources/MacOS
+    LIBPATH += $$PWD/Resources/MacOS
     LIBS += -lmediainfo -lzen -lz
     QMAKE_INFO_PLIST = Resources/MacOS/Info.plist
     ICON = Resources/MacOS/icon.icns
@@ -60,7 +60,7 @@ win32{
     LIBPATH += $$PWD/Resources/Windows
     LIBS +=  -lmediainfo -lavisynthwrapper
     RC_ICONS = Resources/Windows/icon.ico
-    VERSION = 1.1.9.9
+    VERSION = 1.1.0.0
     QMAKE_TARGET_PRODUCT = "AMVtool"
     QMAKE_TARGET_DESCRIPTION = "GUI for FFmpeg designed for AMV editors."
     QMAKE_TARGET_COPYRIGHT = "\\251 2022 by l33tmeatwad"

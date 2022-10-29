@@ -275,14 +275,9 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
             inputColorSpaces.append(colorspace);
             inputColorMatrix.append(colormatrix);
 
-            if (bitdepth == "")
-            {
-                bitdepth = "Unknown";
-            }
-            else
-            {
+            if (bitdepth != "")
                 bitdepth = bitdepth + "bit";
-            }
+
             inputVideoBitDepths.append(bitdepth);
 
 

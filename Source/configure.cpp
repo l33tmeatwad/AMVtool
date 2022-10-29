@@ -1050,7 +1050,12 @@ void configure::on_buttonBox_accepted()
     if (inputScanType[ui->selectVideoStream->currentIndex()].contains("Interlaced"))
             ifInterlaced = " Interlaced";
 
-    fs.changeSettings(selectedFile, inputVideoBitDepths[ui->selectVideoStream->currentIndex()] + " " + inputLumaRange[ui->selectVideoStream->currentIndex()] + ifInterlaced, configurationList);
+    QString inputBitDepth = "";
+    if (inputVideoBitDepths[ui->selectVideoStream->currentIndex()] != "")
+        inputBitDepth = inputVideoBitDepths[ui->selectVideoStream->currentIndex()] + " ";
+
+
+    fs.changeSettings(selectedFile, inputBitDepth + inputLumaRange[ui->selectVideoStream->currentIndex()] + ifInterlaced, configurationList);
 
     if (selectedFile == -1 && ui->copyVideo->isChecked())
     {

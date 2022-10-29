@@ -56,7 +56,10 @@ void filesettings::changeSettings(int ql, QString bitdepth, QStringList configur
         for (int i = 0; i < outputConfig.count(); i++)
         {
             configurationList[2] = outputConfig[i][2];
-            configurationList[5] = outputConfig[i][5];
+            if (outputConfig[i][5].contains("BT.2020") && configurationList[6] == "1")
+                configurationList[5] = "BT.709";
+            else
+                configurationList[5] = outputConfig[i][5];
             configurationList[12] = outputConfig[i][12];
             if (mainQueueInfo[i][1].right(3) == "vpy" && outputConfig[i][12] == "Original Audio")
                 configurationList[13] = "None";

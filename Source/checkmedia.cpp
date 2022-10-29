@@ -207,17 +207,9 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
             inputColorSpaces.append(colorspace);
             inputColorMatrix.append(colormatrix);
 
-            if (bitdepth == "")
-            {
-                if (lumaRange.contains("PQ") || lumaRange.contains("HLG"))
-                    bitdepth = "10bit";
-                else
-                    bitdepth = "8bit";
-            }
-            else
-            {
+            if (bitdepth != "")
                 bitdepth = bitdepth + "bit";
-            }
+
             inputVideoBitDepths.append(bitdepth);
 
 

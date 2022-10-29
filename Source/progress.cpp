@@ -2,7 +2,7 @@
 #include <cmath>
 #include <QRegularExpression>
 
-QList<QString> progress::currentProcess(QString currentstatus, float duration)
+QList<QString> progress::currentProcess(QString currentstatus, float duration, float framerate)
 {
     int currentpercent = 0;
     float progress = 0;
@@ -14,16 +14,34 @@ QList<QString> progress::currentProcess(QString currentstatus, float duration)
         progress = parseTimecode(findstatus.captured(0).right(11));
     }
 
+
+
     float encspeed = 0.01f;
+    int framenumber = 0;
     QString encodespeed;
-    if (currentstatus.contains("speed="))
+    QString currentframe;
+    if (currentstatus.contains("frame=") && currentstatus.contains("speed="))
     {
+        int framespot = currentstatus.indexOf("frame=");
+        int sizespot = currentstatus.indexOf("size=");
+        currentframe = currentstatus;
+        currentframe = currentframe.mid(framespot, sizespot-framespot);
+        framespot = currentframe.indexOf("frame=");
+        int fpsspot = currentframe.indexOf("fps=");
+        currentframe = currentframe.mid(framespot+6, fpsspot-6).replace(" ","").replace("\r","");
+        framenumber = currentframe.toInt();
+
         int speedspot = currentstatus.indexOf("speed=");
         encodespeed = currentstatus.replace(currentstatus.left(speedspot+6), "").replace("x","").replace(" ", "").replace("\r","");
         encodespeed = encodespeed.left(encodespeed.length()-1);
         encspeed = encodespeed.toFloat();
     }
-    currentpercent = (progress/duration) *100;
+
+    if (progress == 0 && framenumber > 0)
+    {
+        progress = (framenumber/framerate)*1000;
+    }
+    currentpercent = (progress/duration) * 100;
 
     QString timeleft = generateTimeLeft(encspeed,duration,progress);
     return { QString::number(currentpercent), "Speed=" + QString::number(encspeed) + "x" + " | Time Left=" + timeleft };

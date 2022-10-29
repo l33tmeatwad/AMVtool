@@ -66,8 +66,8 @@ private:
     bool stopprocess;
     bool outputcreated;
 
-
     float inputDuration;
+    float inputFrameRate;
 
 };
 

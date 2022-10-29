@@ -5,7 +5,7 @@
 class progress
 {
 public:
-    QList<QString> currentProcess(QString currentstatus, float duration);
+    QList<QString> currentProcess(QString currentstatus, float duration, float framerate);
 
 private:
     QString generateTimeLeft(float spd, float dur, float prog);

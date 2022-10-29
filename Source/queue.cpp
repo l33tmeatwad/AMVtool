@@ -28,10 +28,13 @@ QString queue::InputFiles(QString inputFile)
         QString Location = inputFile;
         QString LumaRange = inputMediaInfo[3][0];
         QString ColorMatrix = inputMediaInfo[7][0];
+        QString bitDepth = "";
+        if (inputMediaInfo[2][0] != "")
+            bitDepth = inputMediaInfo[2][0] + " ";
 
-        mainQueueInfo.append({inputFile, filename, inputMediaInfo[2][0] + " " + inputMediaInfo[3][0] + ifInterlaced, "Pending", "1"});
+        mainQueueInfo.append({inputFile, filename, bitDepth + inputMediaInfo[3][0] + ifInterlaced, "Pending", "1"});
         fs.addSettings(Location.replace(filename,""), LumaRange, ColorMatrix, isVPY);
-        openedFileInfo = inputMediaInfo[2][0] + " " + inputMediaInfo[3][0] + ifInterlaced + " | " + filename;
+        openedFileInfo = bitDepth + inputMediaInfo[3][0] + ifInterlaced + " | " + filename;
     }
     if (RecontainerSettings && openedFileInfo != "Error")
     {

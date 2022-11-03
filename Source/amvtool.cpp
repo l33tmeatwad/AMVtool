@@ -258,9 +258,9 @@ void AMVtool::updateQueue(int pos, QString status)
     }
     if (status == "Error")
     {
-        if (packetbuffererror == true && outputConfig[pos][23] == "")
+        if (packetbuffererror == true && outputConfig[pos][24] == "")
         {
-            outputConfig[pos][23] = "9999";
+            outputConfig[pos][24] = "9999";
         }
         else
         {
@@ -434,7 +434,7 @@ void AMVtool::Encode(int pos, QList<QStringList> inputMediaInfo, QStringList con
     ui->statusBar->showMessage("Starting Process");
     inputDuration = inputMediaInfo[0][3].toFloat();
     inputFrameRate = inputMediaInfo[10][outputConfig[pos][2].toInt()].toFloat();
-    if (outputConfig[pos][18] == "IVTC" || outputConfig[pos][18] == "Both")
+    if (outputConfig[pos][19] == "IVTC" || outputConfig[pos][19] == "Both")
         inputFrameRate = inputFrameRate*0.8;
     outputcreated = false;
     setupencode se;

@@ -90,7 +90,9 @@ private:
     QStringList inputColorSpaces;
     QStringList inputColorMatrix;
     QStringList inputAudioCodecs;
+    QStringList inputAudioLayouts;
     QStringList altAudioCodecs;
+    QStringList altAudioLayouts;
 
     void enableBitDepth(QList<int> hibitdepth);
     void setVideoStream();
@@ -112,7 +114,7 @@ private:
     void setAudioBitrate();
     void canCopyAudio(QStringList containerinfo);
     bool cancopyaudio = false;
-    void getAltAudioCodecs(QString newAudio);
+    void getAltAudioInfo(QString newAudio);
     bool externalaudio = false;
 
     void setInterlaceVisibility(int index);

@@ -43,6 +43,7 @@ void configure::setData(const int &selFile, QList<QStringList> inputMediaInfo, c
     inputColorMatrix = inputMediaInfo[7];
     inputVideoHeight = inputMediaInfo[9];
     inputAudioCodecs = inputMediaInfo[12];
+    inputAudioLayouts = inputMediaInfo[14];
 
     outputLocation = configurationList[0];
     outputContainer = configurationList[1];
@@ -61,11 +62,11 @@ void configure::setData(const int &selFile, QList<QStringList> inputMediaInfo, c
     outputAudioCodec = configurationList[14];
     audioEncMode = configurationList[15];
     audioEncBitrate = configurationList[16].toInt();
-    deinterlaceType = configurationList[18];
-    cthreshValue = configurationList[19].toInt();
-    outputFieldOrder = configurationList[20];
-    outputResize = configurationList[21];
-    outputAR = configurationList[22];
+    deinterlaceType = configurationList[19];
+    cthreshValue = configurationList[20].toInt();
+    outputFieldOrder = configurationList[21];
+    outputResize = configurationList[22];
+    outputAR = configurationList[23];
 
     if (configurationList[17].toInt() > 1)
     {
@@ -96,7 +97,7 @@ void configure::setData(const int &selFile, QList<QStringList> inputMediaInfo, c
     if (outputAudioSource != "Original Audio")
     {
         ui->externalAudio->setChecked(true);
-        getAltAudioCodecs(outputAudioSource);
+        getAltAudioInfo(outputAudioSource);
     }
     else
     {
@@ -118,10 +119,11 @@ void configure::setData(const int &selFile, QList<QStringList> inputMediaInfo, c
 
     ui->bitrateBox->setValue(videoEncBitrate);
     ui->bitrateBoxAudio->setValue(audioEncBitrate);
-    ui->maxMuxing->setValue(configurationList[23].toInt());
-    ui->faststart->setChecked(configurationList[24].toInt());
-    ui->disableBframes->setChecked(configurationList[25].toInt());
-    ui->experimentalFeatures->setChecked(configurationList[26].toInt());
+    ui->centerOnly->setChecked(configurationList[18].toInt());
+    ui->maxMuxing->setValue(configurationList[24].toInt());
+    ui->faststart->setChecked(configurationList[25].toInt());
+    ui->disableBframes->setChecked(configurationList[26].toInt());
+    ui->experimentalFeatures->setChecked(configurationList[27].toInt());
 }
 
 // SHOW OR HIDE OPTIONS
@@ -275,10 +277,17 @@ void configure::setAudioVisibility()
 {
     QString codec = ui->selectAudioCodec->currentText();
     QString stream = ui->selectAudioStream->currentText();
+    QStringList audioLayouts;
     bool audiocodec;
     bool bitrateoptions;
     bool audiocopy;
     bool encodeincompatible;
+    bool centeronly = false;
+
+    if (ui->externalAudio->isChecked())
+        audioLayouts.append(altAudioLayouts);
+    else
+        audioLayouts.append(inputAudioLayouts);
 
     if (codec == "ALAC" || codec == "FLAC" || codec == "PCM" || codec == "Copy" || stream == "None")
     {
@@ -307,6 +316,19 @@ void configure::setAudioVisibility()
         {
             encodeincompatible = false;
         }
+        if (stream == "All")
+        {
+            for (int i = 0; i < audioLayouts.count(); i++)
+            {
+                if (audioLayouts[i].contains("C"))
+                    centeronly = true;
+            }
+        }
+        else
+        {
+            if (stream != "")
+                centeronly = audioLayouts[stream.toInt()-1].contains("C");
+        }
 
     }
 
@@ -314,6 +336,7 @@ void configure::setAudioVisibility()
     {
         bitrateoptions = false;
         audiocodec = false;
+        centeronly = false;
     }
 
     ui->selectAudioCodec->setVisible(audiocodec);
@@ -324,6 +347,7 @@ void configure::setAudioVisibility()
     ui->labelAudioBitrate->setVisible(bitrateoptions);
     ui->copyAudio->setVisible(audiocopy);
     ui->encodeIncompatible->setVisible(encodeincompatible);
+    ui->centerOnly->setVisible(centeronly);
 
     if (selectedFile == -1)
     {
@@ -799,7 +823,7 @@ void configure::setAudioMode()
         ui->selectAudioMode->setCurrentIndex(0);
 }
 
-void configure::getAltAudioCodecs(QString newAudio)
+void configure::getAltAudioInfo(QString newAudio)
 {
     queue queue;
     QList<QStringList> newAudioInfo = queue.getInputDetails(newAudio);
@@ -808,6 +832,7 @@ void configure::getAltAudioCodecs(QString newAudio)
     {
         altAudioStreams = streamcount;
         altAudioCodecs = newAudioInfo[12];
+        altAudioLayouts = newAudioInfo[14];
         ui->externalAudioSource->setText(newAudio);
         setAudioStream();
     }
@@ -1041,9 +1066,13 @@ void configure::on_buttonBox_accepted()
     if (ui->selectCodec->currentText() == "x264" || ui->selectCodec->currentText() == "x265")
         bframes = ui->disableBframes->isChecked();
 
+    bool outputCenterOnly = false;
+    if (copyaudio != 1 && outputAudioStream != "None")
+        outputCenterOnly = ui->centerOnly->isChecked();
+
     QStringList configurationList = { outputLocation, outputContainer, QString::number(outputVideoStream), outputColorSpace, outputBitDepth, outputColorMatrix, QString::number(ui->convertHDR->isChecked()), outputVideoCodec,
                                       videoEncMode, videoEncPreset, videoEncTune, QString::number(videoEncBitrate), outputAudioSource, outputAudioStream, outputAudioCodec,
-                                    audioEncMode, QString::number(audioEncBitrate), QString::number(copyaudio), deinterlaceType, QString::number(cthreshValue), outputFieldOrder, outputResize, outputAR,
+                                    audioEncMode, QString::number(audioEncBitrate), QString::number(copyaudio), QString::number(outputCenterOnly), deinterlaceType, QString::number(cthreshValue), outputFieldOrder, outputResize, outputAR,
                                       QString::number(ui->maxMuxing->value()), QString::number(faststart), QString::number(bframes),QString::number(ui->experimentalFeatures->isChecked())};
 
     QString ifInterlaced = "";
@@ -1230,7 +1259,7 @@ void configure::on_browseAudio_clicked()
     if (newAudio != "")
     {
         newExtAudio = true;
-        getAltAudioCodecs(newAudio);
+        getAltAudioInfo(newAudio);
     }
     setAudioCodec();
     setAudioStream();

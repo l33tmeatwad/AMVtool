@@ -51,6 +51,8 @@ private:
     QStringList inputFPS;
     QStringList inputAudioStreamIDs;
     QStringList inputAudioCodecs;
+    QStringList inputAudioChannels;
+    QStringList inputAudioLayout;
 
 };
 

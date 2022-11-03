@@ -29,15 +29,16 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
     QString amode = configList[15];
     QString abitrate = configList[16];
     int acopy = configList[17].toInt();
-    QString deinterlace = configList[18];
-    int cthresh = configList[19].toInt();
-    QString fieldorder = configList[20];
-    QString resize = configList[21];
-    QString aspectratio = configList[22];
-    int MaxMuxing = configList[23].toInt();
-    bool FastStart = configList[24].toInt();
-    bool DisableBFrames = configList[25].toInt();
-    bool Experimental = configList[26].toInt();
+    bool centeronly = configList[18].toInt();
+    QString deinterlace = configList[19];
+    int cthresh = configList[20].toInt();
+    QString fieldorder = configList[21];
+    QString resize = configList[22];
+    QString aspectratio = configList[23];
+    int MaxMuxing = configList[24].toInt();
+    bool FastStart = configList[25].toInt();
+    bool DisableBFrames = configList[26].toInt();
+    bool Experimental = configList[27].toInt();
 
     QString inputVideoStreamID = inputMediaInfo[1][vstream];
     QString inputColorSpace = inputMediaInfo[6][vstream];
@@ -46,6 +47,8 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
     QString inputFPS = inputMediaInfo[10][vstream];
     QStringList inputAudioStreams = inputMediaInfo[11];
     QStringList inputAudioCodecs = inputMediaInfo[12];
+    QStringList inputAudioChannels = inputMediaInfo[13];
+    QStringList inputAudioLayout = inputMediaInfo[14];
 
     QStringList containerCompatibility;
     QStringList tilesThreads = getTilesAndThreads(inputHeight.toInt());
@@ -276,6 +279,10 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
                         else
                             ffmpegcommand.append({"-b:a", abitrate + "k" });
                     }
+                    if (audiocodec == "libopus" && inputAudioChannels[i].toInt() == 6 && inputAudioLayout[i].contains("Ls Rs") && !centeronly)
+                        ffmpegcommand.append({"-filter:a:" + QString::number(i-skipped),"pan=5.1|FL=FL|FC=FC|FR=FR|BL=SL|BR=SR|LFE=LFE"});
+                    if (audiocodec != "copy" && inputAudioChannels[i].toInt() > 2 && inputAudioLayout[i].contains("C") && centeronly)
+                        ffmpegcommand.append({"-filter:a:" + QString::number(i-skipped),"pan=mono|FC=FC"});
                 }
             }
         }
@@ -303,6 +310,10 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
                         ffmpegcommand.append({"-b:a", abitrate + "k" });
                     }
                 }
+                if (acodec == "libopus" && inputAudioChannels[astream.toInt()-1].toInt() == 6 && inputAudioLayout[astream.toInt()-1].contains("Ls Rs") && !centeronly)
+                    ffmpegcommand.append({"-filter:a","pan=5.1|FL=FL|FC=FC|FR=FR|BL=SL|BR=SR|LFE=LFE"});
+                if (acodec != "copy" && inputAudioChannels[astream.toInt()-1].toInt() > 2 && inputAudioLayout[astream.toInt()-1].contains("C") && centeronly)
+                    ffmpegcommand.append({"-filter:a","pan=mono|FC=FC"});
             }
         }
     }

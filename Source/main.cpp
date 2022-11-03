@@ -4,7 +4,7 @@
 QList<QStringList> mainQueueInfo;
 QList<QStringList> outputConfig;
 
-QStringList defaultConfiguration = { "Original File Location", "MP4", "0", "YUV420", "8","BT.709", "0", "x264", "Constant Rate Factor", "Medium", "Animation", "18", "Original Audio", "All", "AAC", "Quality", "5", "0", "None", "9", "Auto", "No", "No", "0", "0", "0", "0"};
+QStringList defaultConfiguration = { "Original File Location", "MP4", "0", "YUV420", "8","BT.709", "0", "x264", "Constant Rate Factor", "Medium", "Animation", "18", "Original Audio", "All", "AAC", "Quality", "5", "0", "0", "None", "9", "Auto", "No", "No", "0", "0", "0", "0"};
 bool RecontainerSettings = false;
 QString vspipeexec;
 

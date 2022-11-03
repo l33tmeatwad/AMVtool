@@ -55,7 +55,7 @@ QList<QStringList> queue::getInputDetails(QString mediafile)
     }
     else
     {
-        QList<QStringList> inputMediaInfo = { { "1", "1", "Real Media" }, {"0"}, {"8"}, {"HDR"}, {"Progressive"}, {"Real Video"}, {"YUV420"}, {"BT.709" }, {"1280"}, {"720"}, {"23.976"}, {"0"}, {"Real Audio"} };
+        QList<QStringList> inputMediaInfo = { { "1", "1", "Real Media" }, {"0"}, {"8"}, {"HDR"}, {"Progressive"}, {"Real Video"}, {"YUV420"}, {"BT.709" }, {"1280"}, {"720"}, {"23.976"}, {"0"}, {"Real Audio"}, {"6"}, {"L R C BL BR LFE"} };
         return inputMediaInfo;
     }
 

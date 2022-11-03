@@ -55,6 +55,8 @@ QList<QStringList> checkmedia::checkMedia(QString inputFile)
     inputFPS.clear();
     inputAudioStreamIDs.clear();
     inputAudioCodecs.clear();
+    inputAudioChannels.clear();
+    inputAudioLayout.clear();
 
     if (inputFile.right(3).toLower() == "vpy")
     {
@@ -254,6 +256,8 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
 
 
             QString audiocodec = QString::fromStdString(MI.Get(Stream_Audio, i, __T("Format"), Info_Text, Info_Name));
+            QString audiochannels = QString::fromStdString(MI.Get(Stream_Audio, i, __T("Channels"), Info_Text, Info_Name));
+            QString audiolayout = QString::fromStdString(MI.Get(Stream_Audio, i, __T("ChannelLayout"), Info_Text, Info_Name));
 
             if (audiocodec.contains("TrueHD / AC-3"))
             {
@@ -261,11 +265,15 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
                 inputAudioStreamIDs.append({QString::number(astream),QString::number(astream+1)});
                 inputAudioCodecs.append({"TrueHD","AC-3"});
                 inputAudioStreams = inputAudioStreams+1;
+                inputAudioChannels.append({audiochannels,audiochannels});
+                inputAudioLayout.append({audiolayout,audiolayout});
             }
             else
             {
                 inputAudioStreamIDs.append(audioID);
                 inputAudioCodecs.append(audiocodec);
+                inputAudioChannels.append(audiochannels);
+                inputAudioLayout.append(audiolayout);
             }
         }
 
@@ -277,7 +285,7 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
     MI.Close();
 
     inputMediaDetails.append({ QString::number(inputVideoStreams),QString::number(inputAudioStreams),inputContainer, QString::number(inputDuration) });
-    inputMediaInfo = { inputMediaDetails, inputVideoStreamIDs, inputVideoBitDepths, inputLumaRange, inputScanType, inputVideoCodecs, inputColorSpaces, inputColorMatrix, inputVideoWidth, inputVideoHeight, inputFPS, inputAudioStreamIDs, inputAudioCodecs };
+    inputMediaInfo = { inputMediaDetails, inputVideoStreamIDs, inputVideoBitDepths, inputLumaRange, inputScanType, inputVideoCodecs, inputColorSpaces, inputColorMatrix, inputVideoWidth, inputVideoHeight, inputFPS, inputAudioStreamIDs, inputAudioCodecs, inputAudioChannels, inputAudioLayout };
 
     return inputMediaInfo;
 }
@@ -327,7 +335,7 @@ void checkmedia::setVPYDetails()
         inputMediaDetails.append({ "0", "0", "Error", "0" });
     }
 
-    inputMediaInfo = { inputMediaDetails, {"0"}, inputVideoBitDepths, {"SDR"}, {"Progressive"}, inputVideoCodecs, inputColorSpaces, inputColorMatrix, inputVideoWidth, inputVideoHeight, inputFPS, {""}, inputAudioCodecs };
+    inputMediaInfo = { inputMediaDetails, {"0"}, inputVideoBitDepths, {"SDR"}, {"Progressive"}, inputVideoCodecs, inputColorSpaces, inputColorMatrix, inputVideoWidth, inputVideoHeight, inputFPS, {""}, inputAudioCodecs, {""}, {""} };
 
 }
 

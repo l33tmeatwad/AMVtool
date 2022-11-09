@@ -272,6 +272,7 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
             inputFPS.append(QString::fromStdWString(MI.Get(Stream_Video, i, __T("FrameRate"), Info_Text, Info_Name).c_str()));
         }
         int audioCount = inputAudioStreams;
+        int trueHDCount = 0;
         for (int i = 0; i < audioCount; i++)
         {
             QString audioID;
@@ -306,9 +307,10 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
 
             QString audiocodec = QString::fromStdWString(MI.Get(Stream_Audio, i, __T("Format"), Info_Text, Info_Name).c_str());
 
-            if (audiocodec.contains("TrueHD / AC-3"))
+            if (audiocodec.contains("MLP FBA") && inputContainer.contains("BDAV"))
             {
-                int astream = inputVideoStreams+i;
+                int astream = inputVideoStreams+i+trueHDCount;
+                trueHDCount = trueHDCount+1;
                 inputAudioStreamIDs.append({QString::number(astream),QString::number(astream+1)});
                 inputAudioCodecs.append({"TrueHD","AC-3"});
                 inputAudioStreams = inputAudioStreams+1;

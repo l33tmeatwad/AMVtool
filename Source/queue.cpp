@@ -20,8 +20,8 @@ QString queue::InputFiles(QString inputFile)
     if (inputMediaInfo[0][0].toInt() > 0)
     {
         QString ifInterlaced = "";
-        if (inputMediaInfo[4][0].contains("Interlaced"))
-            ifInterlaced = " Interlaced";
+        if (inputMediaInfo[4][0] != "")
+            ifInterlaced = " " + inputMediaInfo[4][0];
         QFile f(inputFile);
         QFileInfo fileInfo(f);
         QString filename(fileInfo.fileName());

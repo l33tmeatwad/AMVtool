@@ -81,7 +81,6 @@ void configure::setData(const int &selFile, QList<QStringList> inputMediaInfo, c
     setInterlaceVisibility(interlaceIndex);
 
     ui->cthresh->setValue(cthreshValue);
-    ui->fieldOrder->setCurrentIndex(ui->fieldOrder->findText(outputFieldOrder));
 
     if (outputResize != "No")
         ui->resizeVideo->setChecked(true);
@@ -889,11 +888,33 @@ void configure::setAudioBitrate()
 
 void configure::setInterlaceVisibility(int index)
 {
-    if (index == 0 || index == 2 || ui->selectCodec->currentText() == "Copy")
+    if (ui->fieldOrder->currentText() != "")
+        outputFieldOrder = ui->fieldOrder->currentText();
+    ui->fieldOrder->clear();
+    if (index == 4)
+    {
+        ui->labelFieldOrder->setText("with Frame Rate");
+        ui->fieldOrder->addItems({"From Source","23.976","24","25","29.97","30","47.952","48","59.94","60"});
+        ui->fieldOrder->setMinimumWidth(120);
+    }
+    else
+    {
+        ui->labelFieldOrder->setText("Field Order");
+        ui->fieldOrder->addItems({"Auto","Top","Bottom"});
+        ui->fieldOrder->setMinimumWidth(90);
+    }
+
+    int orderIndex = ui->fieldOrder->findText(outputFieldOrder);
+    if (orderIndex != -1)
+        ui->fieldOrder->setCurrentIndex(orderIndex);
+    else
+        ui->fieldOrder->setCurrentIndex(0);
+
+    if (index == 0 || index == 2 || index == 4 || ui->selectCodec->currentText() == "Copy")
     {
         ui->labelcthresh->setVisible(false);
         ui->cthresh->setVisible(false);
-        if (index == 2)
+        if (index == 2 || index == 4)
         {
             ui->labelFieldOrder->setVisible(true);
             ui->fieldOrder->setVisible(true);
@@ -917,7 +938,7 @@ void configure::setInterlaceVisibility(int index)
         ui->interlaceOptions->setVisible(true);
 }
 
-void configure::setResizeOptions ()
+void configure::setResizeOptions()
 {
     bool visible = false;
     if (!ui->resizeResolution->isChecked() && !ui->resizeWidth->isChecked() && !ui->resizeHeight->isChecked())
@@ -1047,7 +1068,6 @@ void configure::on_buttonBox_accepted()
     else
         if (outputVideoCodec == "Copy")
             deinterlaceType = "None";
-
     if (ui->resizeVideo->isChecked() && outputVideoCodec != "Copy")
         outputResize = ui->resizeVideoSel->currentText();
     else
@@ -1076,8 +1096,8 @@ void configure::on_buttonBox_accepted()
                                       QString::number(ui->maxMuxing->value()), QString::number(faststart), QString::number(bframes),QString::number(ui->experimentalFeatures->isChecked())};
 
     QString ifInterlaced = "";
-    if (inputScanType[ui->selectVideoStream->currentIndex()].contains("Interlaced"))
-            ifInterlaced = " Interlaced";
+    if (inputScanType[ui->selectVideoStream->currentIndex()] != "")
+            ifInterlaced = " " + inputScanType[ui->selectVideoStream->currentIndex()];
 
     QString inputBitDepth = "";
     if (inputVideoBitDepths[ui->selectVideoStream->currentIndex()] != "")
@@ -1325,7 +1345,4 @@ void configure::on_changeDAR_toggled(bool checked)
         outputAR = ui->changeDARSel->currentText();
     }
 }
-
-
-
 

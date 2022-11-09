@@ -90,6 +90,8 @@ void filesettings::recontainerSettings(QList<QStringList> inputMediaInfo, int vs
         if (containers.contains(outputConfig[queue][1]))
         {
             outputConfig[queue][7] = "Copy";
+            outputConfig[queue][19] = "None";
+            outputConfig[queue][22] = "No";
         }
     }
 }

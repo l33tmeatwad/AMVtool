@@ -238,6 +238,12 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
             else
                 ffmpegcommand.append({"-colorspace", colormatrix });
         }
+        if (deinterlace == "VFR to CFR")
+        {
+            if (fieldorder != "From Source")
+                inputFPS = fieldorder;
+            ffmpegcommand.append({"-vsync","1","-r",inputFPS});
+        }
     }
     else
     {
@@ -275,9 +281,9 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
                     if (audiocodec == "aac" || audiocodec == "libmp3lame" || audiocodec == "libopus")
                     {
                         if (amode == "Quality")
-                            ffmpegcommand.append({"-q:a", abitrate });
+                            ffmpegcommand.append({"-q:a:" + QString::number(i-skipped), abitrate });
                         else
-                            ffmpegcommand.append({"-b:a", abitrate + "k" });
+                            ffmpegcommand.append({"-b:a:" + QString::number(i-skipped), abitrate + "k" });
                     }
                     if (audiocodec == "libopus" && inputAudioChannels[i].toInt() == 6 && inputAudioLayout[i].contains("Ls Rs") && !centeronly)
                         ffmpegcommand.append({"-filter:a:" + QString::number(i-skipped),"pan=5.1|FL=FL|FC=FC|FR=FR|BL=SL|BR=SR|LFE=LFE"});
@@ -500,7 +506,7 @@ QString setupencode::SetupFilters(bool isHDR, bool convertHDR, QString inputcolo
     if (!isHDR)
         convertHDR = false;
     QString outputfilters = "";
-    if (deinterlace != "None")
+    if (deinterlace != "None" && deinterlace != "VFR to CFR")
     {
         if (deinterlace == "Deinterlace")
         {

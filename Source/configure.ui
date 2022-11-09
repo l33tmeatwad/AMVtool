@@ -912,7 +912,7 @@
        <x>260</x>
        <y>80</y>
        <width>151</width>
-       <height>71</height>
+       <height>76</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="ResizeStyle">
@@ -961,7 +961,7 @@
       </size>
      </property>
      <property name="title">
-      <string>Interlacing Removal</string>
+      <string>Interlacing and VFR Options</string>
      </property>
      <widget class="QWidget" name="gridLayoutWidget_2">
       <property name="geometry">
@@ -1046,6 +1046,11 @@
            <string>Both</string>
           </property>
          </item>
+         <item>
+          <property name="text">
+           <string>VFR to CFR</string>
+          </property>
+         </item>
         </widget>
        </item>
        <item row="0" column="7">
@@ -1075,21 +1080,6 @@
            <height>16777215</height>
           </size>
          </property>
-         <item>
-          <property name="text">
-           <string>Auto</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Top</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Bottom</string>
-          </property>
-         </item>
         </widget>
        </item>
       </layout>
@@ -1099,7 +1089,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>80</y>
+       <y>120</y>
        <width>241</width>
        <height>33</height>
       </rect>
@@ -1128,7 +1118,7 @@
         </property>
         <property name="maximumSize">
          <size>
-          <width>16777215</width>
+          <width>97</width>
           <height>16777215</height>
          </size>
         </property>
@@ -1165,7 +1155,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>120</y>
+       <y>80</y>
        <width>241</width>
        <height>33</height>
       </rect>

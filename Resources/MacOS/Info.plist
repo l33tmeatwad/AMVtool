@@ -11,7 +11,7 @@
 	<key>CFBundleName</key>
 	<string>AMVtool</string>
 	<key>NSHumanReadableCopyright</key>
-        <string>© 2022 l33tmeatwad</string>
+        <string>© 2023 l33tmeatwad</string>
 	<key>CFBundleIconFile</key>
 	<string>icon.icns</string>
 	<key>CFBundleExecutable</key>

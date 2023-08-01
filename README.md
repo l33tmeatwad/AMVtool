@@ -16,6 +16,6 @@ Configure vs Configure All
 Configure will allow you to configure the settings for the currently selected file in the queue.  Unlike Configure All, this option will allow you to select an alternate audio file to use when encoding and allow you to select which audio or video stream you want to use (if applicable).  Configure All will allow you to change the settings for all files in the queue and will also be the new default settings for any new files added to the queue until the program is restarted.
 
 
-Chagne Playback Aspect Ratio
+Change Playback Aspect Ratio
 
 This feature will change the playback aspect ratio for videos, however not all media players and editing software will honor the aspect ratio flag for x264 & x265 video streams that are copied instead of re-encoded. Most software will honor the aspect ratio flag for DNxHR & ProRes video streams that are copied.

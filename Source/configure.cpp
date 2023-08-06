@@ -95,8 +95,8 @@ void configure::setData(const int &selFile, QList<QStringList> inputMediaInfo, c
     setVideoStream();
     if (outputAudioSource != "Original Audio")
     {
-        ui->externalAudio->setChecked(true);
         getAltAudioInfo(outputAudioSource);
+        ui->externalAudio->setChecked(true);
     }
     else
     {
@@ -283,7 +283,7 @@ void configure::setAudioVisibility()
     bool encodeincompatible;
     bool centeronly = false;
 
-    if (ui->externalAudio->isChecked())
+    if (ui->externalAudio->isChecked() && ui->externalAudioSource->text() != "")
         audioLayouts.append(altAudioLayouts);
     else
         audioLayouts.append(inputAudioLayouts);

@@ -152,7 +152,7 @@ private:
     QStringList WEBM = { "VP8","VP9", "Opus","Vorbis"};
 
     QStringList FullResolutions = {"640x480", "854x480", "960x720", "1280x720", "1440x1080", "1920x1080", "2880x2160", "3840x2160", "5760x4320", "7680x4320"};
-    QStringList WidthResolutions = {"640", "854", "960", "1440", "1920", "2880", "3840", "5760", "7680"};
+    QStringList WidthResolutions = {"640", "854", "960", "720", "1440", "1920", "2880", "3840", "5760", "7680"};
     QStringList HeightResolutions = {"480", "720", "1080", "2160", "4320"};
 };
 

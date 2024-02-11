@@ -60,8 +60,8 @@ win32{
     LIBPATH += $$PWD/Resources/Windows
     LIBS +=  -lmediainfo -lavisynthwrapper
     RC_ICONS = Resources/Windows/icon.ico
-    VERSION = 1.2.0.2
+    VERSION = 1.2.0.3
     QMAKE_TARGET_PRODUCT = "AMVtool"
     QMAKE_TARGET_DESCRIPTION = "GUI for FFmpeg designed for AMV editors."
-    QMAKE_TARGET_COPYRIGHT = "\\251 2023 by l33tmeatwad"
+    QMAKE_TARGET_COPYRIGHT = "\\251 2024 by l33tmeatwad"
 }

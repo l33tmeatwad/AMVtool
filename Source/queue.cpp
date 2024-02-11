@@ -87,6 +87,8 @@ QList<QStringList> queue::checkInput(int position)
         inputMediaInfo[0][1] = audioDetails[0][1];
         inputMediaInfo[11] = audioDetails[11];
         inputMediaInfo[12] = audioDetails[12];
+		inputMediaInfo[13] = audioDetails[13];
+		inputMediaInfo[14] = audioDetails[14];
     }
 
     int vstreamcount = inputMediaInfo[0][0].toInt();

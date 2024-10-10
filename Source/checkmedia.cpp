@@ -92,7 +92,6 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
         for (int i = 0; i < inputVideoStreams; i++)
         {
             QString videoID;
-
             if (TSVOB.contains(inputContainer) || inputContainer == "AVI")
             {
                 videoID = QString::fromStdString(MI.Get(Stream_Video, i, __T("ID"), Info_Text, Info_Name));
@@ -113,11 +112,20 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
             }
 
 
-            QString lumaRange = QString::fromStdString(MI.Get(Stream_Video, i, __T("transfer_characteristics"), Info_Text, Info_Name));
-            if (lumaRange.contains("PQ") || lumaRange.contains("HLG"))
-                inputLumaRange.append("HDR");
+            QString hdrCompatibility = QString::fromStdString(MI.Get(Stream_Video, i, __T("HDR_Format_Compatibility"), Info_Text, Info_Name));
+            QString hdrProfile = QString::fromStdString(MI.Get(Stream_Video, i, __T("HDR_Format_Profile"), Info_Text, Info_Name));
+
+            if (hdrProfile.contains("dvhe.05"))
+            {
+                inputLumaRange.append("Dovi5");
+            }
             else
-                inputLumaRange.append("SDR");
+            {
+                if (hdrCompatibility.contains("HDR10") || hdrCompatibility.contains("HLG"))
+                    inputLumaRange.append("HDR");
+                else
+                    inputLumaRange.append("SDR");
+            }
 
             QString scanType = QString::fromStdString(MI.Get(Stream_Video, i, __T("ScanType"), Info_Text, Info_Name));
             if (scanType.contains("Interlaced"))

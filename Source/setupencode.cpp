@@ -29,7 +29,7 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
     QString amode = configList[15];
     QString abitrate = configList[16];
     int acopy = configList[17].toInt();
-    bool centeronly = configList[18].toInt();
+    QString modifymc = configList[18];
     QString deinterlace = configList[19];
     int cthresh = configList[20].toInt();
     QString fieldorder = configList[21];
@@ -285,10 +285,13 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
                         else
                             ffmpegcommand.append({"-b:a:" + QString::number(i-skipped), abitrate + "k" });
                     }
-                    if (audiocodec == "libopus" && inputAudioChannels[i].toInt() == 6 && inputAudioLayout[i].contains("Ls Rs") && !centeronly)
+                    if (audiocodec == "libopus" && inputAudioChannels[i].toInt() == 6 && inputAudioLayout[i].contains("Ls Rs") && modifymc == "No")
                         ffmpegcommand.append({"-filter:a:" + QString::number(i-skipped),"pan=5.1|FL=FL|FC=FC|FR=FR|BL=SL|BR=SR|LFE=LFE"});
-                    if (audiocodec != "copy" && inputAudioChannels[i].toInt() > 2 && inputAudioLayout[i].contains("C") && centeronly)
+                    if (audiocodec != "copy" && inputAudioChannels[i].toInt() > 2 && inputAudioLayout[i].contains("C") && modifymc == "Output Center Only")
                         ffmpegcommand.append({"-filter:a:" + QString::number(i-skipped),"pan=mono|FC=FC"});
+                    if (audiocodec != "copy" && inputAudioChannels[i].toInt() > 2 && modifymc == "Downmix to Stereo")
+                        ffmpegcommand.append({"-ac","2"});
+
                 }
             }
         }
@@ -316,10 +319,12 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
                         ffmpegcommand.append({"-b:a", abitrate + "k" });
                     }
                 }
-                if (acodec == "libopus" && inputAudioChannels[astream.toInt()-1].toInt() == 6 && inputAudioLayout[astream.toInt()-1].contains("Ls Rs") && !centeronly)
+                if (acodec == "libopus" && inputAudioChannels[astream.toInt()-1].toInt() == 6 && inputAudioLayout[astream.toInt()-1].contains("Ls Rs") && modifymc == "No")
                     ffmpegcommand.append({"-filter:a","pan=5.1|FL=FL|FC=FC|FR=FR|BL=SL|BR=SR|LFE=LFE"});
-                if (acodec != "copy" && inputAudioChannels[astream.toInt()-1].toInt() > 2 && inputAudioLayout[astream.toInt()-1].contains("C") && centeronly)
+                if (acodec != "copy" && inputAudioChannels[astream.toInt()-1].toInt() > 2 && inputAudioLayout[astream.toInt()-1].contains("C") && modifymc == "Output Center Only")
                     ffmpegcommand.append({"-filter:a","pan=mono|FC=FC"});
+                if (acodec != "copy" && inputAudioChannels[astream.toInt()-1].toInt() > 2 && modifymc == "Downmix to Stereo")
+                    ffmpegcommand.append({"-ac","2"});
             }
         }
     }

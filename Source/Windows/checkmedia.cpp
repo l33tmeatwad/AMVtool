@@ -180,11 +180,21 @@ QList<QStringList> checkmedia::getMediaInfo(QString inputFile)
                 }
             }
 
-            QString lumaRange = QString::fromStdWString(MI.Get(Stream_Video, i, __T("transfer_characteristics"), Info_Text, Info_Name).c_str());
-            if (lumaRange.contains("PQ") || lumaRange.contains("HLG"))
-                inputLumaRange.append("HDR");
+
+            QString hdrCompatibility = QString::fromStdWString(MI.Get(Stream_Video, i, __T("HDR_Format_Compatibility"), Info_Text, Info_Name).c_str());
+            QString hdrProfile = QString::fromStdWString(MI.Get(Stream_Video, i, __T("HDR_Format_Profile"), Info_Text, Info_Name).c_str());
+
+            if (hdrProfile.contains("dvhe.05"))
+            {
+                inputLumaRange.append("Dovi5");
+            }
             else
-                inputLumaRange.append("SDR");
+            {
+                if (hdrCompatibility.contains("HDR10") || hdrCompatibility.contains("HLG"))
+                    inputLumaRange.append("HDR");
+                else
+                    inputLumaRange.append("SDR");
+            }
 
             QString scanType = QString::fromStdWString(MI.Get(Stream_Video, i, __T("ScanType"), Info_Text, Info_Name).c_str());
             if (scanType.contains("Interlaced"))

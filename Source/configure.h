@@ -65,6 +65,8 @@ private slots:
 
     void on_changeDAR_toggled(bool checked);
 
+    void on_modifyMC_toggled();
+
 private:
     Ui::configure *ui;    
     filesettings fs;

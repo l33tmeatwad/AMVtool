@@ -107,13 +107,16 @@ void AMVtool::addFilesToQueue(QStringList inputFiles)
     {
         queue q;
         QString fileInfo = q.InputFiles(file);
-        if (fileInfo != "Error")
+        if (fileInfo == "Error")
         {
-            ui->fileList->addItem(fileInfo);
+            QMessageBox::information(this,"Error","There was an error processing the following file and it could not be loaded: " + file);
         }
         else
         {
-            QMessageBox::information(this,"Error","There was an error processing the following file and it could not be loaded: " + file);
+            if (fileInfo == "Dovi5")
+                QMessageBox::information(this,"Error","Dolby Vision Profile 5 is not supported so the following file could not be loaded: " + file);
+            else
+                ui->fileList->addItem(fileInfo);
         }
 
     }

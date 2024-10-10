@@ -118,11 +118,21 @@ void configure::setData(const int &selFile, QList<QStringList> inputMediaInfo, c
 
     ui->bitrateBox->setValue(videoEncBitrate);
     ui->bitrateBoxAudio->setValue(audioEncBitrate);
-    ui->centerOnly->setChecked(configurationList[18].toInt());
     ui->maxMuxing->setValue(configurationList[24].toInt());
     ui->faststart->setChecked(configurationList[25].toInt());
     ui->disableBframes->setChecked(configurationList[26].toInt());
     ui->experimentalFeatures->setChecked(configurationList[27].toInt());
+
+    if (configurationList[18] != "No")
+    {
+        ui->modifyMC->setChecked(true);
+        int index = ui->modifyMCsel->findText(configurationList[18]);
+        if(index != -1) { ui->modifyMCsel->setCurrentIndex(index); }
+        else { ui->modifyMCsel->setCurrentIndex(0); }
+    }
+    else
+        ui->modifyMC->setChecked(false);
+
 }
 
 // SHOW OR HIDE OPTIONS
@@ -281,7 +291,7 @@ void configure::setAudioVisibility()
     bool bitrateoptions;
     bool audiocopy;
     bool encodeincompatible;
-    bool centeronly = false;
+    bool modmultichannel = false;
 
     if (ui->externalAudio->isChecked() && ui->externalAudioSource->text() != "")
         audioLayouts.append(altAudioLayouts);
@@ -320,13 +330,13 @@ void configure::setAudioVisibility()
             for (int i = 0; i < audioLayouts.count(); i++)
             {
                 if (audioLayouts[i].contains("C"))
-                    centeronly = true;
+                    modmultichannel = true;
             }
         }
         else
         {
             if (stream != "")
-                centeronly = audioLayouts[stream.toInt()-1].contains("C");
+                modmultichannel = audioLayouts[stream.toInt()-1].contains("C");
         }
 
     }
@@ -335,7 +345,7 @@ void configure::setAudioVisibility()
     {
         bitrateoptions = false;
         audiocodec = false;
-        centeronly = false;
+        modmultichannel = false;
     }
 
     ui->selectAudioCodec->setVisible(audiocodec);
@@ -346,7 +356,11 @@ void configure::setAudioVisibility()
     ui->labelAudioBitrate->setVisible(bitrateoptions);
     ui->copyAudio->setVisible(audiocopy);
     ui->encodeIncompatible->setVisible(encodeincompatible);
-    ui->centerOnly->setVisible(centeronly);
+    ui->modifyMC->setVisible(modmultichannel);
+    if (ui->modifyMC->isChecked() && modmultichannel != false)
+        ui->modifyMCsel->setVisible(true);
+    else
+        ui->modifyMCsel->setVisible(false);
 
     if (selectedFile == -1)
     {
@@ -1086,13 +1100,13 @@ void configure::on_buttonBox_accepted()
     if (ui->selectCodec->currentText() == "x264" || ui->selectCodec->currentText() == "x265")
         bframes = ui->disableBframes->isChecked();
 
-    bool outputCenterOnly = false;
-    if (copyaudio != 1 && outputAudioStream != "None")
-        outputCenterOnly = ui->centerOnly->isChecked();
+    QString modifyMultiChannel  = "No";
+    if (copyaudio != 1 && outputAudioStream != "None" && ui->modifyMC->isChecked())
+        modifyMultiChannel = ui->modifyMCsel->currentText();
 
     QStringList configurationList = { outputLocation, outputContainer, QString::number(outputVideoStream), outputColorSpace, outputBitDepth, outputColorMatrix, QString::number(ui->convertHDR->isChecked()), outputVideoCodec,
                                       videoEncMode, videoEncPreset, videoEncTune, QString::number(videoEncBitrate), outputAudioSource, outputAudioStream, outputAudioCodec,
-                                    audioEncMode, QString::number(audioEncBitrate), QString::number(copyaudio), QString::number(outputCenterOnly), deinterlaceType, QString::number(cthreshValue), outputFieldOrder, outputResize, outputAR,
+                                    audioEncMode, QString::number(audioEncBitrate), QString::number(copyaudio), modifyMultiChannel, deinterlaceType, QString::number(cthreshValue), outputFieldOrder, outputResize, outputAR,
                                       QString::number(ui->maxMuxing->value()), QString::number(faststart), QString::number(bframes),QString::number(ui->experimentalFeatures->isChecked())};
 
     QString ifInterlaced = "";
@@ -1346,3 +1360,7 @@ void configure::on_changeDAR_toggled(bool checked)
     }
 }
 
+void configure::on_modifyMC_toggled()
+{
+    setAudioVisibility();
+}

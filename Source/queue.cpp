@@ -17,7 +17,10 @@ QString queue::InputFiles(QString inputFile)
     }
     inputMediaInfo = cm.checkMedia(inputFile);
 
-    if (inputMediaInfo[0][0].toInt() > 0)
+    if (inputMediaInfo[3][0] == "Dovi5")
+        openedFileInfo = "Dovi5";
+
+    if (inputMediaInfo[0][0].toInt() > 0 && inputMediaInfo[3][0] != "Dovi5")
     {
         QString ifInterlaced = "";
         if (inputMediaInfo[4][0] != "")

@@ -566,10 +566,17 @@
        <x>10</x>
        <y>200</y>
        <width>401</width>
-       <height>41</height>
+       <height>53</height>
       </rect>
      </property>
      <layout class="QGridLayout" name="externalAudioLayout">
+      <item row="0" column="1">
+       <widget class="QPushButton" name="browseAudio">
+        <property name="text">
+         <string>Browse</string>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="0">
        <widget class="QLineEdit" name="externalAudioSource">
         <property name="minimumSize">
@@ -580,13 +587,6 @@
         </property>
         <property name="readOnly">
          <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QPushButton" name="browseAudio">
-        <property name="text">
-         <string>Browse</string>
         </property>
        </widget>
       </item>
@@ -888,15 +888,29 @@
        <x>10</x>
        <y>130</y>
        <width>401</width>
-       <height>31</height>
+       <height>33</height>
       </rect>
      </property>
-     <layout class="QHBoxLayout" name="CenterOnlyLayout">
+     <layout class="QHBoxLayout" name="ModifyMultiChannel">
       <item>
-       <widget class="QCheckBox" name="centerOnly">
+       <widget class="QCheckBox" name="modifyMC">
         <property name="text">
-         <string>Only Output Center Channel</string>
+         <string>Modify Multi-Channel Audio</string>
         </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="modifyMCsel">
+        <item>
+         <property name="text">
+          <string>Output Center Only</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Downmix to Stereo</string>
+         </property>
+        </item>
        </widget>
       </item>
      </layout>

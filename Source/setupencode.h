@@ -38,7 +38,7 @@ private:
     QString outputfile;
     filesettings fs;
 
-    QStringList WidthResolutions = {"640", "854", "960", "1440", "1920", "2880", "3840", "5760", "7680"};
+    QStringList WidthResolutions = {"640", "854", "960", "1280", "1440", "1920", "2880", "3840", "5760", "7680"};
     QStringList HeightResolutions = {"480", "720", "1080", "2160", "4320"};
 };
 

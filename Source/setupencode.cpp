@@ -247,6 +247,7 @@ QStringList setupencode::SetupEncode(int queue, QStringList fileInfo, QList<QStr
     }
     else
     {
+        ffmpegcommand.append({"-r",inputFPS});
         if (aspectratio != "No")
             ffmpegcommand.append({"-aspect",aspectratio.replace(":","/").replace("/1","")});
     }
